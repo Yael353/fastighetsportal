@@ -1,7 +1,11 @@
 import React from "react";
+import Login from "./login/page";
+import Overview from "./overview/page";
 
-function page() {
-  return <div>test</div>;
+export default function page() {
+  return (
+    <div>
+      <h1>Home</h1>
+    </div>
+  );
 }
-
-export default page;
