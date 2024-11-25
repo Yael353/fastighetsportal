@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import LoginComp from "@/components/login/LoginComp";
+import LoginComp from "@/components/login/loginComp";
 
 export default function Login() {
   return (
@@ -8,9 +8,6 @@ export default function Login() {
       <h1>Loginpage</h1>
 
       <LoginComp />
-      <Link href="./overview">
-        <button>Go to overview</button>
-      </Link>
     </div>
   );
 }
