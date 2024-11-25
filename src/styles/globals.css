@@ -1,0 +1,10 @@
+/* Global Tailwind CSS imports */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom global styles */
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+}

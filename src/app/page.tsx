@@ -1,11 +1,21 @@
-import React from "react";
-import Login from "./login/page";
-import Overview from "./overview/page";
+import Image from 'next/image'
+import { LoginForm } from '@/app/components/login-form';
 
-export default function page() {
+
+export default function Home() {
   return (
-    <div>
-      <h1>Home</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <div className="mb-8">
+        <Image
+          src="/images/tornet.jpg"
+          alt="Tornet Logga"
+          width={200}
+          height={100}
+          priority
+        />
+      </div>
+      <LoginForm />
     </div>
-  );
+  )
 }
+
