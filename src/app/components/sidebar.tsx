@@ -1,12 +1,12 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import { useDispatch } from 'react-redux'
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { logout } from '@/lib/slices/authSlice'
-import { AppDispatch } from '@/lib/store'
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { logout } from "@/features/slices/authSlice";
+import { AppDispatch } from "@/features/store/store";
 import {
   Sidebar,
   SidebarContent,
@@ -15,24 +15,24 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 const sidebarItems = [
-  { name: 'Översikt', href: '/dashboard' },
-  { name: 'Fastigheter', href: '/dashboard/properties' },
-  { name: 'Rapporter', href: '/dashboard/reports' },
-  { name: 'Inställningar', href: '/dashboard/settings' },
-]
+  { name: "Översikt", href: "/dashboard" },
+  { name: "Fastigheter", href: "/dashboard/properties" },
+  { name: "Rapporter", href: "/dashboard/reports" },
+  { name: "Inställningar", href: "/dashboard/settings" },
+];
 
 export function AppSidebar() {
-  const pathname = usePathname()
-  const router = useRouter()
-  const dispatch = useDispatch<AppDispatch>()
+  const pathname = usePathname();
+  const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
 
   const handleLogout = () => {
-    dispatch(logout())
-    router.push('/')
-  }
+    dispatch(logout());
+    router.push("/");
+  };
 
   return (
     <Sidebar>
@@ -59,6 +59,5 @@ export function AppSidebar() {
       </div>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }
-
