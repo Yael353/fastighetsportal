@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { AuthAccount, AuthCredentials, AuthResponse } from "../models/auth"; // Importera AuthResponse
-import { RESPONSE_403, RESPONSE_404 } from "../errors/errors";
-import { authFetch } from "@/utils/fetch";
+import { AppDispatch, RootState } from "../store/store";
 
 interface AuthState {
   isLoggedIn: boolean;
@@ -23,30 +22,34 @@ const initialState: AuthState = {
   isOnboardingDone: null,
 };
 
-export const fetchUserFromToken = createAsyncThunk(
-  "auth/fetchUserFromToken",
-  async (credentials: AuthCredentials): Promise<AuthResponse> => {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-    try {
-      const response = await authFetch(`${apiUrl}/v1/auth`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(credentials),
-      });
+export const fetchUserFromToken = createAsyncThunk<
+  AuthResponse, // Return typ
+  AuthCredentials, // Typ för inparametrar
+  { state: RootState; dispatch: AppDispatch } // Extra argument
+>("auth/fetchUserFromToken", async (credentials) => {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-      if (response.status === 404) {
-        throw new RESPONSE_404("Fel uppgifter, prova igen");
-      } else if (response.status === 403) {
-        throw new RESPONSE_403("Fel uppgifter, prova igen");
-      }
+  try {
+    // Använd ett vanligt fetch-anrop för inloggning
+    const response = await fetch(`${apiUrl}/v1/auth`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(credentials),
+    });
 
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      throw error;
+    if (!response.ok) {
+      throw new Error("Login failed");
     }
+
+    const data: AuthResponse = await response.json();
+
+    // Returnera inloggningsdata (inkl. token)
+    console.log(data);
+    return data;
+  } catch (error) {
+    throw error;
   }
-);
+});
 
 const authSlice = createSlice({
   name: "auth",
@@ -86,6 +89,7 @@ const authSlice = createSlice({
           state.token = action.payload.accessToken;
         }
       )
+
       .addCase(
         fetchUserFromToken.rejected,
         (state, action: PayloadAction<any>) => {

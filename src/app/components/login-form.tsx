@@ -17,6 +17,7 @@ import {
 import { fetchUserFromToken } from "@/features/slices/authSlice"; // Importera fetchUserFromToken
 import { AppDispatch } from "@/features/store/store";
 import { User, Lock } from "lucide-react";
+import { AuthCredentials } from "@/features/models/auth";
 
 export function LoginForm() {
   const [username, setUsername] = useState("");
@@ -27,18 +28,18 @@ export function LoginForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const credentials = { user: username, password };
+    const credentials: AuthCredentials = {
+      user: username,
+      password,
+    };
 
-    // Skicka användarens inloggningsuppgifter till Redux
     dispatch(fetchUserFromToken(credentials))
-      .unwrap() // Detta hanterar lyckad/failed response direkt
-      .then((response) => {
-        // Om inloggningen lyckades, omdirigera till dashboard
+      .unwrap()
+      .then(() => {
         router.push("/dashboard");
       })
       .catch((error) => {
         console.error("Inloggning misslyckades: ", error);
-        // Hantera fel här, exempelvis visa ett felmeddelande
       });
   };
 

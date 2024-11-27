@@ -5,9 +5,10 @@ import propertyReducer from "../slices/propertySlice";
 export const store = configureStore({
   reducer: {
     auth: authReducer,
-    property: propertyReducer,
+    property: propertyReducer, 
   },
 });
+
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
