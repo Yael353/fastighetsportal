@@ -1,23 +1,16 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { AuthCredentials, AuthResponse } from "../models/auth"; // Importera AuthResponse
+import { AuthAccount, AuthCredentials, AuthResponse } from "../models/auth"; // Importera AuthResponse
 import { RESPONSE_403, RESPONSE_404 } from "../errors/errors";
+import { authFetch } from "@/utils/fetch";
 
 interface AuthState {
   isLoggedIn: boolean;
-  account: {
-    accountId: string;
-    name: string;
-    description: string;
-    contact: string;
-    userType: string;
-    orgId: string;
-    orgName: string;
-    isNew: boolean;
-    tags: string[];
-  } | null;
+  account: AuthAccount | null;
   token: string | null;
   loading: boolean;
   error: string | null;
+  hasInitiatedLocalAccount: boolean;
+  isOnboardingDone: boolean | null;
 }
 
 const initialState: AuthState = {
@@ -26,16 +19,16 @@ const initialState: AuthState = {
   token: null,
   loading: false,
   error: null,
+  hasInitiatedLocalAccount: false,
+  isOnboardingDone: null,
 };
 
-// AsyncThunk för att autentisera användaren med inloggningsuppgifter
 export const fetchUserFromToken = createAsyncThunk(
   "auth/fetchUserFromToken",
   async (credentials: AuthCredentials): Promise<AuthResponse> => {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     try {
-      const response = await fetch(`${apiUrl}/v1/auth`, {
-        // API URL här
+      const response = await authFetch(`${apiUrl}/v1/auth`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
@@ -48,7 +41,7 @@ export const fetchUserFromToken = createAsyncThunk(
       }
 
       const data = await response.json();
-      return data; // Returnerar AuthResponse med account och accessToken
+      return data;
     } catch (error) {
       throw error;
     }
@@ -60,15 +53,22 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     login: (state, action: PayloadAction<AuthResponse>) => {
-      // Här sparas användarens information och token
       state.isLoggedIn = true;
       state.account = action.payload.account;
       state.token = action.payload.accessToken;
     },
-    logout(state) {
+    logout: (state) => {
       state.isLoggedIn = false;
       state.account = null;
       state.token = null;
+      state.hasInitiatedLocalAccount = false;
+      state.isOnboardingDone = null;
+    },
+    setOnboardingDone: (state, action: PayloadAction<boolean>) => {
+      state.isOnboardingDone = action.payload;
+    },
+    setLocalAccountInitiated: (state, action: PayloadAction<boolean>) => {
+      state.hasInitiatedLocalAccount = action.payload;
     },
   },
   extraReducers: (builder) => {

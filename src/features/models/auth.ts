@@ -23,6 +23,6 @@ export type AuthAccount = {
 };
 
 export type AuthResponse = {
-  account: AuthAccount; // Användarens konto information
-  accessToken: string; // Tillgångstoken för autentisering
+  account: AuthAccount; 
+  accessToken: string; 
 };
