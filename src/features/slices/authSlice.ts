@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { AuthAccount, AuthCredentials, AuthResponse } from "../models/auth"; // Importera AuthResponse
+import { AuthAccount, AuthCredentials, AuthResponse } from "../models/auth";
 import { AppDispatch, RootState } from "../store/store";
 
 interface AuthState {
@@ -23,14 +23,13 @@ const initialState: AuthState = {
 };
 
 export const fetchUserFromToken = createAsyncThunk<
-  AuthResponse, // Return typ
-  AuthCredentials, // Typ för inparametrar
-  { state: RootState; dispatch: AppDispatch } // Extra argument
+  AuthResponse,
+  AuthCredentials,
+  { state: RootState; dispatch: AppDispatch }
 >("auth/fetchUserFromToken", async (credentials) => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   try {
-    // Använd ett vanligt fetch-anrop för inloggning
     const response = await fetch(`${apiUrl}/v1/auth`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -43,7 +42,6 @@ export const fetchUserFromToken = createAsyncThunk<
 
     const data: AuthResponse = await response.json();
 
-    // Returnera inloggningsdata (inkl. token)
     console.log(data);
     return data;
   } catch (error) {

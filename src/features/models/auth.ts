@@ -6,8 +6,8 @@ export enum UserType {
 }
 
 export type AuthCredentials = {
-  user: string; // Användarnamn
-  password: string; // Lösenord
+  user: string;
+  password: string;
 };
 
 export type AuthAccount = {
@@ -20,9 +20,10 @@ export type AuthAccount = {
   orgName: string;
   isNew: boolean;
   tags: string[];
+  expiresAt: number;
 };
 
 export type AuthResponse = {
-  account: AuthAccount; 
-  accessToken: string; 
+  account: AuthAccount;
+  accessToken: string;
 };
