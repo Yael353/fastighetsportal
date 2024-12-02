@@ -23,7 +23,7 @@ export const fetchBuildings = createAsyncThunk<
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   try {
     const response = await authFetch(
-      `${apiUrl}/open/v1/sensor_domains/${id}/buildings`,
+      `${apiUrl}/open/v1/sensor_domains?offset=0&limit=10`,
       {
         method: "GET",
         headers: {
