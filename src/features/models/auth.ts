@@ -4,10 +4,25 @@ export enum UserType {
   PartnerReader = "PARTNER_READER",
   ValaDS = "VALA_DS",
 }
+export type AccessTokenData = {
+  accessToken: string;
+  expiresAt: number;
+};
 
 export type AuthCredentials = {
   user: string;
   password: string;
+};
+
+export type AuthContentData = {
+  account: AuthAccount | null;
+  jwtData: AccessTokenData | null;
+  isLoggedIn: boolean;
+  hasInitiatedLocalAccount: boolean;
+  isOnboardingDone: boolean | null;
+  login: (credentials: AuthCredentials) => Promise<AuthResponse>;
+  changePassword: (newPassword: string) => Promise<void>;
+  logout: () => Promise<void>;
 };
 
 export type AuthAccount = {
