@@ -36,8 +36,8 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader>
-        <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
+      <SidebarHeader className=" pt-0 px-0">
+        <h2 className=" w-full px-4 py-1 text-lg font-semibold tracking-tight bg-slate-200">
           Tornets Portal
         </h2>
       </SidebarHeader>
@@ -46,7 +46,7 @@ export function AppSidebar() {
           {sidebarItems.map((item) => (
             <SidebarMenuItem key={item.name}>
               <SidebarMenuButton asChild isActive={pathname === item.href}>
-                <Link href={item.href}>{item.name}</Link>
+                <Link className="hover:bg-slate-400" href={item.href}>{item.name}</Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}

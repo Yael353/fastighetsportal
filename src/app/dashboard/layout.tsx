@@ -8,7 +8,7 @@ export default function DashboardLayout({
 }) {
   return (
     <SidebarProvider>
-      <div className="flex h-screen">
+      <div className="w-full min-h-screen flex">
         <AppSidebar />
         <SidebarInset>
           <main className="flex-1 p-6 overflow-auto">
