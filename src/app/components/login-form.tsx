@@ -35,7 +35,12 @@ export function LoginForm() {
 
     dispatch(fetchUserFromToken(credentials))
       .unwrap()
-      .then(() => {
+      .then((response) => {
+        // När inloggningen lyckas, spara access token i localStorage
+        const accessToken = response.accessToken; // Förutsätt att accessToken är i svaret
+        localStorage.setItem("accessToken", accessToken);
+
+        // Navigera till dashboard efter inloggning
         router.push("/dashboard");
       })
       .catch((error) => {
