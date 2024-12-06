@@ -14,7 +14,7 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-import { fetchUserFromToken } from "@/features/slices/authSlice"; // Importera fetchUserFromToken
+import { authenticateUser } from "@/features/slices/authSlice"; // Importera fetchUserFromToken
 import { AppDispatch } from "@/features/store/store";
 import { User, Lock } from "lucide-react";
 import { AuthCredentials } from "@/features/models/auth";
@@ -33,11 +33,11 @@ export function LoginForm() {
       password,
     };
 
-    dispatch(fetchUserFromToken(credentials))
+    dispatch(authenticateUser(credentials))
       .unwrap()
       .then((response) => {
         // När inloggningen lyckas, spara access token i localStorage
-        const accessToken = response.accessToken; // Förutsätt att accessToken är i svaret
+        const accessToken = response.access_token; // Förutsätt att accessToken är i svaret
         localStorage.setItem("accessToken", accessToken);
 
         // Navigera till dashboard efter inloggning

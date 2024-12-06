@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchSensorDomains } from "@/features/slices/overviewSlice";
-import { RootState, AppDispatch } from "@/features/store/store"; // Importera AppDispatch
+import { getList } from "@/features/slices/overviewSlice";
+import { RootState, AppDispatch } from "@/features/store/store";
 import {
   Table,
   TableBody,
@@ -15,50 +15,47 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { SensorDomain } from "@/features/models/sensor-data";
+import { AuthContentData } from "@/features/models/auth";
+
+interface PropertyListProps {
+  auth: AuthContentData;
+}
 
 export function PropertyList() {
   const [currentPage, setCurrentPage] = useState(1);
   const sensorDomainsPerPage = 10;
-  const dispatch = useDispatch<AppDispatch>(); // Typa dispatch med AppDispatch
+  const dispatch = useDispatch<AppDispatch>();
 
-  const token = useSelector((state: RootState) => state.auth.token);
-  console.log("Token from Redux store:", token);
-
-  // Hämta sensor-domäner från Redux store
   const { sensorDomains, loading, error } = useSelector(
     (state: RootState) => state.overview
   );
 
-  console.log("sensorDomains från store:", sensorDomains); // Logga sensorDomains från store
+  // Hämta sensor-domäner vid sidladdning eller sidbyte
+  // useEffect(() => {
+  //   if (!sensorDomains) {
+  //     // Kontrollera att auth är tillgänglig och har giltiga data
+  //     if (!auth || !auth.jwtData || !auth.jwtData.accessToken) {
+  //       console.error("Ingen giltig autentisering tillgänglig.");
+  //       return;
+  //     }
 
-  useEffect(() => {
-    // Ladda sensor-domäner vid komponentens uppstart
-    if (!sensorDomains) {
-      console.log("Dispatchar fetchSensorDomains...");
-      dispatch(
-        fetchSensorDomains({
-          offset: (currentPage - 1) * sensorDomainsPerPage,
-          limit: sensorDomainsPerPage,
-        })
-      );
-    }
-  }, [currentPage, dispatch, sensorDomains]);
+  //     dispatch(
+  //       getList({
+  //         offset: (currentPage - 1) * sensorDomainsPerPage,
+  //         limit: sensorDomainsPerPage,
+  //         auth,
+  //       })
+  //     );
+  //   }
+  // }, [currentPage, dispatch, sensorDomains, auth]);
 
-  const indexOfLastDomain = currentPage * sensorDomainsPerPage;
-  const indexOfFirstDomain = indexOfLastDomain - sensorDomainsPerPage;
+  // Kontrollera att sensorDomains alltid är en array
+  const sensorDomainsArray = Array.isArray(sensorDomains) ? sensorDomains : [];
 
-  // Kontrollera om sensorDomains är en array innan slice
-  const currentSensorDomains = Array.isArray(sensorDomains)
-    ? sensorDomains.slice(indexOfFirstDomain, indexOfLastDomain)
-    : []; // Om det inte är en array, returnera en tom array
-
-  console.log("currentSensorDomains:", currentSensorDomains); // Logga aktuella sensor-domäner
-
-  const totalPages = sensorDomains
-    ? Math.ceil(sensorDomains.length / sensorDomainsPerPage)
+  const totalPages = sensorDomainsArray.length
+    ? Math.ceil(sensorDomainsArray.length / sensorDomainsPerPage)
     : 1;
-
-  console.log("totalPages:", totalPages); // Logga totalt antal sidor
 
   const nextPage = () => {
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
@@ -68,13 +65,47 @@ export function PropertyList() {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
 
+  // Dela upp sensorDomainsArray baserat på sidnummer
+  const currentSensorDomains = sensorDomainsArray.slice(
+    (currentPage - 1) * sensorDomainsPerPage,
+    currentPage * sensorDomainsPerPage
+  );
+
+  // Rendera när datan laddas
   if (loading) {
     return <div>Laddar...</div>;
   }
 
   if (error) {
-    console.error("Error:", error); // Logga fel om det finns något
     return <div>Fel: {error}</div>;
+  }
+
+  // Rendera tom lista om inga sensor-domäner finns
+  if (currentSensorDomains.length === 0) {
+    return (
+      <div className="w-full flex flex-col">
+        <div className="w-full overflow-x-auto">
+          <Table>
+            <TableCaption>En lista över sensor-domäner</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Namn</TableHead>
+                <TableHead>Plats</TableHead>
+                <TableHead>Antal sensorer</TableHead>
+                <TableHead>Harvester ID</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell colSpan={4} className="text-center">
+                  Inga sensor-domäner tillgängliga
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -84,29 +115,23 @@ export function PropertyList() {
           <TableCaption>En lista över sensor-domäner</TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-1/4">Namn</TableHead>
-              <TableHead className="w-1/4">Plats</TableHead>
-              <TableHead className="w-1/4">Information</TableHead>
-              <TableHead className="w-1/4">Antal Sensorn</TableHead>
+              <TableHead>Namn</TableHead>
+              <TableHead>Plats</TableHead>
+              <TableHead>Antal sensorer</TableHead>
+              <TableHead>Harvester ID</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentSensorDomains.length > 0 ? (
-              currentSensorDomains.map((domain) => (
-                <TableRow key={domain.id}>
-                  <TableCell>{domain.name}</TableCell>
-                  <TableCell>{`${domain.location.latitude}, ${domain.location.longitude}`}</TableCell>
-                  <TableCell>{domain.info}</TableCell>
-                  <TableCell>{domain.sensors.length}</TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={4} className="text-center">
-                  Inga sensor-domäner tillgängliga
+            {currentSensorDomains.map((domain: SensorDomain) => (
+              <TableRow key={domain.id}>
+                <TableCell>{domain.name}</TableCell>
+                <TableCell>
+                  {domain.location.latitude}, {domain.location.longitude}
                 </TableCell>
+                <TableCell>{domain.sensors.length}</TableCell>
+                <TableCell>{domain.harvester?.id || "Ingen"}</TableCell>
               </TableRow>
-            )}
+            ))}
           </TableBody>
         </Table>
       </div>

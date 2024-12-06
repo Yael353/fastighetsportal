@@ -1,6 +1,8 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { AuthAccount, AuthCredentials, AuthResponse } from "../models/auth";
 import { AppDispatch, RootState } from "../store/store";
+import { usePathname, useRouter } from "next/navigation";
+import { Router } from "next/router";
 
 interface AuthState {
   isLoggedIn: boolean;
@@ -9,7 +11,6 @@ interface AuthState {
   loading: boolean;
   error: string | null;
   hasInitiatedLocalAccount: boolean;
-  isOnboardingDone: boolean | null;
 }
 
 const initialState: AuthState = {
@@ -19,34 +20,39 @@ const initialState: AuthState = {
   loading: false,
   error: null,
   hasInitiatedLocalAccount: false,
-  isOnboardingDone: null,
 };
 
-export const fetchUserFromToken = createAsyncThunk<
+// AsyncThunk för att hämta autentisering från servern.
+export const authenticateUser = createAsyncThunk<
   AuthResponse,
   AuthCredentials,
   { state: RootState; dispatch: AppDispatch }
->("auth/fetchUserFromToken", async (credentials, { rejectWithValue }) => {
+>("auth/authenticateUser", async (credentials, { rejectWithValue }) => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   try {
-    console.log("Attempting to fetch user with credentials:", credentials);
+    console.log("Skickar autentiseringsbegäran till API: ", credentials);
     const response = await fetch(`${apiUrl}/v1/auth`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials),
     });
 
+    console.log("Auth-anrop statuskod:", response.status);
+
     if (!response.ok) {
-      console.error("API response not OK. Status:", response.status);
-      throw new Error("Login failed");
+      throw new Error(`Authentication failed with status: ${response.status}`);
     }
 
     const data: AuthResponse = await response.json();
-    console.log("Fetch succeeded. Data:", data);
-    return data;
+    console.log("Svar från auth-anropet: ", data);
+
+    return {
+      ...data,
+      access_token: data.access_token, // Mappa om här
+    };
   } catch (error: any) {
-    console.error("Fetch failed:", error.message);
+    console.error("Fel under autentisering:", error.message);
     return rejectWithValue(error.message);
   }
 });
@@ -56,63 +62,87 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     login: (state, action: PayloadAction<AuthResponse>) => {
-      console.log("Login reducer triggered with payload:", action.payload);
+      console.log("Login reducer payload:", action.payload);
+
       state.isLoggedIn = true;
       state.account = action.payload.account;
-      state.token = action.payload.accessToken;
+      state.token = action.payload.access_token;
 
       if (typeof window !== "undefined") {
-        localStorage.setItem("accessToken", action.payload.accessToken);
-        console.log("Token saved to localStorage:", action.payload.accessToken);
+        console.log("Vet inte vad jag kollar här", action.payload.access_token);
+        localStorage.setItem(
+          "accessToken",
+          action.payload.access_token || "null"
+        );
+        console.log("inte här heller", action.payload.access_token);
+        localStorage.setItem("account", JSON.stringify(action.payload.account));
       }
     },
+
     logout: (state) => {
-      console.log("Logout reducer triggered");
+      console.log("Kör logout-reducer. Rensar state och localStorage.");
       state.isLoggedIn = false;
       state.account = null;
       state.token = null;
       state.hasInitiatedLocalAccount = false;
-      state.isOnboardingDone = null;
+      localStorage.removeItem("accessToken");
+
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("account");
+        localStorage.setItem("logout", Date.now().toString()); // Lägg till en synkroniseringssignal
+        window.location.href = "/"; // Omdirigera användaren
+      }
     },
-    setOnboardingDone: (state, action: PayloadAction<boolean>) => {
-      console.log("setOnboardingDone triggered with payload:", action.payload);
-      state.isOnboardingDone = action.payload;
-    },
-    setLocalAccountInitiated: (state, action: PayloadAction<boolean>) => {
-      console.log(
-        "setLocalAccountInitiated triggered with payload:",
-        action.payload
-      );
-      state.hasInitiatedLocalAccount = action.payload;
+    initializeFromLocalStorage: (state) => {
+      console.log("Initialiserar från localStorage.");
+      if (typeof window !== "undefined") {
+        const token = localStorage.getItem("accessToken");
+        const account = localStorage.getItem("account");
+
+        console.log("Token från localStorage:", token);
+        console.log("Account från localStorage:", account);
+
+        if (token && account) {
+          state.token = token;
+          state.account = JSON.parse(account);
+          state.isLoggedIn = true;
+        } else {
+          state.hasInitiatedLocalAccount = true;
+        }
+      }
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUserFromToken.pending, (state) => {
-        console.log("fetchUserFromToken.pending triggered");
+      .addCase(authenticateUser.pending, (state) => {
+        console.log("Autentiseringsanrop pågår...");
         state.loading = true;
         state.error = null;
       })
       .addCase(
-        fetchUserFromToken.fulfilled,
+        authenticateUser.fulfilled,
         (state, action: PayloadAction<AuthResponse>) => {
-          console.log(
-            "fetchUserFromToken.fulfilled triggered with payload:",
-            action.payload
-          );
+          console.log("Autentisering lyckades:", action.payload);
           state.loading = false;
           state.isLoggedIn = true;
           state.account = action.payload.account;
-          state.token = action.payload.accessToken;
+          state.token = action.payload.access_token;
+
+          if (typeof window !== "undefined") {
+            console.log("Sparar autentiseringsuppgifter i localStorage.");
+            localStorage.setItem("accessToken", action.payload.access_token);
+            localStorage.setItem(
+              "account",
+              JSON.stringify(action.payload.account)
+            );
+          }
         }
       )
       .addCase(
-        fetchUserFromToken.rejected,
+        authenticateUser.rejected,
         (state, action: PayloadAction<any>) => {
-          console.log(
-            "fetchUserFromToken.rejected triggered with payload:",
-            action.payload
-          );
+          console.error("Autentisering misslyckades:", action.payload);
           state.loading = false;
           state.error = action.payload;
           state.isLoggedIn = false;
@@ -123,5 +153,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { login, logout } = authSlice.actions;
+export const { login, logout, initializeFromLocalStorage } = authSlice.actions;
 export default authSlice.reducer;

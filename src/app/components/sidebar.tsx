@@ -30,6 +30,8 @@ export function AppSidebar() {
   const dispatch = useDispatch<AppDispatch>();
 
   const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("account");
     dispatch(logout());
     router.push("/");
   };
@@ -46,7 +48,9 @@ export function AppSidebar() {
           {sidebarItems.map((item) => (
             <SidebarMenuItem key={item.name}>
               <SidebarMenuButton asChild isActive={pathname === item.href}>
-                <Link className="hover:bg-slate-400" href={item.href}>{item.name}</Link>
+                <Link className="hover:bg-slate-400" href={item.href}>
+                  {item.name}
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}

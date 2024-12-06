@@ -33,12 +33,12 @@ export type AuthAccount = {
   userType: UserType;
   orgId: string;
   orgName: string;
-  isNew: boolean;
+  // isNew: boolean;
   tags: string[];
-  expiresAt: number;
+  // expiresAt: number;
 };
 
 export type AuthResponse = {
   account: AuthAccount;
-  accessToken: string;
+  access_token: string;
 };
