@@ -69,31 +69,30 @@ const authSlice = createSlice({
       state.token = action.payload.access_token;
 
       if (typeof window !== "undefined") {
-        console.log("Vet inte vad jag kollar här", action.payload.access_token);
         localStorage.setItem(
           "accessToken",
           action.payload.access_token || "null"
         );
-        console.log("inte här heller", action.payload.access_token);
         localStorage.setItem("account", JSON.stringify(action.payload.account));
       }
     },
 
     logout: (state) => {
-      console.log("Kör logout-reducer. Rensar state och localStorage.");
+      console.log("Logout reducer triggered. Clearing state and localStorage.");
       state.isLoggedIn = false;
       state.account = null;
       state.token = null;
       state.hasInitiatedLocalAccount = false;
-      localStorage.removeItem("accessToken");
 
       if (typeof window !== "undefined") {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("account");
-        localStorage.setItem("logout", Date.now().toString()); // Lägg till en synkroniseringssignal
-        window.location.href = "/"; // Omdirigera användaren
+        localStorage.setItem("logout", Date.now().toString());
+        console.log("Redirecting to login page.");
+        window.location.href = "/";
       }
     },
+
     initializeFromLocalStorage: (state) => {
       console.log("Initialiserar från localStorage.");
       if (typeof window !== "undefined") {

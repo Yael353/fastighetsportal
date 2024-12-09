@@ -30,10 +30,7 @@ export function AppSidebar() {
   const dispatch = useDispatch<AppDispatch>();
 
   const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("account");
     dispatch(logout());
-    router.push("/");
   };
 
   return (

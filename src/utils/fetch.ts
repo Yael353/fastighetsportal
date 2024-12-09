@@ -8,7 +8,7 @@ export const authFetch = async (
   getState: () => RootState,
   dispatch: AppDispatch
 ): Promise<Response> => {
-  const token = getAuthToken(); // Hämta token från localStorage
+  const token = getAuthToken();
 
   // Automatiskt lägg till Authorization-header om token finns
   const headers = new Headers(options.headers || {});
