@@ -74,6 +74,7 @@ const authSlice = createSlice({
           action.payload.access_token || "null"
         );
         localStorage.setItem("account", JSON.stringify(action.payload.account));
+        window.location.href = "/dashboard";
       }
     },
 

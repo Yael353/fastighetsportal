@@ -1,6 +1,6 @@
 import { PropertyList } from "../components/PropertyList";
 import { getAuthToken } from "@/utils/auth";
-import ProtectedRoute from "../components/protectedRoute";
+import ProtectedRoute from "../components/ProtectedRoute";
 
 export default function DashboardPage() {
   return (

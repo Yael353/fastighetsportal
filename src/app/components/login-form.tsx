@@ -14,10 +14,11 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-import { authenticateUser } from "@/features/slices/authSlice"; // Importera fetchUserFromToken
+import { authenticateUser } from "@/features/slices/authSlice"; //  Importera fetchUserFromToken
 import { AppDispatch } from "@/features/store/store";
 import { User, Lock } from "lucide-react";
 import { AuthCredentials } from "@/features/models/auth";
+import ProtectedRoute from "./ProtectedRoute";
 
 export function LoginForm() {
   const [username, setUsername] = useState("");
@@ -49,50 +50,52 @@ export function LoginForm() {
   };
 
   return (
-    <Card className="w-[350px]">
-      <CardHeader>
-        <CardTitle>Logga in</CardTitle>
-        <CardDescription>Webbportalen</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit}>
-          <div className="grid w-full items-center gap-4">
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="username">Användarnamn</Label>
-              <div className="relative">
-                <User className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="username"
-                  placeholder="Ange användarnamn"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="pl-8"
-                  required
-                />
+    <ProtectedRoute>
+      <Card className="w-[350px]">
+        <CardHeader>
+          <CardTitle>Logga in</CardTitle>
+          <CardDescription>Webbportalen</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit}>
+            <div className="grid w-full items-center gap-4">
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="username">Användarnamn</Label>
+                <div className="relative">
+                  <User className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="username"
+                    placeholder="Ange användarnamn"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="pl-8"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="password">Lösenord</Label>
+                <div className="relative">
+                  <Lock className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Ange lösenord"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-8"
+                    required
+                  />
+                </div>
               </div>
             </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="password">Lösenord</Label>
-              <div className="relative">
-                <Lock className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Ange lösenord"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-8"
-                  required
-                />
-              </div>
-            </div>
-          </div>
-          <CardFooter className="flex justify-between">
-            <Button variant="outline">Avbryt</Button>
-            <Button type="submit">Logga in</Button>
-          </CardFooter>
-        </form>
-      </CardContent>
-    </Card>
+            <CardFooter className="flex justify-between p-4">
+              <Button variant="outline">Avbryt</Button>
+              <Button type="submit">Logga in</Button>
+            </CardFooter>
+          </form>
+        </CardContent>
+      </Card>
+    </ProtectedRoute>
   );
 }
