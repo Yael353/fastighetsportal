@@ -1,8 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { AuthAccount, AuthCredentials, AuthResponse } from "../models/auth";
 import { AppDispatch, RootState } from "../store/store";
-import { usePathname, useRouter } from "next/navigation";
-import { Router } from "next/router";
 
 interface AuthState {
   isLoggedIn: boolean;
@@ -31,14 +29,11 @@ export const authenticateUser = createAsyncThunk<
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   try {
-    console.log("Skickar autentiseringsbegäran till API: ", credentials);
     const response = await fetch(`${apiUrl}/v1/auth`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials),
     });
-
-    console.log("Auth-anrop statuskod:", response.status);
 
     if (!response.ok) {
       throw new Error(`Authentication failed with status: ${response.status}`);
@@ -62,8 +57,6 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     login: (state, action: PayloadAction<AuthResponse>) => {
-      console.log("Login reducer payload:", action.payload);
-
       state.isLoggedIn = true;
       state.account = action.payload.account;
       state.token = action.payload.access_token;
@@ -89,7 +82,6 @@ const authSlice = createSlice({
         localStorage.removeItem("accessToken");
         localStorage.removeItem("account");
         localStorage.setItem("logout", Date.now().toString());
-        console.log("Redirecting to login page.");
         window.location.href = "/";
       }
     },
@@ -99,9 +91,6 @@ const authSlice = createSlice({
       if (typeof window !== "undefined") {
         const token = localStorage.getItem("accessToken");
         const account = localStorage.getItem("account");
-
-        console.log("Token från localStorage:", token);
-        console.log("Account från localStorage:", account);
 
         if (token && account) {
           state.token = token;
@@ -116,7 +105,6 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(authenticateUser.pending, (state) => {
-        console.log("Autentiseringsanrop pågår...");
         state.loading = true;
         state.error = null;
       })
