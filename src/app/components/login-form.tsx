@@ -14,44 +14,58 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-import { authenticateUser } from "@/features/slices/authSlice"; //  Importera fetchUserFromToken
+import { authenticateUser } from "@/features/slices/authSlice";
 import { AppDispatch } from "@/features/store/store";
-import { User, Lock } from "lucide-react";
+import { User, Lock, Loader2 } from "lucide-react";
 import { AuthCredentials } from "@/features/models/auth";
 import ProtectedRoute from "./ProtectedRoute";
 
 export function LoginForm() {
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const router = useRouter();
-  const dispatch = useDispatch<AppDispatch>();
+  const [isLoading, setIsLoading] = useState(false); 
+  const [isError, setIsError] = useState(false); 
+  const router = useRouter(); 
+  const dispatch = useDispatch<AppDispatch>(); 
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  // Hanterar inloggningsformuläret
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); 
+    setIsLoading(true); 
+    setIsError(false);
 
+    // Skapa credentials-objektet för autentisering
     const credentials: AuthCredentials = {
       user: username,
       password,
     };
 
-    dispatch(authenticateUser(credentials))
-      .unwrap()
-      .then((response) => {
-        // När inloggningen lyckas, spara access token i localStorage
-        const accessToken = response.access_token; // Förutsätt att accessToken är i svaret
-        localStorage.setItem("accessToken", accessToken);
+    try {
+      // Försök att autentisera användaren
+      const response = await dispatch(authenticateUser(credentials)).unwrap();
+      
+      // När inloggningen lyckas, spara access token i localStorage
+      const accessToken = response.access_token;
+      localStorage.setItem("accessToken", accessToken);
 
-        // Navigera till dashboard efter inloggning
-        router.push("/dashboard");
-      })
-      .catch((error) => {
-        console.error("Inloggning misslyckades: ", error);
-      });
+      setTimeout(() => {
+        setIsLoading(false); 
+        router.push("/dashboard"); 
+      }, 1000);
+    } catch (error) {
+      // Om inloggning misslyckas, logga felet och visa felstatus
+      console.error("Inloggning misslyckades: ", error);
+      setIsLoading(false); 
+      setIsError(true); 
+
+      setTimeout(() => setIsError(false), 500);
+    }
   };
 
   return (
     <ProtectedRoute>
-      <Card className="w-[350px]">
+      <Card className={`w-[350px] ${isError ? "animate-shake" : ""}`}>
         <CardHeader>
           <CardTitle>Logga in</CardTitle>
           <CardDescription>Webbportalen</CardDescription>
@@ -89,9 +103,17 @@ export function LoginForm() {
                 </div>
               </div>
             </div>
-            <CardFooter className="flex justify-between p-4">
-              <Button variant="outline">Avbryt</Button>
-              <Button type="submit">Logga in</Button>
+            <CardFooter className="flex justify-center p-4">
+              <Button size="lg" type="submit" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Loggar in...
+                  </>
+                ) : (
+                  "Logga in"
+                )}
+              </Button>
             </CardFooter>
           </form>
         </CardContent>
