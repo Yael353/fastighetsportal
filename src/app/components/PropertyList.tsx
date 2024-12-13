@@ -145,7 +145,6 @@ export function PropertyList() {
         <Button onClick={nextPage} disabled={currentPage === totalPages}>
           Nästa <ChevronRight className="ml-2 h-4 w-4" />
         </Button>
-        
       </div>
     </div>
   );

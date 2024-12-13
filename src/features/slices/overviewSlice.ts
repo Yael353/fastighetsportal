@@ -2,6 +2,8 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { SensorDomain } from "../models/sensor-data";
 import { RootState, AppDispatch } from "../store/store";
 import { AuthContentData } from "../models/auth";
+import { authFetch } from "@/utils/fetch";
+import { getAuthToken } from "@/utils/auth";
 
 // Typ för slice state
 interface OverviewState {
@@ -29,23 +31,20 @@ export const getList = createAsyncThunk<
       offset: offset.toString(),
       limit: limit.toString(),
     });
+
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
     try {
-      const response = await fetch(
+      const response = await authFetch(
         `${apiUrl}/open/v1/sensor_domains?${params}`,
         {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
+        auth // Skicka vidare auth här
       );
-
-      if (response.status === 404) {
-        throw new Error("Fel uppgifter, prova igen");
-      } else if (response.status === 403) {
-        throw new Error("Åtkomst nekad (403)");
-      }
 
       const responseJson = await response.json();
       return responseJson as SensorDomain[];

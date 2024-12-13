@@ -1,41 +1,47 @@
-import { AppDispatch, RootState } from "@/features/store/store";
-import { getAuthToken } from "./auth";
-import { logout } from "@/features/slices/authSlice";
+import { AuthContentData } from "@/features/models/auth";
 
 export const authFetch = async (
-  url: string,
-  options: RequestInit,
-  getState: () => RootState,
-  dispatch: AppDispatch
+  url: string | URL | Request,
+  init: RequestInit = {},
+  auth: AuthContentData
 ): Promise<Response> => {
-  const token = getAuthToken();
-
-  // Automatiskt lägg till Authorization-header om token finns
-  const headers = new Headers(options.headers || {});
-  if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
+  if (!auth.jwtData) {
+    throw new Error("No JWT Data");
   }
 
-  const updatedOptions = {
-    ...options,
+  if (auth.jwtData.expiresAt - Date.now() < 0) {
+    await auth.logout();
+    throw new Error("Auth Expired");
+  }
+
+  // Konvertera headers till Record<string, string> om det behövs
+  const existingHeaders =
+    init.headers instanceof Headers
+      ? Object.fromEntries(init.headers.entries())
+      : Array.isArray(init.headers)
+      ? Object.fromEntries(init.headers)
+      : init.headers || {};
+
+  const headers: Record<string, string> = {
+    ...existingHeaders,
+    Authorization: `Bearer ${auth.jwtData.accessToken}`,
+  };
+
+  const options: RequestInit = {
+    ...init,
     headers,
   };
 
   try {
-    const response = await fetch(url, updatedOptions);
+    const response = await fetch(url, options);
 
-    // Hantera felkoder globalt, exempelvis 401
-    if (response.status === 401) {
-      console.warn("Unauthorized - token might be expired. Logging out...");
-      dispatch(logout());
-    } else if (!response.ok) {
-      console.error(`Request failed with status: ${response.status}`);
-      throw new Error(`HTTP Error: ${response.status}`);
+    if (!response.ok) {
+      throw new Error(`Fetch failed with status: ${response.status}`);
     }
 
     return response;
   } catch (error) {
-    console.error("Error during API request:", error);
+    console.error("Error in authFetch:", error);
     throw error;
   }
 };

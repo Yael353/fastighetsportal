@@ -21,19 +21,20 @@ import { AuthCredentials } from "@/features/models/auth";
 import ProtectedRoute from "./ProtectedRoute";
 
 export function LoginForm() {
-
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false); 
-  const [isError, setIsError] = useState(false); 
-  const router = useRouter(); 
-  const dispatch = useDispatch<AppDispatch>(); 
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
 
   // Hanterar inloggningsformuläret
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); 
-    setIsLoading(true); 
+    e.preventDefault();
+    setIsLoading(true);
     setIsError(false);
+    setErrorMessage("");
 
     // Skapa credentials-objektet för autentisering
     const credentials: AuthCredentials = {
@@ -42,24 +43,26 @@ export function LoginForm() {
     };
 
     try {
-      // Försök att autentisera användaren
       const response = await dispatch(authenticateUser(credentials)).unwrap();
-      
-      // När inloggningen lyckas, spara access token i localStorage
       const accessToken = response.access_token;
       localStorage.setItem("accessToken", accessToken);
 
       setTimeout(() => {
-        setIsLoading(false); 
-        router.push("/dashboard"); 
+        setIsLoading(false);
+        router.push("/dashboard");
       }, 1000);
-    } catch (error) {
-      // Om inloggning misslyckas, logga felet och visa felstatus
-      console.error("Inloggning misslyckades: ", error);
-      setIsLoading(false); 
-      setIsError(true); 
+    } catch (error: any) {
+      setIsLoading(false);
+      setIsError(true);
 
-      setTimeout(() => setIsError(false), 500);
+      const message =
+        error?.message || "Fel användarnamn eller lösenord, försök igen!";
+      setErrorMessage(message);
+
+      setTimeout(() => {
+        setIsError(false);
+        setErrorMessage("");
+      }, 5000);
     }
   };
 
@@ -71,6 +74,11 @@ export function LoginForm() {
           <CardDescription>Webbportalen</CardDescription>
         </CardHeader>
         <CardContent>
+          {isError && (
+            <div className="mb-4 p-2 text-red-500 border border-red-500 rounded">
+              {errorMessage}
+            </div>
+          )}
           <form onSubmit={handleSubmit}>
             <div className="grid w-full items-center gap-4">
               <div className="flex flex-col space-y-1.5">

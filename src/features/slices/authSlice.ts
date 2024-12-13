@@ -47,7 +47,7 @@ export const authenticateUser = createAsyncThunk<
       access_token: data.access_token, // Mappa om här
     };
   } catch (error: any) {
-    console.error("Fel under autentisering:", error.message);
+    // console.error("Fel under autentisering:", error.message);
     return rejectWithValue(error.message);
   }
 });
@@ -72,7 +72,6 @@ const authSlice = createSlice({
     },
 
     logout: (state) => {
-      console.log("Logout reducer triggered. Clearing state and localStorage.");
       state.isLoggedIn = false;
       state.account = null;
       state.token = null;
@@ -87,7 +86,6 @@ const authSlice = createSlice({
     },
 
     initializeFromLocalStorage: (state) => {
-      console.log("Initialiserar från localStorage.");
       if (typeof window !== "undefined") {
         const token = localStorage.getItem("accessToken");
         const account = localStorage.getItem("account");
@@ -118,7 +116,6 @@ const authSlice = createSlice({
           state.token = action.payload.access_token;
 
           if (typeof window !== "undefined") {
-            console.log("Sparar autentiseringsuppgifter i localStorage.");
             localStorage.setItem("accessToken", action.payload.access_token);
             localStorage.setItem(
               "account",
@@ -130,7 +127,7 @@ const authSlice = createSlice({
       .addCase(
         authenticateUser.rejected,
         (state, action: PayloadAction<any>) => {
-          console.error("Autentisering misslyckades:", action.payload);
+          // console.error("Autentisering misslyckades:", action.payload);
           state.loading = false;
           state.error = action.payload;
           state.isLoggedIn = false;
