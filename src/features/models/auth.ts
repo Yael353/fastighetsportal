@@ -6,7 +6,6 @@ export enum UserType {
 }
 export type AccessTokenData = {
   accessToken: string;
-  expiresAt: number;
 };
 
 export type AuthCredentials = {
@@ -16,7 +15,7 @@ export type AuthCredentials = {
 
 export type AuthContentData = {
   account: AuthAccount | null;
-  jwtData: AccessTokenData | null;
+  token: AccessTokenData | null;
   isLoggedIn: boolean;
   hasInitiatedLocalAccount: boolean;
   isOnboardingDone: boolean | null;
@@ -41,4 +40,5 @@ export type AuthAccount = {
 export type AuthResponse = {
   account: AuthAccount;
   access_token: string;
+  expiresAt: number;
 };

@@ -16,11 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { SensorDomain } from "@/features/models/sensor-data";
-import { AuthContentData } from "@/features/models/auth";
-
-interface PropertyListProps {
-  auth: AuthContentData;
-}
+import { getAuthToken } from "@/utils/auth";
 
 export function PropertyList() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,27 +27,30 @@ export function PropertyList() {
     (state: RootState) => state.overview
   );
 
-  // Hämta sensor-domäner vid sidladdning eller sidbyte
-  // useEffect(() => {
-  //   if (!sensorDomains) {
-  //     // Kontrollera att auth är tillgänglig och har giltiga data
-  //     if (!auth || !auth.jwtData || !auth.jwtData.accessToken) {
-  //       console.error("Ingen giltig autentisering tillgänglig.");
-  //       return;
-  //     }
+  console.log("sensorDomains", sensorDomains);
 
-  //     dispatch(
-  //       getList({
-  //         offset: (currentPage - 1) * sensorDomainsPerPage,
-  //         limit: sensorDomainsPerPage,
-  //         auth,
-  //       })
-  //     );
-  //   }
-  // }, [currentPage, dispatch, sensorDomains, auth]);
+  // Hämta autentiseringstoken från localStorage
+  const authToken = getAuthToken();
 
-  // Kontrollera att sensorDomains alltid är en array
-  const sensorDomainsArray = Array.isArray(sensorDomains) ? sensorDomains : [];
+  useEffect(() => {
+    if (authToken) {
+      // Om token finns, hämta sensor-domäner
+      dispatch(
+        getList({
+          offset: (currentPage - 1) * sensorDomainsPerPage,
+          limit: sensorDomainsPerPage,
+        })
+      );
+    } else {
+      console.error("Ingen giltig autentisering tillgänglig.");
+    }
+  }, [currentPage, dispatch, authToken]);
+
+  // Hämta sensor-domäner från sensorDomains.data
+  const sensorDomainsArray = Array.isArray(sensorDomains?.data)
+    ? sensorDomains.data
+    : [];
+  console.log("sensorDomainsArray ", sensorDomainsArray);
 
   const totalPages = sensorDomainsArray.length
     ? Math.ceil(sensorDomainsArray.length / sensorDomainsPerPage)
@@ -70,6 +69,8 @@ export function PropertyList() {
     (currentPage - 1) * sensorDomainsPerPage,
     currentPage * sensorDomainsPerPage
   );
+
+  console.log("currentsensorDomains: ", currentSensorDomains);
 
   // Rendera när datan laddas
   if (loading) {
@@ -90,14 +91,12 @@ export function PropertyList() {
             <TableHeader>
               <TableRow>
                 <TableHead>Namn</TableHead>
-                <TableHead>Plats</TableHead>
-                <TableHead>Antal sensorer</TableHead>
-                <TableHead>Harvester ID</TableHead>
+                <TableHead>Harvester Aktiv</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               <TableRow>
-                <TableCell colSpan={4} className="text-center">
+                <TableCell colSpan={2} className="text-center">
                   Inga sensor-domäner tillgängliga
                 </TableCell>
               </TableRow>
@@ -116,9 +115,7 @@ export function PropertyList() {
           <TableHeader>
             <TableRow>
               <TableHead>Namn</TableHead>
-              <TableHead>Plats</TableHead>
-              <TableHead>Antal sensorer</TableHead>
-              <TableHead>Harvester ID</TableHead>
+              <TableHead>Harvester Aktiv</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -126,10 +123,12 @@ export function PropertyList() {
               <TableRow key={domain.id}>
                 <TableCell>{domain.name}</TableCell>
                 <TableCell>
-                  {domain.location.latitude}, {domain.location.longitude}
+                  <span
+                    className={`inline-block w-4 h-4 rounded-full justify-center ml-10 ${
+                      domain.harvester.active ? "bg-green-500" : "bg-red-500"
+                    }`}
+                  />
                 </TableCell>
-                <TableCell>{domain.sensors.length}</TableCell>
-                <TableCell>{domain.harvester?.id || "Ingen"}</TableCell>
               </TableRow>
             ))}
           </TableBody>

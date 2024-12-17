@@ -44,8 +44,12 @@ export function LoginForm() {
 
     try {
       const response = await dispatch(authenticateUser(credentials)).unwrap();
-      const accessToken = response.access_token;
-      localStorage.setItem("accessToken", accessToken);
+
+      // Anpassa till AccessTokenData-strukturen
+      const accessTokenData = { accessToken: response.access_token };
+
+      localStorage.setItem("accessToken", accessTokenData.accessToken);
+      localStorage.setItem("account", JSON.stringify(response.account));
 
       setTimeout(() => {
         setIsLoading(false);

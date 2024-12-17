@@ -1,11 +1,16 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { AuthAccount, AuthCredentials, AuthResponse } from "../models/auth";
+import {
+  AuthAccount,
+  AuthCredentials,
+  AuthResponse,
+  AccessTokenData,
+} from "../models/auth";
 import { AppDispatch, RootState } from "../store/store";
 
 interface AuthState {
   isLoggedIn: boolean;
   account: AuthAccount | null;
-  token: string | null;
+  token: AccessTokenData | null; 
   loading: boolean;
   error: string | null;
   hasInitiatedLocalAccount: boolean;
@@ -42,12 +47,8 @@ export const authenticateUser = createAsyncThunk<
     const data: AuthResponse = await response.json();
     console.log("Svar från auth-anropet: ", data);
 
-    return {
-      ...data,
-      access_token: data.access_token, // Mappa om här
-    };
+    return data;
   } catch (error: any) {
-    // console.error("Fel under autentisering:", error.message);
     return rejectWithValue(error.message);
   }
 });
@@ -59,7 +60,7 @@ const authSlice = createSlice({
     login: (state, action: PayloadAction<AuthResponse>) => {
       state.isLoggedIn = true;
       state.account = action.payload.account;
-      state.token = action.payload.access_token;
+      state.token = { accessToken: action.payload.access_token }; // Konverterar till AccessTokenData
 
       if (typeof window !== "undefined") {
         localStorage.setItem(
@@ -91,7 +92,7 @@ const authSlice = createSlice({
         const account = localStorage.getItem("account");
 
         if (token && account) {
-          state.token = token;
+          state.token = { accessToken: token }; // Konverterar till AccessTokenData
           state.account = JSON.parse(account);
           state.isLoggedIn = true;
         } else {
@@ -113,7 +114,7 @@ const authSlice = createSlice({
           state.loading = false;
           state.isLoggedIn = true;
           state.account = action.payload.account;
-          state.token = action.payload.access_token;
+          state.token = { accessToken: action.payload.access_token }; // Konverterar till AccessTokenData
 
           if (typeof window !== "undefined") {
             localStorage.setItem("accessToken", action.payload.access_token);
@@ -127,7 +128,6 @@ const authSlice = createSlice({
       .addCase(
         authenticateUser.rejected,
         (state, action: PayloadAction<any>) => {
-          // console.error("Autentisering misslyckades:", action.payload);
           state.loading = false;
           state.error = action.payload;
           state.isLoggedIn = false;

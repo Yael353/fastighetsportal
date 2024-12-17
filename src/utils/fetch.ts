@@ -1,20 +1,29 @@
-import { AuthContentData } from "@/features/models/auth";
+import { logout } from "@/features/slices/authSlice";
+import { AppDispatch } from "@/features/store/store";
+import { getAuthToken } from "./auth";
 
 export const authFetch = async (
   url: string | URL | Request,
   init: RequestInit = {},
-  auth: AuthContentData
+  dispatch: AppDispatch
 ): Promise<Response> => {
-  if (!auth.jwtData) {
-    throw new Error("No JWT Data");
+  const token = getAuthToken();
+
+  if (!token) {
+    console.error("No valid accessToken found. Logging out...");
+    dispatch(logout());
+    throw new Error("No access token. You have been logged out.");
   }
 
-  if (auth.jwtData.expiresAt - Date.now() < 0) {
-    await auth.logout();
-    throw new Error("Auth Expired");
+  // Kontrollera token expiration om du sparar expiresAt i localStorage
+  const expiresAt = Number(localStorage.getItem("expiresAt")) || 0;
+  if (expiresAt && expiresAt - Date.now() < 0) {
+    console.warn("Token has expired. Logging out...");
+    dispatch(logout());
+    throw new Error("Auth token expired.");
   }
 
-  // Konvertera headers till Record<string, string> om det behövs
+  // Hantera headers
   const existingHeaders =
     init.headers instanceof Headers
       ? Object.fromEntries(init.headers.entries())
@@ -24,7 +33,8 @@ export const authFetch = async (
 
   const headers: Record<string, string> = {
     ...existingHeaders,
-    Authorization: `Bearer ${auth.jwtData.accessToken}`,
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
   };
 
   const options: RequestInit = {
@@ -36,6 +46,10 @@ export const authFetch = async (
     const response = await fetch(url, options);
 
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        console.warn("Unauthorized or expired token. Logging out...");
+        dispatch(logout());
+      }
       throw new Error(`Fetch failed with status: ${response.status}`);
     }
 
