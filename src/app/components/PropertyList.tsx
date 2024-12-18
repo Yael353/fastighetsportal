@@ -115,19 +115,22 @@ export function PropertyList() {
           <TableHeader>
             <TableRow>
               <TableHead>Namn</TableHead>
-              <TableHead>Harvester Aktiv</TableHead>
+              <TableHead>Harvester</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {currentSensorDomains.map((domain: SensorDomain) => (
-              <TableRow key={domain.id}>
-                <TableCell>{domain.name}</TableCell>
-                <TableCell>
+              <TableRow key={domain.id} className=" space-x-2 justify-between">
+                <TableCell className="first-letter:uppercase font-semibold text-gray-800 text-3xl tracking-wider hover:scale-105 hover:pl-10 pr-14">
+                  {domain.name}
+                </TableCell>
+                <TableCell className="flex gap-2 my-4">
                   <span
-                    className={`inline-block w-4 h-4 rounded-full justify-center ml-10 ${
+                    className={`inline-block w-4 h-4 rounded-full justify-center ${
                       domain.harvester.active ? "bg-green-500" : "bg-red-500"
                     }`}
-                  />
+                  ></span>
+                  <p>{domain.harvester.active ? "Active" : "Inactive"}</p>
                 </TableCell>
               </TableRow>
             ))}

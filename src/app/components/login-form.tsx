@@ -72,64 +72,96 @@ export function LoginForm() {
 
   return (
     <ProtectedRoute>
-      <Card className={`w-[350px] ${isError ? "animate-shake" : ""}`}>
-        <CardHeader>
-          <CardTitle>Logga in</CardTitle>
-          <CardDescription>Webbportalen</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isError && (
-            <div className="mb-4 p-2 text-red-500 border border-red-500 rounded">
-              {errorMessage}
-            </div>
-          )}
-          <form onSubmit={handleSubmit}>
-            <div className="grid w-full items-center gap-4">
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="username">Användarnamn</Label>
-                <div className="relative">
-                  <User className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="username"
-                    placeholder="Ange användarnamn"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="pl-8"
-                    required
-                  />
+      <div className="flex justify-center items-center w-full min-h-screen bg-white">
+        <div className="relative w-[500px] h-auto">
+          <img
+            src="images/logo.jpg"
+            alt="logo"
+            className="absolute z-50 -top-12 left-1/2 transform -translate-x-1/2 w-32 h-32 rounded-full border-4 border-blue-800"
+          />
+          <Card
+            className={`w-full mt-10 shadow-lg rounded-lg bg-white ${
+              isError
+                ? "animate-shake border border-gradient-to-r m-4 from-blue-200 to-blue-800"
+                : "border border-gray-200"
+            }`}
+          >
+            <CardHeader className="text-center bg-gradient-to-r from-blue-400 to-blue-800 text-white rounded-t-lg pt-12">
+              <CardTitle className="text-2xl font-semibold">Logga in</CardTitle>
+              <CardDescription className="text-yellow-50">
+                Webbportalen
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isError && (
+                <div className="m-4 p-4 text-red-600 border border-red-500 rounded bg-red-50">
+                  {errorMessage}
                 </div>
-              </div>
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="password">Lösenord</Label>
-                <div className="relative">
-                  <Lock className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Ange lösenord"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-8"
-                    required
-                  />
+              )}
+              <form onSubmit={handleSubmit}>
+                <div className="grid w-full items-center gap-6">
+                  <div className="flex flex-col space-y-2">
+                    <Label
+                      htmlFor="username"
+                      className="text-gray-700 font-medium mt-4"
+                    >
+                      Användarnamn
+                    </Label>
+                    <div className="relative">
+                      <User className="absolute left-2 top-3 h-5 w-5 text-blue-400" />
+                      <Input
+                        id="username"
+                        placeholder="Ange användarnamn"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        className="pl-10 py-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none transition-shadow"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-col space-y-2">
+                    <Label
+                      htmlFor="password"
+                      className="text-gray-700 font-medium"
+                    >
+                      Lösenord
+                    </Label>
+                    <div className="relative">
+                      <Lock className="absolute left-2 top-3 h-5 w-5 text-blue-400" />
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="Ange lösenord"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="pl-10 py-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none transition-shadow"
+                        required
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <CardFooter className="flex justify-center p-4">
-              <Button size="lg" type="submit" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Loggar in...
-                  </>
-                ) : (
-                  "Logga in"
-                )}
-              </Button>
-            </CardFooter>
-          </form>
-        </CardContent>
-      </Card>
+                <CardFooter className="flex justify-center p-4">
+                  <Button
+                    size="lg"
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-[50%] bg-blue-400 hover:bg-blue-500 text-white font-semibold transition-colors rounded-lg"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Loggar in...
+                      </>
+                    ) : (
+                      "Logga in"
+                    )}
+                  </Button>
+                </CardFooter>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </ProtectedRoute>
   );
 }
