@@ -1,66 +1,51 @@
 "use client";
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+import { CartesianGrid, Line, LineChart, XAxis, Tooltip } from "recharts";
 
 const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
+  { desktop: 186, mobile: 80 },
+  { desktop: 305, mobile: 200 },
+  { desktop: 237, mobile: 120 },
+  { desktop: 73, mobile: 190 },
+  { desktop: 209, mobile: 130 },
+  { desktop: 214, mobile: 140 },
 ];
-
-const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "hsl(var(--chart-1))",
-  },
-  mobile: {
-    label: "Mobile",
-    color: "hsl(var(--chart-2))",
-  },
-};
 
 export function ChartTest() {
   return (
-    <ChartContainer config={chartConfig}>
+    <div className="w-full h-24 flex justify-center items-center">
       <LineChart
+        width={600}
+        height={100}
         data={chartData}
         margin={{
-          left: 12,
-          right: 12,
+          top: 5,
+          right: 20,
+          left: 10,
+          bottom: 5,
         }}
       >
-        <CartesianGrid vertical={false} />
-        <XAxis
+        {/* <CartesianGrid strokeDasharray="3 3" /> */}
+        {/* <XAxis
           dataKey="month"
           tickLine={false}
           axisLine={false}
           tickMargin={8}
           tickFormatter={(value) => value.slice(0, 3)}
-        />
-        <ChartTooltip
-          cursor={false}
-          content={<ChartTooltipContent hideLabel />}
-        />
+        /> */}
+        <Tooltip />
         <Line
+          type="monotone"
           dataKey="desktop"
-          type="natural"
-          stroke="var(--color-desktop)"
+          stroke="#8884d8"
           strokeWidth={2}
           dot={{
-            fill: "var(--color-desktop)",
+            fill: "#8884d8",
           }}
           activeDot={{
             r: 6,
           }}
         />
       </LineChart>
-    </ChartContainer>
+    </div>
   );
 }

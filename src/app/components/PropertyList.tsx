@@ -151,8 +151,11 @@ export function PropertyList() {
                 </div>
 
                 {/* Tom yta för framtida diagram */}
-                <div className="flex justify-center items-center">
-                  <div className="h-24 bg-gray-100 rounded-md  max-w-[658px] mx-auto flex items-center justify-center">
+                <div className="flex flex-col justify-center items-center">
+                  <p className="font-semibold pb-2 text-xl text-[#8884d8]">
+                    Temperatur:
+                  </p>
+                  <div className="h-24  max-w-[658px] mx-auto flex items-center justify-center rounded-xl">
                     <ChartTest />
                   </div>
                 </div>
