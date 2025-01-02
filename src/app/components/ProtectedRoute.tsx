@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const router = useRouter();
+  const [isValidating, setIsValidating] = useState(true);
 
   // Funktion för att validera token
   const validateToken = (): boolean => {
@@ -15,8 +16,9 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
 
     try {
       const decodedToken = JSON.parse(atob(token.split(".")[1])); // Decodera JWT-token
-      const expiresAt = decodedToken.exp * 1000; // Expiry-tid i millisekunder
-      return expiresAt > Date.now(); // Kontrollera om token fortfarande är giltig
+      const expiresAt = decodedToken.exp * 1000;
+
+      return expiresAt > Date.now();
     } catch (error) {
       console.error("Tokenvalidering misslyckades:", error);
       return false;
@@ -27,20 +29,20 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const tokenIsValid = validateToken();
     if (tokenIsValid) {
-      router.push("/dashboard");
+      router.replace("/dashboard");
     } else {
       localStorage.setItem("logout", Date.now().toString());
-      router.push("/");
+      router.replace("/");
     }
+    setIsValidating(false);
   }, [router]);
 
-  //Lyssna på storage-event för att synkronisera mellan flikar
   useEffect(() => {
     const handleStorageEvent = (event: StorageEvent) => {
       if (event.key === "accessToken" && event.newValue) {
-        router.push("/dashboard");
+        router.replace("/dashboard");
       } else if (event.key === "logout") {
-        router.push("/");
+        router.replace("/");
       }
     };
 
@@ -50,6 +52,10 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
       window.removeEventListener("storage", handleStorageEvent);
     };
   }, [router]);
+
+  if (isValidating) {
+    return <div style={{ backgroundColor: "white", height: "100vh" }}></div>;
+  }
 
   return <>{children}</>;
 };

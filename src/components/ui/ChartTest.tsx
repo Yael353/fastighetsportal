@@ -12,7 +12,7 @@ const chartData = [
 
 export function ChartTest() {
   return (
-    <div className="w-full h-24 flex justify-center items-center">
+    <div className="w-full h-24 flex justify-center items-center ">
       <LineChart
         width={600}
         height={100}

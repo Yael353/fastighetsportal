@@ -86,7 +86,7 @@ export function LoginForm() {
                 : "border border-gray-200"
             }`}
           >
-            <CardHeader className="text-center bg-gradient-to-r from-blue-400 to-blue-800 text-white rounded-t-lg pt-12">
+            <CardHeader className="text-center bg-gradient-to-r from-blue-400 to-black text-white rounded-t-lg pt-12">
               <CardTitle className="text-2xl font-semibold">Logga in</CardTitle>
               <CardDescription className="text-yellow-50">
                 Webbportalen

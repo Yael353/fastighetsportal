@@ -126,7 +126,7 @@ export function PropertyList() {
             >
               <Link href={`/dashboard/detailedPage/${domain.id}`}>
                 {/* Namn som rubrik */}
-                <h2 className="text-2xl font-extrabold text-gray-900 text-center tracking-wide first-letter:uppercase">
+                <h2 className="text-2xl font-extrabold text-gray-900 text-center tracking-wide first-letter:uppercase border-b-2 border-">
                   {domain.name}
                 </h2>
 
@@ -151,11 +151,11 @@ export function PropertyList() {
                 </div>
 
                 {/* Tom yta för framtida diagram */}
-                <div className="flex flex-col justify-center items-center">
+                <div className="flex flex-col justify-center items-center ">
                   <p className="font-semibold pb-2 text-xl text-[#8884d8]">
                     Temperatur:
                   </p>
-                  <div className="h-24  max-w-[658px] mx-auto flex items-center justify-center rounded-xl">
+                  <div className="h-24 w-[200px] mx-auto flex items-center justify-center rounded-xl">
                     <ChartTest />
                   </div>
                 </div>
