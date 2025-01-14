@@ -6,8 +6,8 @@ import overviewReducer from "@/features/slices/overviewSlice";
 export const store = configureStore({
   reducer: {
     auth: authReducer,
-    property: propertyReducer,
     overview: overviewReducer,
+    property: propertyReducer,
   },
 });
 

@@ -1,9 +1,8 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { SensorDomain } from "../models/sensor-data";
 import { RootState, AppDispatch } from "../store/store";
-// import { AuthContentData } from "../models/auth";
 import { authFetch } from "@/utils/fetch";
-// import { getAuthToken } from "@/utils/auth";
+
 
 // Typ för slice state
 interface OverviewState {
@@ -36,7 +35,7 @@ export const getList = createAsyncThunk<
 
     try {
       const response = await authFetch(
-        `${apiUrl}/open/v1/sensor_domains?offset=0&limit=37`,
+        `${apiUrl}/open/v1/sensor_domains?${params}`,
         { method: "GET" },
         dispatch
       );
@@ -44,10 +43,10 @@ export const getList = createAsyncThunk<
       // ${params}
 
       const responseJson = await response.json();
-      console.log("Fetched sensor domains:", responseJson);
+      // console.log("Fetched sensor domains:", responseJson);
       return responseJson as SensorDomain[];
     } catch (error: any) {
-      console.error("Error fetching sensor domains:", error.message || error);
+      // console.error("Error fetching sensor domains:", error.message || error);
       return rejectWithValue(
         error.message || "Ett fel uppstod vid hämtning av sensor-domäner"
       );
@@ -65,22 +64,22 @@ const overviewSlice = createSlice({
       .addCase(getList.pending, (state) => {
         state.loading = true;
         state.error = null;
-        console.log("Fetching sensor domains...");
+        // console.log("Fetching sensor domains...");
       })
       .addCase(
         getList.fulfilled,
         (state, action: PayloadAction<SensorDomain[]>) => {
           state.loading = false;
           state.sensorDomains = action.payload;
-          console.log("Sensor domains fetched successfully");
-          console.log("Sensor domains fetched successfully:", action.payload);
+          // console.log("Sensor domains fetched successfully");
+          // console.log("Sensor domains fetched successfully:", action.payload);
         }
       )
       .addCase(getList.rejected, (state, action) => {
         state.loading = false;
         state.error =
           action.payload || "Ett fel uppstod vid hämtning av sensor-domäner";
-        console.error("Error fetching sensor domains:", state.error);
+        // console.error("Error fetching sensor domains:", state.error);
       });
   },
 });

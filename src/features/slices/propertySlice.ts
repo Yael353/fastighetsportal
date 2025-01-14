@@ -1,30 +1,43 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { RootState, AppDispatch } from "../store/store";
+import { authFetch } from "@/utils/fetch";
+import { SensorDomain } from "../models/sensor-data";
+import { fetchSensorDomain } from "../thunks/fetchSensors";
 
-interface Property {
-  id: string
-  name: string
-  address: string
-  type: string
+interface ResidentialState {
+  data: SensorDomain | null;
+  loading: boolean;
+  error: string | null;
 }
 
-interface PropertyState {
-  properties: Property[]
-}
-
-const initialState: PropertyState = {
-  properties: [],
-}
+const initialState: ResidentialState = {
+  data: null,
+  loading: false,
+  error: null,
+};
 
 const propertySlice = createSlice({
-  name: 'property',
+  name: "properties",
   initialState,
-  reducers: {
-    setProperties: (state, action: PayloadAction<Property[]>) => {
-      state.properties = action.payload
-    },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchSensorDomain.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(
+        fetchSensorDomain.fulfilled,
+        (state, action: PayloadAction<SensorDomain>) => {
+          state.loading = false;
+          state.data = action.payload;
+        }
+      )
+      .addCase(fetchSensorDomain.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string; // Thunk använder rejectValue
+      });
   },
-})
+});
 
-export const { setProperties } = propertySlice.actions
-export default propertySlice.reducer
-
+export default propertySlice.reducer;

@@ -1,5 +1,5 @@
 "use client";
-import { CartesianGrid, Line, LineChart, XAxis, Tooltip } from "recharts";
+import { Line, LineChart, XAxis, Tooltip, CartesianGrid } from "recharts";
 
 const chartData = [
   { desktop: 186, mobile: 80 },
@@ -12,7 +12,7 @@ const chartData = [
 
 export function ChartTest() {
   return (
-    <div className="w-full h-24 flex justify-center items-center ">
+    <div className="w-full h-24 flex justify-center items-center p-4 ">
       <LineChart
         width={600}
         height={100}
@@ -24,8 +24,8 @@ export function ChartTest() {
           bottom: 5,
         }}
       >
-        {/* <CartesianGrid strokeDasharray="3 3" /> */}
-        {/* <XAxis
+        {/* <CartesianGrid strokeDasharray="3 3" />
+        <XAxis
           dataKey="month"
           tickLine={false}
           axisLine={false}
