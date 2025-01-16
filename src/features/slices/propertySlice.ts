@@ -1,6 +1,4 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { RootState, AppDispatch } from "../store/store";
-import { authFetch } from "@/utils/fetch";
 import { SensorDomain } from "../models/sensor-data";
 import { fetchSensorDomain } from "../thunks/fetchSensors";
 

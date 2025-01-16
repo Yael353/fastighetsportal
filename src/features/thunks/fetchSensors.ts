@@ -59,7 +59,7 @@ export const fetchSensorDomain = createAsyncThunk<
   }
 });
 
-// Thunk för att hämta batch-sensordata
+// hämta batch-sensordata
 export const fetchBatchSensorData = createAsyncThunk<
   BatchSensorDataResponse, // Returntyp
   {
@@ -68,7 +68,7 @@ export const fetchBatchSensorData = createAsyncThunk<
     startUtc: Moment;
     endUtc: Moment;
     freq: BatchSensorDataFreq;
-  }, // Payload
+  }, 
   { state: RootState; dispatch: AppDispatch; rejectValue: string } // Context-typer
 >(
   "sensorDomain/fetchBatchSensorData",
