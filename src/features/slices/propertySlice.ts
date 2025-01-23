@@ -33,7 +33,7 @@ const propertySlice = createSlice({
       )
       .addCase(fetchSensorDomain.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string; // Thunk använder rejectValue
+        state.error = action.payload as string;
       });
   },
 });

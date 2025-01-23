@@ -3,7 +3,6 @@ import { SensorDomain } from "../models/sensor-data";
 import { RootState, AppDispatch } from "../store/store";
 import { authFetch } from "@/utils/fetch";
 
-
 // Typ för slice state
 interface OverviewState {
   sensorDomains: SensorDomain[] | null;
@@ -35,7 +34,7 @@ export const getList = createAsyncThunk<
 
     try {
       const response = await authFetch(
-        `${apiUrl}/open/v1/sensor_domains?${params}`,
+        `${apiUrl}/open/v1/sensor_domains?offset=0&`,
         { method: "GET" },
         dispatch
       );
@@ -43,7 +42,6 @@ export const getList = createAsyncThunk<
       // ${params}
 
       const responseJson = await response.json();
-      // console.log("Fetched sensor domains:", responseJson);
       return responseJson as SensorDomain[];
     } catch (error: any) {
       // console.error("Error fetching sensor domains:", error.message || error);
@@ -64,22 +62,18 @@ const overviewSlice = createSlice({
       .addCase(getList.pending, (state) => {
         state.loading = true;
         state.error = null;
-        // console.log("Fetching sensor domains...");
       })
       .addCase(
         getList.fulfilled,
         (state, action: PayloadAction<SensorDomain[]>) => {
           state.loading = false;
           state.sensorDomains = action.payload;
-          // console.log("Sensor domains fetched successfully");
-          // console.log("Sensor domains fetched successfully:", action.payload);
         }
       )
       .addCase(getList.rejected, (state, action) => {
         state.loading = false;
         state.error =
           action.payload || "Ett fel uppstod vid hämtning av sensor-domäner";
-        // console.error("Error fetching sensor domains:", state.error);
       });
   },
 });

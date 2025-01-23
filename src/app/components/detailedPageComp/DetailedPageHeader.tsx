@@ -3,19 +3,10 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "next/navigation";
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { AppDispatch, RootState } from "@/features/store/store";
 import { fetchSensorDomain } from "@/features/thunks/fetchSensors";
-
-// Typ för Marker props
-// interface MarkerProps {
-//   lat: number;
-//   lng: number;
-//   text: string;
-// }
-
-// Komponent för att visa markör
+import { FaHome } from "react-icons/fa";
 
 export default function DetailedPageHeader() {
   const { id } = useParams(); // Hämta ID från URL
@@ -29,7 +20,7 @@ export default function DetailedPageHeader() {
   // Hämta sensordomain-data när komponenten mountar
   useEffect(() => {
     if (typeof id === "string") {
-      dispatch(fetchSensorDomain({ id })); // Hämtar data med ID från URL
+      dispatch(fetchSensorDomain({ id }));
     }
   }, [id, dispatch]);
 
@@ -38,140 +29,41 @@ export default function DetailedPageHeader() {
   if (error) return <p>Error: {error}</p>;
   if (!data) return <p>No property data found for ID: {id}</p>;
 
-  const { name, location } = data; // Extrahera namn och plats från data
+  const { name, location } = data;
+
+  // Bygg URL för den statiska kartan med satellitbild
+  const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${location.latitude},${location.longitude}&zoom=16&size=600x200&maptype=roadmap&markers=color:red|${location.latitude},${location.longitude}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`;
 
   return (
-    <div className="space-y-6">
-      {/* Google Map */}
-      <div style={{ height: "300px", width: "100%" }} className="">
-        <LoadScript
-          googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}
-        >
-          <GoogleMap
-            mapContainerStyle={{ height: "100%", width: "100%" }}
-            center={{
-              lat: location.latitude,
-              lng: location.longitude,
-            }}
-            zoom={15}
-          >
-            <Marker
-              position={{
-                lat: location.latitude,
-                lng: location.longitude,
-              }}
-              label={name}
-            />
-          </GoogleMap>
-        </LoadScript>
+    <div className="">
+      {/* Static Satellite Map */}
+      <div className="w-full flex justify-center">
+        <img
+          src={staticMapUrl}
+          alt="Static roadmap"
+          className="rounded-md w-full sm:w-[90%] 2xl:w-[95%] h-[350px]"
+          style={{
+            maskImage:
+              "linear-gradient(to bottom, rgba(255, 255, 255, 1) 85%, rgba(255, 255, 255, 0) 90%)",
+          }}
+        />
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white to-transparent"></div>{" "}
       </div>
 
       {/* Property Information */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex justify-center">{name}</CardTitle>
+          <div className="flex items-center justify-center gap-x-5">
+            <CardTitle className="text-3xl font-bold text-gray-800 tracking-wide first-letter:uppercase">
+              {name.charAt(0).toUpperCase() + name.slice(1)}
+            </CardTitle>
+            <FaHome size={30} />
+          </div>
         </CardHeader>
       </Card>
 
       {/* Additional Information */}
-      <Card></Card>
+      <Card className="mt-10 p-20">Tja</Card>
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// return (
-//     <div className="space-y-6">
-//       {/* Property Information */}
-//       <Card>
-//         <CardHeader>
-//           <CardTitle className="flex justify-center text-xl font-bold text-gray-800 tracking-wide first-letter:uppercase">
-//             {name}
-//           </CardTitle>
-//           {/* <CardDescription>
-//             Location: Latitude {location.latitude}, Longitude{" "}
-//             {location.longitude}
-//           </CardDescription> */}
-//         </CardHeader>
-//         <CardContent>
-//           <p>Here is some detailed information about the property.</p>
-//         </CardContent>
-//       </Card>
-
-//       {/* Google Map */}
-//       {/* <Card>
-//         <CardHeader>
-//           <CardTitle className="flex justify-center">Map</CardTitle>
-//         </CardHeader>
-//         <CardContent style={{ height: "400px" }}>
-//           <GoogleMapReact
-//             bootstrapURLKeys={{
-//               key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
-//             }}
-//             defaultCenter={position}
-//             defaultZoom={15}
-//           >
-//             <Marker lat={position.lat} lng={position.lng} text="Here" />
-//           </GoogleMapReact>
-//         </CardContent>
-//       </Card> */}
-
-//       {/* Render Sensors */}
-//       {/* {sensors.map((sensor) => (
-//         <Card key={sensor.id}>
-//           <CardHeader>
-//             <CardTitle>{sensor.name}</CardTitle>
-//             <CardDescription>Sensor ID: {sensor.id}</CardDescription>
-//           </CardHeader>
-//         </Card>
-//       ))}
-//       */}
-//     </div>
-//   );
-// }
-
-// /* //Rendera sensorerna
-// {sensors.map((sensor) => (
-// <Card key={sensor.id}>
-//   <CardHeader>
-//     <CardTitle>{sensor.name}</CardTitle>
-//     <CardDescription>Sensor ID: {sensor.id}</CardDescription>
-//   </CardHeader>
-//    <CardContent>
-//     <ResponsiveContainer width="100%" height={300}>
-//       <LineChart data={sensor.data}>
-//         <CartesianGrid strokeDasharray="3 3" />
-//         <XAxis dataKey="time" />
-//         <YAxis />
-//         <Tooltip />
-//         <Legend />
-//         <Line
-//           type="monotone"
-//           dataKey="value"
-//           name="Value"
-//           stroke="#8884d8"
-//         />
-//       </LineChart>
-//     </ResponsiveContainer>
-//   </CardContent> */
-// {
-// }
-// {
-//   /* </Card> */
-// }
-// {
-//   /* //   ))} */
-// }

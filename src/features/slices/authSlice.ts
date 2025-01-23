@@ -10,7 +10,7 @@ import { AppDispatch, RootState } from "../store/store";
 interface AuthState {
   isLoggedIn: boolean;
   account: AuthAccount | null;
-  token: AccessTokenData | null; 
+  token: AccessTokenData | null;
   loading: boolean;
   error: string | null;
   hasInitiatedLocalAccount: boolean;
@@ -45,7 +45,6 @@ export const authenticateUser = createAsyncThunk<
     }
 
     const data: AuthResponse = await response.json();
-    console.log("Svar från auth-anropet: ", data);
 
     return data;
   } catch (error: any) {
@@ -110,7 +109,6 @@ const authSlice = createSlice({
       .addCase(
         authenticateUser.fulfilled,
         (state, action: PayloadAction<AuthResponse>) => {
-          console.log("Autentisering lyckades:", action.payload);
           state.loading = false;
           state.isLoggedIn = true;
           state.account = action.payload.account;

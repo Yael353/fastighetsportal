@@ -3,6 +3,9 @@ import authReducer from "../slices/authSlice";
 import propertyReducer from "../slices/propertySlice";
 import overviewReducer from "@/features/slices/overviewSlice";
 import sensorDataReducer from "@/features/slices/batchSlice";
+import { buildingsReducer } from "../slices/buildingsSlice";
+import apartmentReducer from "@/features/slices/ApartmentConsumptionSlice";
+import summaryStatisticsReducer from "@/features/slices/summaryStatisticsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +13,9 @@ export const store = configureStore({
     overview: overviewReducer,
     property: propertyReducer,
     sensorData: sensorDataReducer,
+    buildings: buildingsReducer,
+    apartmentConsumption: apartmentReducer,
+    summaryStatistics: summaryStatisticsReducer,
   },
 });
 

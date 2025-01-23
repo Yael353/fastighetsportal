@@ -23,16 +23,13 @@ import { ChartTest } from "@/components/ui/ChartTest";
 
 export function PropertyList() {
   const [currentPage, setCurrentPage] = useState(1);
-  const sensorDomainsPerPage = 10;
+  const sensorDomainsPerPage = 9;
   const dispatch = useDispatch<AppDispatch>();
 
   const { sensorDomains, loading, error } = useSelector(
     (state: RootState) => state.overview
   );
 
-  console.log("sensorDomains", sensorDomains);
-
-  // Hämta autentiseringstoken från localStorage
   const authToken = getAuthToken();
 
   useEffect(() => {
@@ -53,7 +50,6 @@ export function PropertyList() {
   const sensorDomainsArray = Array.isArray(sensorDomains?.data)
     ? sensorDomains.data
     : [];
-  console.log("sensorDomainsArray ", sensorDomainsArray);
 
   const totalPages = sensorDomainsArray.length
     ? Math.ceil(sensorDomainsArray.length / sensorDomainsPerPage)

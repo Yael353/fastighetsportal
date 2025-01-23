@@ -52,3 +52,7 @@ export type SensorDomain = {
   controllers: SensorDomainController[];
   harvester: SensorDomainHarvester;
 };
+
+export interface SensorDomainsResponse {
+  data: SensorDomain[];
+}

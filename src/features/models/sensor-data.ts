@@ -90,7 +90,10 @@ export type BuildingResponse = {
   size_kvm_distribution: object;
 };
 
-export type BuildingsResponse = Map<string, object>;
+export type BuildingsResponse = Record<string, BuildingResponse>;
+
+// export type BuildingsResponse = Map<string, object>;
+// export type BuildingsResponse = Record<string, object>; // Uppdaterad definition
 
 export type ApartmentConsumptionResponse = {
   id: string;
