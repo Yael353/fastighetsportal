@@ -35,32 +35,31 @@ export default function DetailedPageHeader() {
   const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${location.latitude},${location.longitude}&zoom=16&size=600x200&maptype=roadmap&markers=color:red|${location.latitude},${location.longitude}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`;
 
   return (
-    <div className="">
+    <div className="w-full">
       {/* Static Satellite Map */}
-      <div className="w-full flex justify-center">
+      <div className="w-full">
         <img
           src={staticMapUrl}
           alt="Static roadmap"
-          className="rounded-md w-full sm:w-[90%] 2xl:w-[95%] h-[350px]"
+          className="rounded-md w-full sm:w-[100%] 2xl:w-[95%%] h-auto"
           style={{
             maskImage:
               "linear-gradient(to bottom, rgba(255, 255, 255, 1) 85%, rgba(255, 255, 255, 0) 90%)",
           }}
         />
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white to-transparent"></div>{" "}
-      </div>
 
-      {/* Property Information */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-center gap-x-5">
-            <CardTitle className="text-3xl font-bold text-gray-800 tracking-wide first-letter:uppercase">
-              {name.charAt(0).toUpperCase() + name.slice(1)}
-            </CardTitle>
-            <FaHome size={30} />
-          </div>
-        </CardHeader>
-      </Card>
+        {/* Property Information */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-center gap-x-5">
+              <CardTitle className="text-3xl font-bold text-gray-800 tracking-wide first-letter:uppercase">
+                {name.charAt(0).toUpperCase() + name.slice(1)}
+              </CardTitle>
+              <FaHome size={30} />
+            </div>
+          </CardHeader>
+        </Card>
+      </div>
 
       {/* Additional Information */}
       <Card className="mt-10 p-20">Tja</Card>
