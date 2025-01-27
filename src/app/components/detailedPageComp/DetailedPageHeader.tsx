@@ -3,10 +3,21 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "next/navigation";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AppDispatch, RootState } from "@/features/store/store";
 import { fetchSensorDomain } from "@/features/thunks/fetchSensors";
 import { FaHome } from "react-icons/fa";
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+
+// Mock data för månatlig beläggning
+const occupancyData = [
+  { month: 'Jan', rate: 92 },
+  { month: 'Feb', rate: 94 },
+  { month: 'Mar', rate: 95 },
+  { month: 'Apr', rate: 95 },
+  { month: 'Maj', rate: 96 },
+  { month: 'Jun', rate: 95 },
+];
 
 export default function DetailedPageHeader() {
   const { id } = useParams(); // Hämta ID från URL
@@ -35,34 +46,108 @@ export default function DetailedPageHeader() {
   const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${location.latitude},${location.longitude}&zoom=16&size=600x200&maptype=roadmap&markers=color:red|${location.latitude},${location.longitude}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`;
 
   return (
-    <div className="w-full">
+    <div className="">
       {/* Static Satellite Map */}
-      <div className="w-full">
+      <div className="flex justify-center">
         <img
           src={staticMapUrl}
           alt="Static roadmap"
-          className="rounded-md w-full sm:w-[100%] 2xl:w-[95%%] h-auto"
+          className="rounded-md w-full sm:w-[90%] 2xl:w-[95%] h-[350px]"
           style={{
             maskImage:
               "linear-gradient(to bottom, rgba(255, 255, 255, 1) 85%, rgba(255, 255, 255, 0) 90%)",
           }}
         />
-
-        {/* Property Information */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-center gap-x-5">
-              <CardTitle className="text-3xl font-bold text-gray-800 tracking-wide first-letter:uppercase">
-                {name.charAt(0).toUpperCase() + name.slice(1)}
-              </CardTitle>
-              <FaHome size={30} />
-            </div>
-          </CardHeader>
-        </Card>
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white to-transparent"></div>{" "}
       </div>
 
+      {/* Property Information */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-center gap-x-5">
+            <CardTitle className="text-3xl font-bold text-gray-800 tracking-wide first-letter:uppercase">
+              {name.charAt(0).toUpperCase() + name.slice(1)}
+            </CardTitle>
+            <FaHome size={30} />
+          </div>
+        </CardHeader>
+      </Card>
+
       {/* Additional Information */}
-      <Card className="mt-10 p-20">Tja</Card>
+      <div className="flex flex-row gap-2 overflow-x-auto w-full">
+            <Card className="flex-1 min-w-[250px]">
+              <CardHeader className="p-4">
+                <CardTitle className="text-lg">Outdoor air temperature</CardTitle>
+                {/* <CardDescription>Beläggningsgrad över tid</CardDescription> */}
+              </CardHeader>
+              <CardContent className="p-2">
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={occupancyData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="rate" name="Beläggning (%)" stroke="#8884d8" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+            <Card className="flex-1 min-w-[250px]">
+              <CardHeader className="p-4">
+                <CardTitle className="text-lg">Forward water temperature</CardTitle>
+                {/* <CardDescription>Beläggningsgrad över tid</CardDescription> */}
+              </CardHeader>
+              <CardContent className="p-2">
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={occupancyData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="rate" name="Beläggning (%)" stroke="#8884d8" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+            <Card className="flex-1 min-w-[250px]">
+              <CardHeader className="p-4">
+                <CardTitle className="text-lg">Indoor air temperature</CardTitle>
+                {/* <CardDescription>Beläggningsgrad över tid</CardDescription> */}
+              </CardHeader>
+              <CardContent className="p-2">
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={occupancyData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="rate" name="Beläggning (%)" stroke="#8884d8" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+            <Card className="flex-1 min-w-[250px]">
+              <CardHeader className="p-4">
+                <CardTitle className="text-lg">Return water temperature</CardTitle>
+                {/* <CardDescription>Beläggningsgrad över tid</CardDescription> */}
+              </CardHeader>
+              <CardContent className="p-2">
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={occupancyData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="rate" name="Beläggning (%)" stroke="#8884d8" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
     </div>
   );
 }

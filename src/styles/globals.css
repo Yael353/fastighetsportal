@@ -3,7 +3,20 @@
 @tailwind components;
 @tailwind utilities;
 
+
+:root {
+  --color-sales: #ff0000;
+  --color-visitors: #00ff00;
+  --color-line1: #0000ff;
+  --color-line2: #ff00ff;
+  --color-line3: #00ffff;
+  --chart-1: 0, 100%, 50%;
+  --chart-2: 120, 100%, 50%;
+  --chart-3: 240, 100%, 50%;
+}
 /* Custom global styles */
+
+
 body {
   margin: 0;
   font-family: 'Inter', sans-serif;

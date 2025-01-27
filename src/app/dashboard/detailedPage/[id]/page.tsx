@@ -16,7 +16,7 @@ export default function DetailedPage() {
   return (
     <>
       <DetailedPageHeader />
-      {/* <SensorDataComp propertyId={propertyId} /> */}
+      <SensorDataComp/>
     </>
   );
 }
