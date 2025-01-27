@@ -6,6 +6,7 @@ import sensorDataReducer from "@/features/slices/batchSlice";
 import { buildingsReducer } from "../slices/buildingsSlice";
 import apartmentReducer from "@/features/slices/ApartmentConsumptionSlice";
 import summaryStatisticsReducer from "@/features/slices/summaryStatisticsSlice";
+import algoConfigReducer from "@/features/slices/algoConfigSlice";
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     buildings: buildingsReducer,
     apartmentConsumption: apartmentReducer,
     summaryStatistics: summaryStatisticsReducer,
+    AlgoConfig: algoConfigReducer,
   },
 });
 
