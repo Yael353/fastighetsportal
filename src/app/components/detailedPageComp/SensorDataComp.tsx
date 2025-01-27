@@ -2,6 +2,7 @@
 import { useParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ChartsLayout from "@/components/ui/ChartsLayout";
+import ApartmentComp from "./ApartmentComp";
 
 // Mock data för månatlig beläggning
 const occupancyData = [
@@ -64,9 +65,9 @@ export default function SensorDataComp() {
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">UC Sensorer</TabsTrigger>
-          <TabsTrigger value="tenants">Lägenheter</TabsTrigger>
-          <TabsTrigger value="maintenance">Underhåll</TabsTrigger>
-          <TabsTrigger value="finances">Ekonomi</TabsTrigger>
+          <TabsTrigger value="apartments">Lägenheter</TabsTrigger>
+          {/* <TabsTrigger value="maintenance">Underhåll</TabsTrigger>
+          <TabsTrigger value="finances">Ekonomi</TabsTrigger> */}
         </TabsList>
         <TabsContent value="overview" className="space-y-4">
           <div className="container mx-auto p-4">
@@ -74,36 +75,11 @@ export default function SensorDataComp() {
           </div>
         </TabsContent>
 
-        {/* <TabsContent value="tenants">
-          <Card>
-            <CardHeader>
-              <CardTitle>Hyresgäster</CardTitle>
-              <CardDescription>Aktiva hyreskontrakt</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Företag</TableHead>
-                    <TableHead>Lokal</TableHead>
-                    <TableHead>Yta (m²)</TableHead>
-                    <TableHead>Kontraktsperiod</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {tenants.map((tenant) => (
-                    <TableRow key={tenant.id}>
-                      <TableCell className="font-medium">{tenant.name}</TableCell>
-                      <TableCell>{tenant.space}</TableCell>
-                      <TableCell>{tenant.area}</TableCell>
-                      <TableCell>{tenant.contract}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+        <TabsContent value="apartments">
+          <ApartmentComp/>
         </TabsContent>
+
+        {/*
         <TabsContent value="maintenance">
           <Card>
             <CardHeader>

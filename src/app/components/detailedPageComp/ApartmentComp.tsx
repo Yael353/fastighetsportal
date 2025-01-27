@@ -1,11 +1,7 @@
-import React from 'react'
+import React from "react";
 
 function ApartmentComp() {
-  return (
-    <div>
-      
-    </div>
-  )
+  return <div>Tja</div>;
 }
 
-export default ApartmentComp
+export default ApartmentComp;
