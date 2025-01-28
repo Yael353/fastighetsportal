@@ -5,15 +5,16 @@
 
 
 :root {
-  --color-sales: #ff0000;
-  --color-visitors: #00ff00;
-  --color-line1: #0000ff;
-  --color-line2: #ff00ff;
-  --color-line3: #00ffff;
-  --chart-1: 0, 100%, 50%;
-  --chart-2: 120, 100%, 50%;
-  --chart-3: 240, 100%, 50%;
+  --color-sales: #ff6b6b;      /* Mjukare röd */
+  --color-visitors: #6bff6b;  /* Mjukare grön */
+  --color-line1: #6b6bff;     /* Mjukare blå */
+  --color-line2: #ff6bff;     /* Mjukare rosa */
+  --color-line3: #6bffff;     /* Mjukare cyan */
+  --chart-1: 0, 80%, 70%;     /* HSL: Mjuk röd */
+  --chart-2: 120, 80%, 70%;   /* HSL: Mjuk grön */
+  --chart-3: 240, 80%, 70%;   /* HSL: Mjuk blå */
 }
+
 /* Custom global styles */
 
 

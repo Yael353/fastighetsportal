@@ -92,9 +92,6 @@ export type BuildingResponse = {
 
 export type BuildingsResponse = Record<string, BuildingResponse>;
 
-// export type BuildingsResponse = Map<string, object>;
-// export type BuildingsResponse = Record<string, object>; // Uppdaterad definition
-
 export type ApartmentConsumptionResponse = {
   id: string;
   description: string;

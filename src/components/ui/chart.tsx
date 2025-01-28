@@ -56,7 +56,7 @@ const ChartContainer = React.forwardRef<
           className
         )}
         {...props}
-      >
+      > 
         <ChartStyle id={chartId} config={config} />
         <RechartsPrimitive.ResponsiveContainer>
           {children}
@@ -68,37 +68,47 @@ const ChartContainer = React.forwardRef<
 ChartContainer.displayName = "Chart"
 
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
-  const colorConfig = Object.entries(config).filter(
-    ([, config]) => config.theme || config.color
-  )
-
-  if (!colorConfig.length) {
-    return null
+  // Kontrollera att nödvändiga props finns
+  if (!id || !config || Object.keys(config).length === 0) {
+    console.error("ChartStyle: Missing or invalid props", { id, config });
+    return null;
   }
 
+  // Få alla färgkonfigurationer från config
+  const colorConfig = Object.entries(config).filter(([_, itemConfig]) => {
+    return "theme" in itemConfig || "color" in itemConfig;
+  });
+
+  // Om det inte finns några färginställningar, returnera null
+  if (!colorConfig.length) {
+    return null;
+  }
+
+  // Returnera genererad CSS för varje tema och konfiguration
   return (
     <style
       dangerouslySetInnerHTML={{
         __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
+          .map(([theme, prefix]) => `
 ${prefix} [data-chart=${id}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
     const color =
-      itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
-      itemConfig.color
-    return color ? `  --color-${key}: ${color};` : null
+      "theme" in itemConfig
+        ? itemConfig.theme[theme as keyof typeof THEMES]
+        : itemConfig.color;
+    return color ? `  --color-${key}: ${color};` : null;
   })
+  .filter(Boolean) // Filtrera bort null-värden
   .join("\n")}
 }
-`
-          )
+`)
           .join("\n"),
       }}
     />
-  )
-}
+  );
+};
+
 
 const ChartTooltip = RechartsPrimitive.Tooltip
 
