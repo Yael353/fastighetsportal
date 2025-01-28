@@ -2,7 +2,7 @@
 import { useParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ChartsLayout from "@/components/ui/ChartsLayout";
-import ApartmentComp from "./ApartmentComp";
+import ApartmentComp from "./apartment/ApartmentComp";
 
 // Mock data för månatlig beläggning
 const occupancyData = [
