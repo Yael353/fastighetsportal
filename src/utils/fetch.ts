@@ -9,7 +9,6 @@ export const authFetch = async (
 ): Promise<Response> => {
   const token = getAuthToken();
 
-
   if (!token) {
     console.error("No valid accessToken found. Logging out...");
     dispatch(logout());
@@ -37,7 +36,6 @@ export const authFetch = async (
     Authorization: `Bearer ${token}`,
     "Content-Type": "application/json",
   };
-  console.log("Request headers:", headers);
 
   const options: RequestInit = {
     ...init,

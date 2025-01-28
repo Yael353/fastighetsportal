@@ -26,14 +26,17 @@ const summaryStatisticsSlice = createSlice({
       })
       .addCase(
         fetchSummaryApartmentStatistics.fulfilled,
+
         (
           state,
           action: PayloadAction<SummarySensorDomainApartmentStatisticsResponse>
         ) => {
+          console.log("Fetch Summary Fulfilled Payload:", action.payload);
           state.loading = false;
           state.data = action.payload;
         }
       )
+
       .addCase(fetchSummaryApartmentStatistics.rejected, (state, action) => {
         state.loading = false;
         state.error =

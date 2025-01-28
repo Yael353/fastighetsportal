@@ -17,7 +17,7 @@ export const store = configureStore({
     buildings: buildingsReducer,
     apartmentConsumption: apartmentReducer,
     summaryStatistics: summaryStatisticsReducer,
-    AlgoConfig: algoConfigReducer,
+    algoConfig: algoConfigReducer,
   },
 });
 

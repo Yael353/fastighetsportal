@@ -19,7 +19,6 @@ const algoConfigSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    // Hantera GET (fetchAlgoConfig)
     builder
       .addCase(fetchAlgoConfig.pending, (state) => {
         state.loading = true;
@@ -34,13 +33,13 @@ const algoConfigSlice = createSlice({
         state.error = action.payload || "Ett oväntat fel inträffade.";
       });
 
-    // Hantera POST (postAlgoConfig)
     builder
       .addCase(postAlgoConfig.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(postAlgoConfig.fulfilled, (state, action) => {
+        console.log("Fetched AlgoConfig:", action.payload);
         state.loading = false;
         state.data = action.payload; // Uppdatera med den nya datan om nödvändigt
       })

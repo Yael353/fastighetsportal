@@ -14,7 +14,7 @@ export const fetchAlgoConfig = createAsyncThunk<
   "algoConfig/fetch",
   async ({ controllerId }, { dispatch, rejectWithValue }) => {
     try {
-      console.log(`Fetching algo config for controller ID: ${controllerId}`);
+      console.debug("Fetching algo config for controller ID:", controllerId);
       console.log(`Request URL: ${apiUrl}/open/v1/algo_config/${controllerId}`);
 
       // Anropa API:et med authFetch
@@ -24,8 +24,6 @@ export const fetchAlgoConfig = createAsyncThunk<
         dispatch
       );
 
-      console.log("Raw response:", response);
-
       // Kontrollera HTTP-status
       if (response.status === 404) {
         throw new RESPONSE_404("Fel uppgifter, prova igen");
@@ -33,6 +31,7 @@ export const fetchAlgoConfig = createAsyncThunk<
         throw new RESPONSE_403("Fel uppgifter, prova igen");
       }
 
+      console.log("Response status:", response.status);
       // Parsar JSON-svaret
       const responseJson = await response.json();
       console.log("Parsed API response JSON:", responseJson);
@@ -51,8 +50,10 @@ export const fetchAlgoConfig = createAsyncThunk<
           "Ett oväntat fel inträffade vid hämtning av algoritmkonfiguration."
       );
     }
+    
   }
 );
+console.log("Test log to check console visibility");
 
 interface PostAlgoConfigArgs {
   controllerId: string;
