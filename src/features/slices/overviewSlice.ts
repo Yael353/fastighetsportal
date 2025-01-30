@@ -20,31 +20,26 @@ const initialState: OverviewState = {
 // AsyncThunk för att hämta sensor-domäner
 export const getList = createAsyncThunk<
   SensorDomain[],
-  { offset: number; limit: number },
+  { offset?: number; limit?: number } | undefined, // 🔹 Gör argumenten valfria
   { state: RootState; dispatch: AppDispatch; rejectValue: string }
 >(
   "overview/getList",
-  async ({ offset, limit }, { dispatch, rejectWithValue }) => {
-    const params = new URLSearchParams({
-      offset: offset.toString(),
-      limit: limit.toString(),
-    });
-
+  async ({ offset, limit } = {}, { dispatch, rejectWithValue }) => {
+    // 🔹 Default till tomt objekt
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
     try {
-      const response = await authFetch(
-        `${apiUrl}/open/v1/sensor_domains?offset=0&`,
-        { method: "GET" },
-        dispatch
-      );
+      // 🔹 Skapa URL baserat på om offset och limit finns
+      let url = `${apiUrl}/open/v1/sensor_domains`;
+      if (offset !== undefined && limit !== undefined) {
+        url += `?offset=${offset}&limit=${limit}`;
+      }
 
-      // ${params}
-
+      const response = await authFetch(url, { method: "GET" }, dispatch);
       const responseJson = await response.json();
+
       return responseJson as SensorDomain[];
     } catch (error: any) {
-      // console.error("Error fetching sensor domains:", error.message || error);
       return rejectWithValue(
         error.message || "Ett fel uppstod vid hämtning av sensor-domäner"
       );

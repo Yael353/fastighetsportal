@@ -1,22 +1,34 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import DetailedPageHeader from "@/app/components/detailedPageComp/DetailedPageHeader";
 import SensorDataComp from "@/app/components/detailedPageComp/SensorDataComp";
-import { useSelector } from "react-redux";
-import { RootState } from "@/features/store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/features/store/store";
+import { useParams } from "next/navigation";
+import { getAuthToken } from "@/utils/auth";
+import { getList } from "@/features/slices/overviewSlice";
+import { fetchSensorDomain } from "@/features/thunks/fetchSensors";
 
 export default function DetailedPage() {
-  // const propertyId = useSelector((state: RootState) => state.property.data?.id);
+  type UserParams = {
+    id: string;
+  };
 
-  // if (!propertyId) {
-  //   return <p>Property not found.</p>;
-  // }
+  const authToken = getAuthToken();
+  const dispatch = useDispatch<AppDispatch>(); // 🟢 Flytta `useDispatch` hit
+  const { id } = useParams<UserParams>();
+
+  useEffect(() => {
+    if (id && authToken) {
+      dispatch(fetchSensorDomain({ id }));; // 🟢 Anropa dispatch rätt här
+    }
+  }, [id, authToken, dispatch]);
 
   return (
     <>
       <DetailedPageHeader />
-      <SensorDataComp/>
+      <SensorDataComp id={id} />
     </>
   );
 }

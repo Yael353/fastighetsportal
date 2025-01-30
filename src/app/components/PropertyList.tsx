@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getList } from "@/features/slices/overviewSlice";
 import { RootState, AppDispatch } from "@/features/store/store";
@@ -19,7 +19,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { SensorDomain } from "@/features/models/sensor-data";
 import { getAuthToken } from "@/utils/auth";
 import { getSensorDomainSensorDescription } from "@/utils/sensors";
-import { ChartTest } from "@/components/ui/ChartTest";
 
 export function PropertyList() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -47,9 +46,13 @@ export function PropertyList() {
   }, [currentPage, dispatch, authToken]);
 
   // Hämta sensor-domäner från sensorDomains.data
-  const sensorDomainsArray = Array.isArray(sensorDomains?.data)
-    ? sensorDomains.data
-    : [];
+  const sensorDomainsArray = useMemo(() => {
+    return Array.isArray(sensorDomains?.data) ? sensorDomains.data : [];
+  }, [sensorDomains]);
+
+//  console.count("sensorDomäner:");
+//  console.log("sensorDomäner: ", sensorDomainsArray);
+
 
   const totalPages = sensorDomainsArray.length
     ? Math.ceil(sensorDomainsArray.length / sensorDomainsPerPage)
@@ -71,8 +74,6 @@ export function PropertyList() {
     (currentPage - 1) * sensorDomainsPerPage,
     currentPage * sensorDomainsPerPage
   );
-
-  console.log("currentsensorDomains: ", currentSensorDomains);
 
   // Rendera när datan laddas
   if (loading) {

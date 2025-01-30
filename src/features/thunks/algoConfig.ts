@@ -53,7 +53,6 @@ export const fetchAlgoConfig = createAsyncThunk<
     
   }
 );
-console.log("Test log to check console visibility");
 
 interface PostAlgoConfigArgs {
   controllerId: string;

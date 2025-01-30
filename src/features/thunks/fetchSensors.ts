@@ -31,7 +31,7 @@ export const fetchSensorDomain = createAsyncThunk<
       dispatch
     );
 
-    // console.log("sensor response:", response);
+    console.log("sensor response:", response);
 
     if (response.status === 404) {
       throw new RESPONSE_404("Fel uppgifter, prova igen");

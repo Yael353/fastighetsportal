@@ -1,79 +1,71 @@
-import React, { useMemo } from "react";
-import { useSelector } from "react-redux";
-import moment from "moment";
-import { RootState } from "@/features/store/store";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/features/store/store";
+import { getList } from "@/features/slices/overviewSlice";
+import { getAuthToken } from "@/utils/auth";
+import { fetchAlgoConfig } from "@/features/thunks/algoConfig";
 
-const ApartmentComp: React.FC = () => {
-  const algoConfig = useSelector((state: RootState) => state.algoConfig.data);
-  const summaryStatistics = useSelector(
-    (state: RootState) => state.summaryStatistics.data
+interface ApartmentCompProps {
+  id: string;
+}
+
+export default function ApartmentComp({ id }: ApartmentCompProps) {
+  const dispatch = useDispatch<AppDispatch>();
+  const authToken = getAuthToken();
+
+  // State and selector hooks
+  const sensorDomains = useSelector(
+    (state: RootState) => state.overview.sensorDomains
   );
 
-  const isLoading =
-    useSelector((state: RootState) => state.algoConfig.loading) ||
-    useSelector((state: RootState) => state.summaryStatistics.loading);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const error =
-    useSelector((state: RootState) => state.algoConfig.error) ||
-    useSelector((state: RootState) => state.summaryStatistics.error);
+  // Fetch sensor domains if auth token is available
+  useEffect(() => {
+    if (authToken) {
+      dispatch(getList());
+    } else {
+      console.error("Ingen giltig autentisering tillgänglig.");
+    }
+  }, [dispatch, authToken]);
 
-  console.log("AlgoConfig:", algoConfig);
-  console.log("SummaryStatistics:", summaryStatistics);
+  // Mark loading as false once sensorDomains is available
+  useEffect(() => {
+    if (sensorDomains) {
+      setIsLoading(false);
+    }
+  }, [sensorDomains]);
 
-  // Filtrera statistik för de senaste 30 dagarna
-  const filteredStatistics = useMemo(() => {
-    if (!summaryStatistics) return null;
+  // Find the sensor domain for the given ID
+  const sensorDomain = sensorDomains?.data.find((item) => item.id === id);
 
-    const thirtyDaysAgo = moment().subtract(30, "days");
+  console.log("sensordomain", sensorDomain);
+  
 
-    return Object.entries(summaryStatistics).reduce(
-      (acc, [sizeType, stats]) => {
-        const filteredStats = stats.filter((stat) =>
-          moment(stat.timestamp).isAfter(thirtyDaysAgo)
-        );
-        if (filteredStats.length > 0) {
-          acc[sizeType] = filteredStats;
-        }
-        return acc;
-      },
-      {} as typeof summaryStatistics
-    );
-  }, [summaryStatistics]);
+  // Extract controllers and controller IDs
+  const controllers = sensorDomain?.controllers || [];
+  const controllerIds = controllers.map((controller) => controller.id);
+  const seperatedIds = controllerIds.join(",");
 
+  console.log("lista ", controllerIds);
+ 
+  useEffect(() => {
+    if (authToken && controllerIds.length > 0) {
+      controllerIds.forEach((element) => {
+        dispatch(fetchAlgoConfig(element));
+      });
+      console.log("Separedade2", seperatedIds);
+    }
+  }, [authToken, JSON.stringify(controllerIds), dispatch]);
+
+  // Render logic (no hooks inside this conditional block)
   if (isLoading) {
-    return <p>Loading...</p>;
+    return <div>Laddar...</div>;
   }
 
-  if (error) {
-    return <p className="text-red-500">Error: {error}</p>;
+  if (!sensorDomain) {
+    return <div>Ingen sensor domain hittades för det här ID:t.</div>;
   }
 
-  if (!filteredStatistics || !algoConfig) {
-    return <p>No data available</p>;
-  }
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {Object.entries(filteredStatistics).map(([sizeType, stats]) => (
-        <div
-          key={sizeType}
-          className="card bg-gray-100 p-4 rounded-lg shadow-lg"
-        >
-          <h2 className="text-xl font-bold mb-2">{sizeType}</h2>
-          {stats.map((stat, index) => (
-            <div key={index} className="mb-2">
-              <p className="text-lg font-medium">
-                {stat.avg.toFixed(1)} {stat.u_name}
-              </p>
-            </div>
-          ))}
-          <div className="mt-4 text-sm text-gray-500">
-            Temperatur (komfort): {algoConfig.iat_sp.toFixed(2)} °C
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-export default ApartmentComp;
+  return <></>;
+}

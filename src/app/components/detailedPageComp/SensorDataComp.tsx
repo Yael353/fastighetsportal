@@ -4,10 +4,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ChartsLayout from "@/components/ui/ChartsLayout";
 import ApartmentComp from "./apartment/ApartmentComp";
 
+interface SensorDataCompProps {
+  id: string; // 🔹 Acceptera `id` som en prop
+}
 
-export default function SensorDataComp() {
-  const { id } = useParams();
-
+export default function SensorDataComp({ id }: SensorDataCompProps) {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <Tabs defaultValue="overview" className="space-y-4">
@@ -24,7 +25,7 @@ export default function SensorDataComp() {
         </TabsContent>
 
         <TabsContent value="apartments">
-          <ApartmentComp/>
+          <ApartmentComp id={id} />
         </TabsContent>
 
         {/*
