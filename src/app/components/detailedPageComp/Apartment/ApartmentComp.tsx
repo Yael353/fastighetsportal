@@ -40,7 +40,6 @@ export default function ApartmentComp({ id }: ApartmentCompProps) {
   const sensorDomain = sensorDomains?.data.find((item) => item.id === id);
 
   console.log("sensordomain", sensorDomain);
-  
 
   // Extract controllers and controller IDs
   const controllers = sensorDomain?.controllers || [];
@@ -48,15 +47,15 @@ export default function ApartmentComp({ id }: ApartmentCompProps) {
   const seperatedIds = controllerIds.join(",");
 
   console.log("lista ", controllerIds);
- 
+
   useEffect(() => {
     if (authToken && controllerIds.length > 0) {
-      controllerIds.forEach((element) => {
-        dispatch(fetchAlgoConfig(element));
+      controllerIds.forEach((controllerId: string) => {
+        dispatch(fetchAlgoConfig({ controllerId }));
       });
       console.log("Separedade2", seperatedIds);
     }
-  }, [authToken, JSON.stringify(controllerIds), dispatch]);
+  }, [authToken, controllerIds, dispatch]);
 
   // Render logic (no hooks inside this conditional block)
   if (isLoading) {

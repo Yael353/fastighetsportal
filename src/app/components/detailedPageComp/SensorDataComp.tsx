@@ -1,7 +1,7 @@
 "use client";
 import { useParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ChartsLayout from "@/components/ui/ChartsLayout";
+import ChartsLayout from "@/app/components/ChartsLayout";
 import ApartmentComp from "./apartment/ApartmentComp";
 
 interface SensorDataCompProps {
@@ -20,7 +20,7 @@ export default function SensorDataComp({ id }: SensorDataCompProps) {
         </TabsList>
         <TabsContent value="overview" className="space-y-4">
           <div className="container mx-auto ">
-            <ChartsLayout />
+            <ChartsLayout id={id} />
           </div>
         </TabsContent>
 

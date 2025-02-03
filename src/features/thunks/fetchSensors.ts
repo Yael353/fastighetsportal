@@ -12,6 +12,7 @@ import { AppDispatch, RootState } from "../store/store";
 import { Moment } from "moment";
 import { formatUtcString } from "@/utils/date";
 import { SummarySensorDomainApartmentStatisticsResponse } from "../models/statistics";
+import { paginateArray } from "@/utils/paginator";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -31,8 +32,6 @@ export const fetchSensorDomain = createAsyncThunk<
       dispatch
     );
 
-    console.log("sensor response:", response);
-
     if (response.status === 404) {
       throw new RESPONSE_404("Fel uppgifter, prova igen");
     } else if (response.status === 403) {
@@ -41,11 +40,10 @@ export const fetchSensorDomain = createAsyncThunk<
 
     const responseJson = await response.json();
 
-    // console.log("Fetched sensor domain:", responseJson);
-
+    // console.log("Sensordomain från fetchSensors ", responseJson);
     return responseJson as SensorDomain;
   } catch (error: any) {
-    // console.error("Error fetching sensor domain:", error.message || error);
+    console.error("Error fetching sensor domain:", error.message || error);
 
     if (error instanceof RESPONSE_404 || error instanceof RESPONSE_403) {
       return rejectWithValue(error.message);
@@ -59,7 +57,7 @@ export const fetchSensorDomain = createAsyncThunk<
 
 // hämta batch-sensordata
 export const fetchBatchSensorData = createAsyncThunk<
-  BatchSensorDataResponse,
+  BatchSensorDataResponse[],
   {
     sensorDomainId: string;
     sensorIds: string[];
@@ -67,7 +65,7 @@ export const fetchBatchSensorData = createAsyncThunk<
     endUtc: Moment;
     freq: BatchSensorDataFreq;
   },
-  { state: RootState; dispatch: AppDispatch; rejectValue: string } // Context-typer
+  { state: RootState; dispatch: AppDispatch; rejectValue: string }
 >(
   "sensorDomain/fetchBatchSensorData",
   async (
@@ -75,33 +73,40 @@ export const fetchBatchSensorData = createAsyncThunk<
     { dispatch, rejectWithValue }
   ) => {
     try {
-      // Bygg query-parametrar
-      const params = new URLSearchParams({
-        sensors: sensorIds.join(","),
-        freq: freq.toString(),
-        start_utc: formatUtcString(startUtc),
-        end_utc: formatUtcString(endUtc),
-      });
-
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
-      // Skicka API-anrop med authFetch
-      const response = await authFetch(
-        `${apiUrl}/open/v1/sensor_domain/${sensorDomainId}/batch/data?${params}`,
-        { method: "GET" },
-        dispatch
-      );
-
-      // Kontrollera svarskod
-      if (response.status !== 200) {
-        throw new RESPONSE_500("Någonting gick fel");
+      if (!apiUrl) {
+        throw new Error("API URL saknas i miljövariabler!");
       }
 
-      // Parsar JSON-svaret
-      const responseJson = await response.json();
-      // console.log("Fetched batch sensor data:", responseJson);
+      // Använd paginering för att dela upp sensorIds i batcher
+      const MAX_SENSOR_IDS_PER_BATCH = 10;
+      const sensorBatches = paginateArray(sensorIds, MAX_SENSOR_IDS_PER_BATCH);
+      const allResponses: BatchSensorDataResponse[] = [];
 
-      return responseJson as BatchSensorDataResponse; // Returnera datan till thunken
+      // Loopa igenom varje batch och gör ett API-anrop
+      for (const batch of sensorBatches) {
+        const params = new URLSearchParams({
+          sensors: batch.join(","), // Skicka endast en batch
+          freq: freq.toString(),
+          start_utc: formatUtcString(startUtc),
+          end_utc: formatUtcString(endUtc),
+        });
+
+        const fullUrl = `${apiUrl}/open/v1/sensor_domain/${sensorDomainId}/batch/data?${params}`;
+        // console.log("Fetching Batch Sensor Data from:", fullUrl);
+
+        // Skicka API-anrop med authFetch
+        const response = await authFetch(fullUrl, { method: "GET" }, dispatch);
+
+        // Parsar och lagrar varje batchs svar
+        const responseJson = await response.json();
+        // console.log("batchSensorData från batch:", responseJson);
+
+        allResponses.push(responseJson);
+      }
+
+      // Kombinera alla batch-svar till en array
+      return allResponses;
     } catch (error: any) {
       console.error(
         "Error fetching batch sensor data:",
@@ -115,6 +120,7 @@ export const fetchBatchSensorData = createAsyncThunk<
     }
   }
 );
+
 // Hämta byggnader
 export const fetchBuildings = createAsyncThunk<
   BuildingsResponse,

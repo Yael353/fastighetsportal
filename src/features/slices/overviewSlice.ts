@@ -38,6 +38,7 @@ export const getList = createAsyncThunk<
       const response = await authFetch(url, { method: "GET" }, dispatch);
       const responseJson = await response.json();
 
+      console.log("responseJson ", responseJson);
       return responseJson as SensorDomain[];
     } catch (error: any) {
       return rejectWithValue(
