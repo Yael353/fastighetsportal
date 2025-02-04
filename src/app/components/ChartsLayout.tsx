@@ -48,6 +48,27 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
     );
   }, [sensorDomain]);
 
+  const filteredFWT = useMemo(() => {
+    if (!sensorDomain?.sensors) return [];
+    return sensorDomain.sensors.filter(
+      (sensor) => sensor.vala_description?.name === "FWT"
+    );
+  }, [sensorDomain]);
+
+  const filteredRWT = useMemo(() => {
+    if (!sensorDomain?.sensors) return [];
+    return sensorDomain.sensors.filter(
+      (sensor) => sensor.vala_description?.name === "RWT"
+    );
+  }, [sensorDomain]);
+
+  // const filteredFWT_SP = useMemo(() => {
+  //   if (!sensorDomain?.sensors) return [];
+  //   return sensorDomain.sensors.filter(
+  //     (sensor) => sensor.vala_description?.name === "FWT_SP"
+  //   );
+  // }, [sensorDomain]);
+
   // Effekt för att ladda sensor-domän om den saknas
   useEffect(() => {
     if (!sensorDomain) {
@@ -62,7 +83,9 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
     // Kombinera sensor-id:n från båda grupperna
     const oatIds = filteredOAT.map((sensor) => sensor.id);
     const iatIds = filteredIAT.map((sensor) => sensor.id);
-    const sensorIds = Array.from(new Set([...oatIds, ...iatIds]));
+    const fwtIds = filteredFWT.map((sensor) => sensor.id);
+    const rwtIds = filteredRWT.map((sensor) => sensor.id);
+    const sensorIds = Array.from(new Set([...oatIds, ...iatIds , ...fwtIds, ...rwtIds]));
 
     if (sensorIds.length === 0) {
       console.warn(
@@ -80,7 +103,7 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
         freq: BatchSensorDataFreq.raw, // Använder enum-värdet
       })
     );
-  }, [dispatch, sensorDomain, filteredOAT, filteredIAT]);
+  }, [dispatch, sensorDomain, filteredOAT, filteredIAT, filteredFWT, filteredRWT]);
 
   // Funktion för att bygga chartData för en given sensorgrupp
   const buildChartData = (
@@ -113,6 +136,43 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
     () => buildChartData(filteredIAT),
     [filteredIAT, sensorsState]
   );
+
+  const chartDataFWT = useMemo(
+    () => buildChartData(filteredFWT),
+    [filteredFWT, sensorsState]
+  );
+
+  const chartDataRWT = useMemo(
+    () => buildChartData(filteredRWT),
+    [filteredRWT, sensorsState]
+  );
+
+  const mergeChartData = (dataFWT, dataRWT) => {
+    const mergedData = new Map();
+  
+    // Lägg till FWT-data i Map baserat på tid
+    dataFWT.forEach((item) => {
+      mergedData.set(item.time, { time: item.time, [filteredFWT[0]?.id]: item[filteredFWT[0]?.id] });
+    });
+  
+    // Lägg till RWT-data i Map, se till att tid finns
+    dataRWT.forEach((item) => {
+      if (mergedData.has(item.time)) {
+        mergedData.get(item.time)[filteredRWT[0]?.id] = item[filteredRWT[0]?.id];
+      } else {
+        mergedData.set(item.time, { time: item.time, [filteredRWT[0]?.id]: item[filteredRWT[0]?.id] });
+      }
+    });
+  
+    // Konvertera tillbaka till array och sortera efter tid
+    return Array.from(mergedData.values()).sort((a, b) => new Date(a.time) - new Date(b.time));
+  };
+  
+  const mergedChartData = useMemo(
+    () => mergeChartData(chartDataFWT, chartDataRWT),
+    [chartDataFWT, chartDataRWT]
+  );
+  
 
   // Kontroll för laddning
   const propertyLoading = useSelector(
@@ -192,13 +252,13 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={[...chartDataOAT, ...chartDataIAT]}>
+            <LineChart data={mergedChartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="time" />
               <YAxis />
               <Tooltip />
               <Legend />
-              {[...filteredOAT, ...filteredIAT].map((sensor) => (
+              {[...filteredFWT, ...filteredRWT].map((sensor) => (
                 <Line
                   key={sensor.id}
                   type="monotone"
@@ -207,6 +267,7 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
                     16
                   )}`}
                   name={sensor.name}
+                  connectNulls={true}
                 />
               ))}
             </LineChart>
