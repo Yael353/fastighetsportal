@@ -5,7 +5,7 @@ import { BatchSensorDataResponse } from "../models/sensor-data";
 interface SensorDataState {
   sensors: Record<
     string,
-    { sensorData: any; loading: boolean; error: string | null }
+    { sensorData: any[]; loading: boolean; error: string | null }
   >;
 }
 
@@ -32,12 +32,10 @@ const sensorDataSlice = createSlice({
           state.sensors[sensorId].error = null;
         });
       })
+
       .addCase(fetchBatchSensorData.fulfilled, (state, action) => {
         const { meta, payload } = action;
 
-        // console.log("✅ Sensordata från API (batchsvar):", payload);
-
-        // Iterera över varje batch och slå ihop sensor_data
         payload.forEach((batch: BatchSensorDataResponse) => {
           batch.sensor_data.forEach((sensor) => {
             if (!state.sensors[sensor.id]) {
@@ -47,16 +45,28 @@ const sensorDataSlice = createSlice({
                 error: null,
               };
             }
-            // Lägg till ny data istället för att ersätta
-            state.sensors[sensor.id].sensorData = [
-              ...state.sensors[sensor.id].sensorData,
-              ...sensor.data,
-            ];
+
+            const existingData = state.sensors[sensor.id].sensorData;
+            const newData = sensor.data;
+
+            const mergedData = [...existingData];
+
+            newData.forEach((newPoint) => {
+              const exists = existingData.some(
+                (oldPoint) => oldPoint.time_utc === newPoint.time_utc
+              );
+              if (!exists) {
+                mergedData.push(newPoint);
+              }
+            });
+
+            state.sensors[sensor.id].sensorData = mergedData;
             state.sensors[sensor.id].loading = false;
             state.sensors[sensor.id].error = null;
           });
         });
       })
+
       .addCase(fetchBatchSensorData.rejected, (state, action) => {
         const { meta } = action;
         meta.arg.sensorIds.forEach((sensorId) => {

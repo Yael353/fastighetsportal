@@ -128,14 +128,13 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
     });
   };
 
-  const chartDataOAT = useMemo(
-    () => buildChartData(filteredOAT),
-    [filteredOAT, sensorsState]
-  );
-  const chartDataIAT = useMemo(
-    () => buildChartData(filteredIAT),
-    [filteredIAT, sensorsState]
-  );
+  const chartDataOAT = useMemo(() => {
+    return buildChartData(filteredOAT);
+  }, [filteredOAT.map(s => s.id).join(','), sensorsState]);
+  
+  const chartDataIAT = useMemo(() => {
+    return buildChartData(filteredIAT);
+  }, [filteredIAT.map(s => s.id).join(','), sensorsState]);
 
   const chartDataFWT = useMemo(
     () => buildChartData(filteredFWT),
