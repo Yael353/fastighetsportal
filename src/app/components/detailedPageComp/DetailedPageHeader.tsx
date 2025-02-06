@@ -8,8 +8,6 @@ import { AppDispatch, RootState } from "@/features/store/store";
 import { fetchSensorDomain } from "@/features/thunks/fetchSensors";
 import { FaHome } from "react-icons/fa";
 import {
-  // BarChart,
-  // Bar,
   LineChart,
   Line,
   XAxis,
@@ -18,10 +16,8 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  // PieChart,
-  // Pie,
-  // Cell,
 } from "recharts";
+import { useSensorData } from "@/hooks/useSensorData";
 
 // Mock data för månatlig beläggning
 const occupancyData = [
@@ -36,6 +32,17 @@ const occupancyData = [
 export default function DetailedPageHeader() {
   const { id } = useParams(); // Hämta ID från URL
   const dispatch = useDispatch<AppDispatch>();
+
+  const {
+    chartDataOAT,
+    chartDataIAT,
+    chartDataFWT,
+    chartDataRWT,
+    filteredOAT,
+    filteredIAT,
+    filteredFWT,
+    filteredRWT,
+  } = useSensorData(id);
 
   // Hämta sensordomain-data från Redux-storen
   const { data, loading, error } = useSelector(
@@ -95,18 +102,21 @@ export default function DetailedPageHeader() {
           </CardHeader>
           <CardContent className="p-2">
             <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={occupancyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
+              <LineChart data={chartDataOAT}>
+                <XAxis dataKey="time" />
                 <YAxis />
                 <Tooltip />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="rate"
-                  name="Beläggning (%)"
-                  stroke="#8884d8"
-                />
+                {filteredOAT.map((sensor) => (
+                  <Line
+                    key={sensor.id}
+                    type="monotone"
+                    dataKey={sensor.id}
+                    stroke="#28a745"
+                    name={sensor.name}
+                    dot={false}
+                    strokeWidth={2}
+                  />
+                ))}
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -118,18 +128,21 @@ export default function DetailedPageHeader() {
           </CardHeader>
           <CardContent className="p-2">
             <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={occupancyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
+            <LineChart data={chartDataFWT}>
+                <XAxis dataKey="time" />
                 <YAxis />
                 <Tooltip />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="rate"
-                  name="Beläggning (%)"
-                  stroke="#8884d8"
-                />
+                {filteredFWT.map((sensor) => (
+                  <Line
+                    key={sensor.id}
+                    type="monotone"
+                    dataKey={sensor.id}
+                    stroke="#6f42c1"
+                    name={sensor.name}
+                    dot={false}
+                    strokeWidth={2}
+                  />
+                ))}
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -141,18 +154,21 @@ export default function DetailedPageHeader() {
           </CardHeader>
           <CardContent className="p-2">
             <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={occupancyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
+            <LineChart data={chartDataIAT}>
+                <XAxis dataKey="time" />
                 <YAxis />
                 <Tooltip />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="rate"
-                  name="Beläggning (%)"
-                  stroke="#8884d8"
-                />
+                {filteredIAT.map((sensor) => (
+                  <Line
+                    key={sensor.id}
+                    type="monotone"
+                    dataKey={sensor.id}
+                    stroke="#dc3545"
+                    name={sensor.name}
+                    dot={false}
+                    strokeWidth={2}
+                  />
+                ))}
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -164,18 +180,21 @@ export default function DetailedPageHeader() {
           </CardHeader>
           <CardContent className="p-2">
             <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={occupancyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
+            <LineChart data={chartDataRWT}>
+                <XAxis dataKey="time" />
                 <YAxis />
                 <Tooltip />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="rate"
-                  name="Beläggning (%)"
-                  stroke="#8884d8"
-                />
+                {filteredRWT.map((sensor) => (
+                  <Line
+                    key={sensor.id}
+                    type="monotone"
+                    dataKey={sensor.id}
+                    stroke="#007bff"
+                    name={sensor.name}
+                    dot={false}
+                    strokeWidth={2}
+                  />
+                ))}
               </LineChart>
             </ResponsiveContainer>
           </CardContent>

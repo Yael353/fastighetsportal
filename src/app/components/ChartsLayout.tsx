@@ -23,6 +23,11 @@ interface ApartmentCompProps {
   id: string;
 }
 
+const sensorColors = {
+  FWT: "#6f42c1", // Blå
+  RWT: "#007bff", // Röd
+};
+
 const ChartsLayout = ({ id }: ApartmentCompProps) => {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -203,10 +208,10 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
                     key={sensor.id}
                     type="monotone"
                     dataKey={sensor.id}
-                    stroke={`#${Math.floor(Math.random() * 16777215).toString(
-                      16
-                    )}`}
+                    stroke="#28a745"
                     name={sensor.name}
+                    dot={false}
+                    strokeWidth={2}
                   />
                 ))}
               </LineChart>
@@ -232,10 +237,10 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
                     key={sensor.id}
                     type="monotone"
                     dataKey={sensor.id}
-                    stroke={`#${Math.floor(Math.random() * 16777215).toString(
-                      16
-                    )}`}
+                    stroke="#dc3545"
                     name={sensor.name}
+                    dot={false}
+                    strokeWidth={2}
                   />
                 ))}
               </LineChart>
@@ -262,11 +267,11 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
                   key={sensor.id}
                   type="monotone"
                   dataKey={sensor.id}
-                  stroke={`#${Math.floor(Math.random() * 16777215).toString(
-                    16
-                  )}`}
+                  stroke={sensorColors[sensor.vala_description?.name] || "#808080"} // FWT = blå, RWT = röd
                   name={sensor.name}
                   connectNulls={true}
+                  dot={false}
+                  strokeWidth={2}
                 />
               ))}
             </LineChart>
