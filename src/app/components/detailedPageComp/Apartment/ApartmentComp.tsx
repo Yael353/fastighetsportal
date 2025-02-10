@@ -1,70 +1,114 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/features/store/store";
-import { getList } from "@/features/slices/overviewSlice";
 import { getAuthToken } from "@/utils/auth";
 import { fetchAlgoConfig } from "@/features/thunks/algoConfig";
+import { fetchSummaryApartmentStatistics } from "@/features/thunks/fetchSensors";
+import { useParams } from "next/navigation"; // Importera useParams
+import ApartmentsCards from "./ApartmentsCards";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
-interface ApartmentCompProps {
-  id: string;
-}
-
-export default function ApartmentComp({ id }: ApartmentCompProps) {
+export default function ApartmentComp() {
   const dispatch = useDispatch<AppDispatch>();
   const authToken = getAuthToken();
+  const { id: sensorDomainId } = useParams(); // Hämta sensorDomainId från URL:en
 
-  // State and selector hooks
-  const sensorDomains = useSelector(
-    (state: RootState) => state.overview.sensorDomains
+  // Hämta controllers från property-store
+  const property = useSelector((state: RootState) => state.property.data);
+  const controllers = property?.controllers || [];
+
+  // Hämta algoConfig (vi visar bara iat_sp från denna)
+  const algoConfig = useSelector((state: RootState) => state.algoConfig.data);
+  const algoLoading = useSelector(
+    (state: RootState) => state.algoConfig.loading
+  );
+
+  // Hämta lägenhetsstatistik från summaryStatistics
+  const summaryStatistics = useSelector(
+    (state: RootState) => state.summaryStatistics.data
+  );
+  const summaryLoading = useSelector(
+    (state: RootState) => state.summaryStatistics.loading
   );
 
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch sensor domains if auth token is available
+  // Hämta AlgoConfig & Lägenhetsstatistik vid komponentens mount
   useEffect(() => {
-    if (authToken) {
-      dispatch(getList());
-    } else {
-      console.error("Ingen giltig autentisering tillgänglig.");
+    if (authToken && controllers.length > 0) {
+      controllers.forEach((controller) => {
+        dispatch(fetchAlgoConfig({ controllerId: controller.id })).catch(
+          (error) =>
+            console.error(
+              `Fel vid hämtning av algoConfig för ${controller.id}:`,
+              error
+            )
+        );
+      });
     }
-  }, [dispatch, authToken]);
 
-  // Mark loading as false once sensorDomains is available
-  useEffect(() => {
-    if (sensorDomains) {
+    if (sensorDomainId) {
+      dispatch(fetchSummaryApartmentStatistics({ sensorDomainId }))
+        .catch((error) =>
+          console.error("Fel vid hämtning av summaryStatistics:", error)
+        )
+        .finally(() => setIsLoading(false));
+    } else {
       setIsLoading(false);
     }
-  }, [sensorDomains]);
+  }, [authToken, JSON.stringify(controllers), sensorDomainId, dispatch]);
 
-  // Find the sensor domain for the given ID
-  const sensorDomain = sensorDomains?.data.find((item) => item.id === id);
-
-  console.log("sensordomain", sensorDomain);
-
-  // Extract controllers and controller IDs
-  const controllers = sensorDomain?.controllers || [];
-  const controllerIds = controllers.map((controller) => controller.id);
-  const seperatedIds = controllerIds.join(",");
-
-  console.log("lista ", controllerIds);
-
-  useEffect(() => {
-    if (authToken && controllerIds.length > 0) {
-      controllerIds.forEach((controllerId: string) => {
-        dispatch(fetchAlgoConfig({ controllerId }));
-      });
-      console.log("Separedade2", seperatedIds);
-    }
-  }, [authToken, controllerIds, dispatch]);
-
-  // Render logic (no hooks inside this conditional block)
-  if (isLoading) {
+  if (isLoading || algoLoading || summaryLoading) {
     return <div>Laddar...</div>;
   }
 
-  if (!sensorDomain) {
-    return <div>Ingen sensor domain hittades för det här ID:t.</div>;
-  }
-
-  return <></>;
+  return (
+    <div>
+      <div className="p-4 bg-white shadow-md rounded-md max-w-full mx-auto h-auto ">
+        <h2 className="text-lg font-bold text-blue-900 mb-4">
+          Medelvärde för lägenheter de 30 senaste dagarna
+        </h2>
+        <Table className="border border-gray-300 text-sm">
+          <TableHeader className="bg-blue-100 text-gray-700">
+            <TableRow>
+              <TableHead className="text-left font-extrabold">
+                Antal rum
+              </TableHead>
+              <TableHead className="text-center font-extrabold">kWh</TableHead>
+              <TableHead className="text-center font-extrabold">L</TableHead>
+              <TableHead className="text-center font-extrabold">°C</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {summaryStatistics  &&
+              Object.entries(summaryStatistics).map(([size, stats]) => (
+                <TableRow
+                  key={size}
+                  className="hover:bg-blue-50 hover:transition-transform duration-150 hover:scale-103"
+                >
+                  <TableCell>{size}</TableCell>
+                  {["kWh", "L", "C"].map((unit) => (
+                    <TableCell key={unit} className="text-center">
+                      {stats
+                        .find((stat) => stat.u_name === unit)
+                        ?.avg?.toFixed(1) || "-"}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </div>
+      <div className="pt-8">
+        <ApartmentsCards />
+      </div>
+    </div>
+  );
 }

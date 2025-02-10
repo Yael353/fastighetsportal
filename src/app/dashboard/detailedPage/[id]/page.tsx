@@ -16,12 +16,12 @@ export default function DetailedPage() {
   };
 
   const authToken = getAuthToken();
-  const dispatch = useDispatch<AppDispatch>(); // 🟢 Flytta `useDispatch` hit
+  const dispatch = useDispatch<AppDispatch>();
   const { id } = useParams<UserParams>();
 
   useEffect(() => {
     if (id && authToken) {
-      dispatch(fetchSensorDomain({ id }));; // 🟢 Anropa dispatch rätt här
+      dispatch(fetchSensorDomain({ id }));
     }
   }, [id, authToken, dispatch]);
 

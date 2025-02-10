@@ -130,18 +130,11 @@ export const fetchBuildings = createAsyncThunk<
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   try {
-    console.log(`Fetching buildings for sensor domain ID: ${id}`);
-    console.log(
-      `Request URL: ${apiUrl}/open/v1/sensor_domains/${id}/buildings`
-    );
-
     const response = await authFetch(
       `${apiUrl}/open/v1/sensor_domains/${id}/buildings`,
       { method: "GET" },
       dispatch
     );
-
-    console.log("Raw response:", response);
 
     if (response.status === 404) {
       throw new Error("Fel uppgifter, prova igen (404)");
@@ -246,13 +239,6 @@ export const fetchSummaryApartmentStatistics = createAsyncThunk<
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
     try {
-      console.log(
-        `Fetching summary statistics for sensor domain ID: ${sensorDomainId}`
-      );
-      console.log(
-        `Request URL: ${apiUrl}/open/v1/sensor_domains/${sensorDomainId}/apartment_statistics`
-      );
-
       const response = await authFetch(
         `${apiUrl}/open/v1/sensor_domains/${sensorDomainId}/apartment_statistics`,
         {
@@ -261,10 +247,8 @@ export const fetchSummaryApartmentStatistics = createAsyncThunk<
             "Content-Type": "application/json",
           },
         },
-        dispatch // Här skickar vi med dispatch från thunk
+        dispatch
       );
-
-      console.log("Raw response:", response);
 
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
@@ -272,7 +256,6 @@ export const fetchSummaryApartmentStatistics = createAsyncThunk<
 
       const responseJson = await response.json();
 
-      console.log("Parsed API response JSON:", responseJson);
 
       return responseJson as SummarySensorDomainApartmentStatisticsResponse;
     } catch (error: any) {

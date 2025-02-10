@@ -31,7 +31,7 @@ const summaryStatisticsSlice = createSlice({
           state,
           action: PayloadAction<SummarySensorDomainApartmentStatisticsResponse>
         ) => {
-          console.log("Fetch Summary Fulfilled Payload:", action.payload);
+          // console.log("Fetch Summary Fulfilled Payload:", action.payload);
           state.loading = false;
           state.data = action.payload;
         }

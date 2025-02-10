@@ -25,7 +25,7 @@ export default function SensorDataComp({ id }: SensorDataCompProps) {
         </TabsContent>
 
         <TabsContent value="apartments">
-          <ApartmentComp id={id} />
+          <ApartmentComp />
         </TabsContent>
 
         {/*

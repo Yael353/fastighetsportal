@@ -14,9 +14,6 @@ export const fetchAlgoConfig = createAsyncThunk<
   "algoConfig/fetch",
   async ({ controllerId }, { dispatch, rejectWithValue }) => {
     try {
-      console.debug("Fetching algo config for controller ID:", controllerId);
-      console.log(`Request URL: ${apiUrl}/open/v1/algo_config/${controllerId}`);
-
       // Anropa API:et med authFetch
       const response = await authFetch(
         `${apiUrl}/open/v1/algo_config/${controllerId}`,
@@ -31,10 +28,8 @@ export const fetchAlgoConfig = createAsyncThunk<
         throw new RESPONSE_403("Fel uppgifter, prova igen");
       }
 
-      console.log("Response status:", response.status);
       // Parsar JSON-svaret
       const responseJson = await response.json();
-      console.log("Parsed API response JSON:", responseJson);
 
       return responseJson as AlgoConfigResponse;
     } catch (error: any) {
@@ -50,7 +45,6 @@ export const fetchAlgoConfig = createAsyncThunk<
           "Ett oväntat fel inträffade vid hämtning av algoritmkonfiguration."
       );
     }
-    
   }
 );
 
@@ -74,14 +68,6 @@ export const postAlgoConfig = createAsyncThunk<
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
     try {
-      console.log("Posting algo config:", {
-        controllerId,
-        comfortConstant,
-        sunConstant,
-        iatSp,
-      });
-      console.log(`Request URL: ${apiUrl}/open/v1/algo_config`);
-
       const response = await authFetch(
         `${apiUrl}/open/v1/algo_config`,
         {
@@ -97,8 +83,6 @@ export const postAlgoConfig = createAsyncThunk<
         dispatch
       );
 
-      console.log("Raw response:", response);
-
       if (response.status === 404) {
         throw new RESPONSE_404("Fel uppgifter, prova igen");
       } else if (response.status === 403) {
@@ -106,7 +90,6 @@ export const postAlgoConfig = createAsyncThunk<
       }
 
       const responseJson = await response.json();
-      console.log("Parsed API response JSON:", responseJson);
 
       return responseJson as AlgoConfigResponse;
     } catch (error: any) {
