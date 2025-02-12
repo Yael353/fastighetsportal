@@ -17,112 +17,82 @@ import {
   fetchSensorDomain,
 } from "@/features/thunks/fetchSensors";
 import moment from "moment";
-import { BatchSensorDataFreq } from "@/features/models/sensor-data"; // Se till att importera din enum
+import { BatchSensorDataFreq } from "@/features/models/sensor-data";
 
 interface ApartmentCompProps {
   id: string;
 }
 
 const sensorColors = {
-  FWT: "#6f42c1", // Blå
-  RWT: "#007bff", // Röd
+  FWT: "#6f42c1", // Lila
+  RWT: "#007bff", // Blå
+  OAT: "#28a745", // Grön
+  IAT: "#dc3545", // Röd
+};
+
+// Funktion för att slå ihop två dataset baserat på tid
+const mergeChartData = (dataA, dataB, keyA, keyB) => {
+  const mergedData = new Map();
+
+  dataA.forEach((item) => {
+    mergedData.set(item.time, { time: item.time, [keyA]: item[keyA] });
+  });
+
+  dataB.forEach((item) => {
+    if (mergedData.has(item.time)) {
+      mergedData.get(item.time)[keyB] = item[keyB];
+    } else {
+      mergedData.set(item.time, { time: item.time, [keyB]: item[keyB] });
+    }
+  });
+
+  return Array.from(mergedData.values()).sort(
+    (a, b) => new Date(a.time) - new Date(b.time)
+  );
 };
 
 const ChartsLayout = ({ id }: ApartmentCompProps) => {
   const dispatch = useDispatch<AppDispatch>();
 
-  // Hämta sensor-domän från property-slicen
+  // Hämta sensor-domän
   const sensorDomain = useSelector((state: RootState) => state.property.data);
-  // Hämta batch-data från sensorData-slicen
-  const sensorsState = useSelector(
-    (state: RootState) => state.sensorData.sensors
-  );
+  const sensorsState = useSelector((state: RootState) => state.sensorData.sensors);
 
-  // Filtrera ut sensorer för OAT och IAT
-  const filteredOAT = useMemo(() => {
-    if (!sensorDomain?.sensors) return [];
-    return sensorDomain.sensors.filter(
-      (sensor) => sensor.vala_description?.name === "OAT"
-    );
-  }, [sensorDomain]);
+  // Filtrera sensorer baserat på deras typ
+  const filteredOAT = useMemo(() => sensorDomain?.sensors?.filter(s => s.vala_description?.name === "OAT") || [], [sensorDomain]);
+  const filteredIAT = useMemo(() => sensorDomain?.sensors?.filter(s => s.vala_description?.name === "IAT") || [], [sensorDomain]);
+  const filteredFWT = useMemo(() => sensorDomain?.sensors?.filter(s => s.vala_description?.name === "FWT") || [], [sensorDomain]);
+  const filteredRWT = useMemo(() => sensorDomain?.sensors?.filter(s => s.vala_description?.name === "RWT") || [], [sensorDomain]);
 
-  const filteredIAT = useMemo(() => {
-    if (!sensorDomain?.sensors) return [];
-    return sensorDomain.sensors.filter(
-      (sensor) => sensor.vala_description?.name === "IAT"
-    );
-  }, [sensorDomain]);
-
-  const filteredFWT = useMemo(() => {
-    if (!sensorDomain?.sensors) return [];
-    return sensorDomain.sensors.filter(
-      (sensor) => sensor.vala_description?.name === "FWT"
-    );
-  }, [sensorDomain]);
-
-  const filteredRWT = useMemo(() => {
-    if (!sensorDomain?.sensors) return [];
-    return sensorDomain.sensors.filter(
-      (sensor) => sensor.vala_description?.name === "RWT"
-    );
-  }, [sensorDomain]);
-
-  // const filteredFWT_SP = useMemo(() => {
-  //   if (!sensorDomain?.sensors) return [];
-  //   return sensorDomain.sensors.filter(
-  //     (sensor) => sensor.vala_description?.name === "FWT_SP"
-  //   );
-  // }, [sensorDomain]);
-
-  // Effekt för att ladda sensor-domän om den saknas
+  // Ladda sensor-domän vid behov
   useEffect(() => {
-    if (!sensorDomain) {
-      dispatch(fetchSensorDomain({ id }));
-    }
+    if (!sensorDomain) dispatch(fetchSensorDomain({ id }));
   }, [dispatch, sensorDomain, id]);
 
-  // När sensorDomain har laddats, hämta batch-data för både OAT och IAT
+  // Ladda sensordata när sensorDomain finns
   useEffect(() => {
     if (!sensorDomain) return;
+    
+    const sensorIds = [...filteredOAT, ...filteredIAT, ...filteredFWT, ...filteredRWT].map(s => s.id);
+    if (sensorIds.length === 0) return;
 
-    // Kombinera sensor-id:n från båda grupperna
-    const oatIds = filteredOAT.map((sensor) => sensor.id);
-    const iatIds = filteredIAT.map((sensor) => sensor.id);
-    const fwtIds = filteredFWT.map((sensor) => sensor.id);
-    const rwtIds = filteredRWT.map((sensor) => sensor.id);
-    const sensorIds = Array.from(new Set([...oatIds, ...iatIds , ...fwtIds, ...rwtIds]));
-
-    if (sensorIds.length === 0) {
-      console.warn(
-        `⚠️ Inga sensorer med "OAT" eller "IAT" hittades för domän med id "${sensorDomain.id}"!`
-      );
-      return;
-    }
-
-    dispatch(
-      fetchBatchSensorData({
-        sensorDomainId: sensorDomain.id,
-        sensorIds,
-        startUtc: moment().subtract(1, "day"),
-        endUtc: moment(),
-        freq: BatchSensorDataFreq.raw, // Använder enum-värdet
-      })
-    );
+    dispatch(fetchBatchSensorData({
+      sensorDomainId: sensorDomain.id,
+      sensorIds,
+      startUtc: moment().subtract(1, "day"),
+      endUtc: moment(),
+      freq: BatchSensorDataFreq.raw,
+    }));
   }, [dispatch, sensorDomain, filteredOAT, filteredIAT, filteredFWT, filteredRWT]);
 
-  // Funktion för att bygga chartData för en given sensorgrupp
-  const buildChartData = (
-    filteredSensors: typeof filteredOAT // Båda arrayerna har samma typ
-  ) => {
-    if (!filteredSensors || filteredSensors.length === 0) return [];
-
+  // Funktion för att bygga chartData
+  const buildChartData = (filteredSensors) => {
+    if (!filteredSensors.length) return [];
     const sensorIds = filteredSensors.map((sensor) => sensor.id);
-    // Utgå från den första sensorens data för att få tidsstämpeln
-    const baseSensorId = sensorIds[0];
-    const baseData = sensorsState[baseSensorId]?.sensorData || [];
+    const baseData = sensorsState[sensorIds[0]]?.sensorData || [];
 
     return baseData.map((dataPoint, index) => {
-      const point: Record<string, any> = { time: dataPoint.time_utc };
+      const point = { time: dataPoint.time_utc };
       sensorIds.forEach((sensorId) => {
         const sensorDataArr = sensorsState[sensorId]?.sensorData;
         if (sensorDataArr && sensorDataArr[index]) {
@@ -133,146 +103,64 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
     });
   };
 
-  const chartDataOAT = useMemo(() => {
-    return buildChartData(filteredOAT);
-  }, [filteredOAT.map(s => s.id).join(','), sensorsState]);
-  
-  const chartDataIAT = useMemo(() => {
-    return buildChartData(filteredIAT);
-  }, [filteredIAT.map(s => s.id).join(','), sensorsState]);
+  // Generera chartData
+  const chartDataOAT = useMemo(() => buildChartData(filteredOAT), [filteredOAT, sensorsState]);
+  const chartDataIAT = useMemo(() => buildChartData(filteredIAT), [filteredIAT, sensorsState]);
+  const chartDataFWT = useMemo(() => buildChartData(filteredFWT), [filteredFWT, sensorsState]);
+  const chartDataRWT = useMemo(() => buildChartData(filteredRWT), [filteredRWT, sensorsState]);
 
-  const chartDataFWT = useMemo(
-    () => buildChartData(filteredFWT),
-    [filteredFWT, sensorsState]
-  );
-
-  const chartDataRWT = useMemo(
-    () => buildChartData(filteredRWT),
-    [filteredRWT, sensorsState]
-  );
-
-  const mergeChartData = (dataFWT, dataRWT) => {
-    const mergedData = new Map();
-  
-    // Lägg till FWT-data i Map baserat på tid
-    dataFWT.forEach((item) => {
-      mergedData.set(item.time, { time: item.time, [filteredFWT[0]?.id]: item[filteredFWT[0]?.id] });
-    });
-  
-    // Lägg till RWT-data i Map, se till att tid finns
-    dataRWT.forEach((item) => {
-      if (mergedData.has(item.time)) {
-        mergedData.get(item.time)[filteredRWT[0]?.id] = item[filteredRWT[0]?.id];
-      } else {
-        mergedData.set(item.time, { time: item.time, [filteredRWT[0]?.id]: item[filteredRWT[0]?.id] });
-      }
-    });
-  
-    // Konvertera tillbaka till array och sortera efter tid
-    return Array.from(mergedData.values()).sort((a, b) => new Date(a.time) - new Date(b.time));
-  };
-  
-  const mergedChartData = useMemo(
-    () => mergeChartData(chartDataFWT, chartDataRWT),
-    [chartDataFWT, chartDataRWT]
-  );
-  
-
-  // Kontroll för laddning
-  const propertyLoading = useSelector(
-    (state: RootState) => state.property.loading
-  );
-
-  if (propertyLoading) {
-    return <p>🔄 Laddar sensor data...</p>;
-  }
+  // Slå ihop data för OAT/IAT och FWT/RWT
+  const mergedChartDataOAT_IAT = useMemo(() => mergeChartData(chartDataOAT, chartDataIAT, filteredOAT[0]?.id, filteredIAT[0]?.id), [chartDataOAT, chartDataIAT]);
+  const mergedChartDataFWT_RWT = useMemo(() => mergeChartData(chartDataFWT, chartDataRWT, filteredFWT[0]?.id, filteredRWT[0]?.id), [chartDataFWT, chartDataRWT]);
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="grid grid-cols-2 gap-2">
-        {/* Diagram för utomhustemperatur (OAT) */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-center">
-              Utomhustemperatur (OAT)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={chartDataOAT}>
-                <XAxis dataKey="time" />
-                <YAxis />
-                <Tooltip />
-                {filteredOAT.map((sensor) => (
-                  <Line
-                    key={sensor.id}
-                    type="monotone"
-                    dataKey={sensor.id}
-                    stroke="#28a745"
-                    name={sensor.name}
-                    dot={false}
-                    strokeWidth={2}
-                  />
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+      {/* OAT & IAT - Dual Axis Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-center">Inomhus- och Utomhustemperatur</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={400}>
+            <LineChart data={mergedChartDataOAT_IAT}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="time" />
+              
+              <YAxis yAxisId="left" label={{ value: "°C", angle: 0, position: "insideLeft" }} stroke={sensorColors.OAT} />
+              <YAxis yAxisId="right" label={{ value: "°C", angle: 0, position: "insideRight" }} stroke={sensorColors.IAT} orientation="right" domain={[18, 23]}  />
 
-        {/* Diagram för inomhustemperatur (IAT) */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-center">
-              Inomhustemperatur (IAT)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={chartDataIAT}>
-                <XAxis dataKey="time" />
-                <YAxis />
-                <Tooltip />
-                {filteredIAT.map((sensor) => (
-                  <Line
-                    key={sensor.id}
-                    type="monotone"
-                    dataKey={sensor.id}
-                    stroke="#dc3545"
-                    name={sensor.name}
-                    dot={false}
-                    strokeWidth={2}
-                  />
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
+              <Tooltip />
+              <Legend />
 
-      {/* Exempel på ett tredje diagram om du vill jämföra alla sensorer */}
+              {filteredOAT.map((sensor) => (
+                <Line key={sensor.id} type="monotone" dataKey={sensor.id} stroke={sensorColors.OAT} name="Utomhustemperatur" dot={false} strokeWidth={2} yAxisId="left" />
+              ))}
+              {filteredIAT.map((sensor) => (
+                <Line key={sensor.id} type="monotone" dataKey={sensor.id} stroke={sensorColors.IAT} name="Inomhustemperatur" dot={false} strokeWidth={2} yAxisId="right" />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      {/* FWT & RWT - Standard Chart */}
       <Card>
         <CardHeader>
           <CardTitle className="text-center">Jämförelse</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={mergedChartData}>
+            <LineChart data={mergedChartDataFWT_RWT}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="time" />
-              <YAxis />
+              <YAxis domain={[25, 50]} />
               <Tooltip />
               <Legend />
-              {[...filteredFWT, ...filteredRWT].map((sensor) => (
-                <Line
-                  key={sensor.id}
-                  type="monotone"
-                  dataKey={sensor.id}
-                  stroke={sensorColors[sensor.vala_description?.name] || "#808080"} // FWT = blå, RWT = röd
-                  name={sensor.name}
-                  connectNulls={true}
-                  dot={false}
-                  strokeWidth={2}
-                />
+              {filteredFWT.map((sensor) => (
+                <Line key={sensor.id} type="monotone" dataKey={sensor.id} stroke={sensorColors.FWT} name="Framlednings temperatur" dot={false} strokeWidth={2} />
+              ))}
+              {filteredRWT.map((sensor) => (
+                <Line key={sensor.id} type="monotone" dataKey={sensor.id} stroke={sensorColors.RWT} name="Returlednings temperatur" dot={false} strokeWidth={2} />
               ))}
             </LineChart>
           </ResponsiveContainer>
