@@ -5,7 +5,7 @@ import { AppDispatch, RootState } from "@/features/store/store";
 import { fetchBuildings } from "@/features/thunks/fetchSensors";
 
 export default function BuildingsPage() {
-  const { id } = useParams(); // Hämta ID från URL
+  const { id } = useParams();
   const dispatch = useDispatch<AppDispatch>();
 
   const { data, loading, error } = useSelector(

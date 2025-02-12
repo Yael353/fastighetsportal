@@ -87,7 +87,7 @@ export default function ApartmentComp() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {summaryStatistics  &&
+            {summaryStatistics &&
               Object.entries(summaryStatistics).map(([size, stats]) => (
                 <TableRow
                   key={size}

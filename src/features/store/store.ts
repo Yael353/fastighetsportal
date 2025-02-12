@@ -7,6 +7,7 @@ import { buildingsReducer } from "../slices/buildingsSlice";
 import apartmentReducer from "@/features/slices/ApartmentConsumptionSlice";
 import summaryStatisticsReducer from "@/features/slices/summaryStatisticsSlice";
 import algoConfigReducer from "@/features/slices/algoConfigSlice";
+import monthlyStatisticsReducer from "@/features/slices/monthlyStatisticsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     apartmentConsumption: apartmentReducer,
     summaryStatistics: summaryStatisticsReducer,
     algoConfig: algoConfigReducer,
+    monthlyStatistics: monthlyStatisticsReducer,
   },
 });
 

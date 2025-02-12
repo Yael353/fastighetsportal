@@ -50,9 +50,8 @@ export function PropertyList() {
     return Array.isArray(sensorDomains?.data) ? sensorDomains.data : [];
   }, [sensorDomains]);
 
-//  console.count("sensorDomäner:");
-//  console.log("sensorDomäner: ", sensorDomainsArray);
-
+  //  console.count("sensorDomäner:");
+  //  console.log("sensorDomäner: ", sensorDomainsArray);
 
   const totalPages = sensorDomainsArray.length
     ? Math.ceil(sensorDomainsArray.length / sensorDomainsPerPage)
@@ -112,7 +111,7 @@ export function PropertyList() {
 
   return (
     <div className="w-full flex flex-col space-y-6 justify-center items-center">
-      <div className="w-[95%] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="w-full px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {currentSensorDomains.map((domain: SensorDomain) => {
           const { ucSensors, apartments } =
             getSensorDomainSensorDescription(domain);
@@ -176,8 +175,8 @@ export function PropertyList() {
       </div>
 
       {/* Pagination */}
-      <div className="w-full flex justify-between items-center mt-6">
-        <Button onClick={prevPage} disabled={currentPage === 1}>
+      <div className="w-full px-4 flex justify-between items-center mt-6">
+        <Button className="" onClick={prevPage} disabled={currentPage === 1}>
           <ChevronLeft className="mr-2 h-4 w-4" /> Föregående
         </Button>
         <span>
