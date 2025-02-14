@@ -12,7 +12,9 @@ export const useSensorData = (id: string) => {
   // Hämta sensor-domain från Redux-storen
   const sensorDomain = useSelector((state: RootState) => state.property.data);
   // Hämta batch-sensor data från Redux-storen
-  const sensorsState = useSelector((state: RootState) => state.sensorData.sensors);
+  const sensorsState = useSelector(
+    (state: RootState) => state.sensorData.sensors
+  );
 
   // Filtrera ut sensorer för OAT, IAT, FWT och RWT
   const filteredOAT = useMemo(() => {
@@ -75,7 +77,14 @@ export const useSensorData = (id: string) => {
         freq: BatchSensorDataFreq.raw,
       })
     );
-  }, [dispatch, sensorDomain, filteredOAT, filteredIAT, filteredFWT, filteredRWT]);
+  }, [
+    dispatch,
+    sensorDomain,
+    filteredOAT,
+    filteredIAT,
+    filteredFWT,
+    filteredRWT,
+  ]);
 
   // Funktion för att bygga chartData
   const buildChartData = (filteredSensors: typeof filteredOAT) => {
@@ -98,12 +107,52 @@ export const useSensorData = (id: string) => {
   };
 
   // Hämta och bearbeta datan för graferna
-  const chartDataOAT = useMemo(() => buildChartData(filteredOAT), [filteredOAT, sensorsState]);
-  const chartDataIAT = useMemo(() => buildChartData(filteredIAT), [filteredIAT, sensorsState]);
-  const chartDataFWT = useMemo(() => buildChartData(filteredFWT), [filteredFWT, sensorsState]);
-  const chartDataRWT = useMemo(() => buildChartData(filteredRWT), [filteredRWT, sensorsState]);
+  const chartDataOAT = useMemo(
+    () => buildChartData(filteredOAT),
+    [filteredOAT, sensorsState]
+  );
+  const chartDataIAT = useMemo(
+    () => buildChartData(filteredIAT),
+    [filteredIAT, sensorsState]
+  );
+  const chartDataFWT = useMemo(
+    () => buildChartData(filteredFWT),
+    [filteredFWT, sensorsState]
+  );
+  const chartDataRWT = useMemo(
+    () => buildChartData(filteredRWT),
+    [filteredRWT, sensorsState]
+  );
 
-  // Returnera de bearbetade datan för graferna
+  // Hämta senaste värdet från en sensor
+  const getLatestValue = (
+    chartData: typeof chartDataIAT,
+    filteredSensors: typeof filteredIAT
+  ) => {
+    if (!chartData || chartData.length === 0) return null; // Om ingen data, returnera null
+    return chartData[chartData.length - 1]?.[filteredSensors[0]?.id] || null; // Returnera senaste värdet
+  };
+
+  // Hämta senaste värdena för varje sensor
+  const latestIAT = getLatestValue(chartDataIAT, filteredIAT);
+  const latestOAT = getLatestValue(chartDataOAT, filteredOAT);
+  const latestFWT = getLatestValue(chartDataFWT, filteredFWT);
+  const latestRWT = getLatestValue(chartDataRWT, filteredRWT);
+
+  // Hämta och formatera tiden för senaste värdet från en sensor
+  const getLatestTimestamp = (chartData: typeof chartDataIAT) => {
+    if (!chartData || chartData.length === 0) return null; // Om ingen data, returnera null
+    const latestTime = chartData[chartData.length - 1]?.time; // Hämta senaste tidstämpeln
+    return latestTime ? moment(latestTime).format("YYYY-MM-DD HH:mm") : null; // Formatera till 'YYYY-MM-DD HH:mm'
+  };
+
+  // Hämta formaterade tider för varje sensor
+  const latestIATTime = getLatestTimestamp(chartDataIAT);
+  const latestOATTime = getLatestTimestamp(chartDataOAT);
+  const latestFWTTime = getLatestTimestamp(chartDataFWT);
+  const latestRWTTime = getLatestTimestamp(chartDataRWT);
+
+  // Lägg till senaste värdena i return-objektet
   return {
     chartDataOAT,
     chartDataIAT,
@@ -112,6 +161,14 @@ export const useSensorData = (id: string) => {
     filteredOAT,
     filteredIAT,
     filteredFWT,
-    filteredRWT
+    filteredRWT,
+    latestIAT, // Senaste inomhustemperatur
+    latestOAT, // Senaste utomhustemperatur
+    latestFWT, // Senaste framledningstemperatur
+    latestRWT, // Senaste returledningstemperatur
+    latestIATTime, // Senaste tidpunkt för IAT
+    latestOATTime, // Senaste tidpunkt för OAT
+    latestFWTTime, // Senaste tidpunkt för FWT
+    latestRWTTime, // Senaste tidpunkt för RWT
   };
 };

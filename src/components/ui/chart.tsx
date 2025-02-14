@@ -70,7 +70,6 @@ ChartContainer.displayName = "Chart"
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   // Kontrollera att nödvändiga props finns
   if (!id || !config || Object.keys(config).length === 0) {
-    console.error("ChartStyle: Missing or invalid props", { id, config });
     return null;
   }
 
