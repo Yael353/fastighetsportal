@@ -3,13 +3,13 @@ import { fetchApartmentConsumptionLastXDays } from "../thunks/fetchSensors";
 import { AllApartmentConsumptionResponse } from "../models/sensor-data";
 
 interface ApartmentState {
-  consumptionData: AllApartmentConsumptionResponse | null;
+  data: AllApartmentConsumptionResponse | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: ApartmentState = {
-  consumptionData: null,
+  data: null,
   loading: false,
   error: null,
 };
@@ -28,7 +28,7 @@ const apartmentSlice = createSlice({
         fetchApartmentConsumptionLastXDays.fulfilled,
         (state, action) => {
           state.loading = false;
-          state.consumptionData = action.payload;
+          state.data = action.payload;
         }
       )
       .addCase(fetchApartmentConsumptionLastXDays.rejected, (state, action) => {

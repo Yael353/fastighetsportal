@@ -89,21 +89,19 @@ export const fetchBatchSensorData = createAsyncThunk<
       // Loopa igenom varje batch och gör ett API-anrop
       for (const batch of sensorBatches) {
         const params = new URLSearchParams({
-          sensors: batch.join(","), // Skicka endast en batch
+          sensors: batch.join(","),
           freq: freq.toString(),
           start_utc: formatUtcString(startUtc),
           end_utc: formatUtcString(endUtc),
         });
 
         const fullUrl = `${apiUrl}/open/v1/sensor_domain/${sensorDomainId}/batch/data?${params}`;
-        // console.log("Fetching Batch Sensor Data from:", fullUrl);
 
         // Skicka API-anrop med authFetch
         const response = await authFetch(fullUrl, { method: "GET" }, dispatch);
 
         // Parsar och lagrar varje batchs svar
         const responseJson = await response.json();
-        // console.log("batchSensorData från batch:", responseJson);
 
         allResponses.push(responseJson);
       }
@@ -169,7 +167,7 @@ export const fetchBuildings = createAsyncThunk<
 export const fetchApartmentConsumptionLastXDays = createAsyncThunk<
   AllApartmentConsumptionResponse,
   {
-    sensordomainId: string;
+    sensorDomainId: string;
     buildingId: string;
     apartmentId: string;
     days_interval: number;
@@ -178,7 +176,7 @@ export const fetchApartmentConsumptionLastXDays = createAsyncThunk<
 >(
   "apartments/fetchConsumption",
   async (
-    { sensordomainId, buildingId, apartmentId, days_interval },
+    { sensorDomainId, buildingId, apartmentId, days_interval },
     { dispatch, rejectWithValue }
   ) => {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -188,20 +186,10 @@ export const fetchApartmentConsumptionLastXDays = createAsyncThunk<
     });
 
     try {
-      console.log(
-        `Fetching apartment consumption for last ${days_interval} days`
-      );
-      console.log(
-        `Request URL: ${apiUrl}/open/v1/sensor_domains/${sensordomainId}/buildings/${buildingId}/apartments/${apartmentId}?${params}`
-      );
+      const fetchedURL = `${apiUrl}/open/v1/sensor_domains/${sensorDomainId}/buildings/${buildingId}/apartments/${apartmentId}?${params}`;
+      // console.log("Data som hämtas", fetchedURL);
 
-      const response = await authFetch(
-        `${apiUrl}/open/v1/sensor_domains/${sensordomainId}/buildings/${buildingId}/apartments/${apartmentId}?${params}`,
-        { method: "GET" },
-        dispatch
-      );
-
-      console.log("Raw response:", response);
+      const response = await authFetch(fetchedURL, { method: "GET" }, dispatch);
 
       if (response.status === 404) {
         throw new Error("Fel uppgifter, prova igen (404)");
@@ -211,7 +199,7 @@ export const fetchApartmentConsumptionLastXDays = createAsyncThunk<
 
       const responseJson = await response.json();
 
-      console.log("Raw API response JSON:", responseJson);
+      // console.log("JsonRespons", responseJson);
 
       return responseJson as AllApartmentConsumptionResponse;
     } catch (error: any) {
@@ -232,6 +220,7 @@ export const fetchApartmentConsumptionLastXDays = createAsyncThunk<
   }
 );
 
+//KLAR OCH ANVÄND?????
 export const fetchSummaryApartmentStatistics = createAsyncThunk<
   SummarySensorDomainApartmentStatisticsResponse,
   { sensorDomainId: string },
@@ -280,6 +269,7 @@ export const fetchSummaryApartmentStatistics = createAsyncThunk<
   }
 );
 
+//REDAN KLAR OCH ANVÄND
 export const fetchMonthlyApartmentStatistics = createAsyncThunk<
   MonthlyApartmentStatisticsResponse,
   {
@@ -301,7 +291,7 @@ export const fetchMonthlyApartmentStatistics = createAsyncThunk<
 
       const response = await authFetch(
         `${apiUrl}/open/v1/sensor_domains/${sensorDomainId}/buildings/${buildingId}/apartments/${apartmentId}/consumption/monthly`,
-        {}, // Skickar en tom RequestInit eftersom authFetch hanterar headers automatiskt
+        {},
         dispatch
       );
 

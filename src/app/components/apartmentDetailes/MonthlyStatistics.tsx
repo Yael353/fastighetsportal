@@ -1,10 +1,5 @@
-// components/MonthlyStatistics.tsx
-import React, { useEffect, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import moment from "moment";
-import { AppDispatch, RootState } from "@/features/store/store";
-import { fetchMonthlyApartmentStatistics } from "@/features/thunks/fetchSensors";
-import { formatSensorUnit, roundSensorMetric } from "@/utils/metric";
+import React from "react";
+import { MonthlyApartmentStatisticsResponse } from "@/features/models/statistics";
 import {
   Table,
   TableHeader,
@@ -12,161 +7,148 @@ import {
   TableRow,
   TableHead,
   TableCell,
-} from "@/components/ui/table"; // justera sökvägen vid behov
+} from "@/components/ui/table";
 
-export interface TableRowData {
+interface Props {
+  data: MonthlyApartmentStatisticsResponse | null;
+  loading: boolean;
+  error: string | null;
+}
+
+interface Entry {
+  year: number;
+  month: number;
+  v_name: "IEM" | "IIAT" | "IHTWM";
+  diff?: number;
+  average?: number;
+  u_name: string;
+}
+
+interface AggregatedEntry {
+  year: number;
+  month: number;
+  date: Date;
+  iem: Entry | null;
+  iiat: Entry | null;
+  ihtwm: Entry | null;
+}
+
+interface TableRowData {
   key: string;
   year: string;
   month: string;
-  iiat: string;
   iem: string;
+  iiat: string;
   ihtwm: string;
 }
 
-export interface Column<T> {
-  title: string;
-  dataIndex: keyof T;
-  key: string;
-  render?: (value: any, record: T, index: number) => React.ReactNode;
-}
+const MonthlyStatistics: React.FC<Props> = ({ data, loading, error }) => {
+  if (loading) return <p>Laddar...</p>;
+  if (error) return <p>{error}</p>;
+  if (!data) return <p>Ingen data tillgänglig.</p>;
 
-interface DataTableProps {
-  columns: Column<TableRowData>[];
-  data: TableRowData[];
-}
-
-// Skapa DataTable-komponenten med hjälp av shadCn:s tabellkomponenter
-const DataTable: React.FC<DataTableProps> = ({ columns, data }) => {
-  return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          {columns.map((col) => (
-            <TableHead key={col.key}>{col.title}</TableHead>
-          ))}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {data.map((row, rowIndex) => (
-          <TableRow key={row.key}>
-            {columns.map((col) => (
-              <TableCell key={col.key}>
-                {col.render
-                  ? col.render(row[col.dataIndex], row, rowIndex)
-                  : row[col.dataIndex]}
-              </TableCell>
-            ))}
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  );
-};
-
-interface MonthlyStatisticsProps {
-  sensorDomainId: string;
-  buildingId: string;
-  apartmentId: string;
-}
-
-const columns: Column<TableRowData>[] = [
-  {
-    title: "År",
-    dataIndex: "year",
-    key: "year",
-    render: (text) => <strong>{text}</strong>,
-  },
-  {
-    title: "Månad",
-    dataIndex: "month",
-    key: "month",
-  },
-  {
-    title: "Medeltemperatur",
-    dataIndex: "iiat",
-    key: "iiat",
-  },
-  {
-    title: "El förbrukning",
-    dataIndex: "iem",
-    key: "iem",
-  },
-  {
-    title: "Varmvatten förbrukning",
-    dataIndex: "ihtwm",
-    key: "ihtwm",
-  },
-];
-
-const MonthlyStatistics: React.FC<MonthlyStatisticsProps> = ({
-  sensorDomainId,
-  buildingId,
-  apartmentId,
-}) => {
-  const dispatch = useDispatch<AppDispatch>();
-
-  // Hämtar data från Redux-slicen för monthlyStatistics.
-  const { data, loading, error } = useSelector(
-    (state: RootState) => state.monthlyStatistics
-  );
-
-  // Vid montering (eller om parametrarna ändras) triggas thunk för att hämta data.
-  useEffect(() => {
-    dispatch(
-      fetchMonthlyApartmentStatistics({
-        sensorDomainId,
-        buildingId,
-        apartmentId,
-      })
-    );
-  }, [dispatch, sensorDomainId, buildingId, apartmentId]);
-
-  // Omvandlar den hämtade datan till ett format som passar vår DataTable-komponent.
-  const tableData: TableRowData[] = useMemo(() => {
-    if (!data) return [];
-
-    const rows: TableRowData[] = [];
-    // data är av typen MonthlyApartmentStatisticsResponse (ett objekt med nycklar och arrayer med statistikobjekt)
-    Object.keys(data).forEach((key) => {
-      const stats = data[key];
-
-      // Hitta ut de olika värdena baserat på v_name
-      const iem = stats.find((s) => s.v_name === "IEM");
-      const iiat = stats.find((s) => s.v_name === "IIAT");
-      const ihtwm = stats.find((s) => s.v_name === "IHTWM");
-
-      if (iem && iiat && ihtwm) {
-        rows.push({
-          key,
-          year: iem.year.toString(),
-          // Konverterar månadsnummer till månadsnamn med moment
-          month: moment(iem.month, "M").format("MMMM"),
-          iem: `${roundSensorMetric(iem.u_name, iem.diff)} ${formatSensorUnit(
-            iem.u_name
-          )}`,
-          iiat: `${roundSensorMetric(
-            iiat.u_name,
-            iiat.average
-          )} ${formatSensorUnit(iiat.u_name)}`,
-          ihtwm: `${roundSensorMetric(
-            ihtwm.u_name,
-            ihtwm.diff
-          )} ${formatSensorUnit(ihtwm.u_name)}`,
-        });
+  const tableData: Record<string, AggregatedEntry> = Object.values(data)
+    .flat()
+    .reduce((acc, entry: Entry) => {
+      const key = `${entry.year}-${entry.month}`;
+      if (!acc[key]) {
+        acc[key] = {
+          year: entry.year,
+          month: entry.month,
+          date: new Date(entry.year, entry.month - 1),
+          iem: null,
+          iiat: null,
+          ihtwm: null,
+        };
       }
-    });
 
-    // Om du vill visa den senaste månaden överst kan du reversera listan.
-    return rows.reverse();
-  }, [data]);
+      if (entry.v_name === "IEM") {
+        acc[key].iem = entry;
+      } else if (entry.v_name === "IIAT") {
+        acc[key].iiat = entry;
+      } else if (entry.v_name === "IHTWM") {
+        acc[key].ihtwm = entry;
+      }
 
-  // Rendera en laddningsindikator, felmeddelande eller tabellen
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+      return acc;
+    }, {} as Record<string, AggregatedEntry>);
+
+  const rows: TableRowData[] = Object.values(tableData)
+    .map((entry, index) => ({
+      key: `${entry.year}-${entry.month}-${index}`,
+      year: entry.year.toString(),
+      month: new Date(entry.year, entry.month - 1).toLocaleString("default", {
+        month: "long",
+      }),
+      iem: entry.iem
+        ? `${parseFloat((entry.iem.diff ?? 0).toFixed(2))} ${entry.iem.u_name}`
+        : "N/A",
+      iiat: entry.iiat
+        ? `${parseFloat((entry.iiat.average ?? 0).toFixed(2))} ${
+            entry.iiat.u_name
+          }`
+        : "N/A",
+      ihtwm: entry.ihtwm
+        ? `${parseFloat((entry.ihtwm.diff ?? 0).toFixed(2))} ${
+            entry.ihtwm.u_name
+          }`
+        : "N/A",
+    }))
+    .reverse()
+    .sort(
+      (a, b) =>
+        new Date(b.year, b.month, 1).getTime() -
+        new Date(a.year, a.month, 1).getTime()
+    )
+    .slice(0, 18);
 
   return (
-    <div>
-      <DataTable columns={columns} data={tableData} />
+    <div className="bg-white shadow-md rounded-xl overflow-hidden border border-blue-100">
+      <Table>
+        <TableHeader className="bg-blue-50 font-extrabold">
+          <TableRow>
+            <TableHead className="px-6 py-3 text-left text-xs font-extrabold uppercase tracking-wider">
+              År
+            </TableHead>
+            <TableHead className="px-6 py-3 text-left text-xs font-extrabold uppercase tracking-wider">
+              Månad
+            </TableHead>
+            <TableHead className="px-6 py-3 text-left text-xs font-extrabold  uppercase tracking-wider">
+              Medeltemperatur
+            </TableHead>
+            <TableHead className="px-6 py-3 text-left text-xs font-extrabold  uppercase tracking-wider">
+              Elförbrukning
+            </TableHead>
+            <TableHead className="px-6 py-3 text-left text-xs font-extrabold  uppercase tracking-wider">
+              Varmvattenförbrukning
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody className="divide-y divide-blue-100">
+          {rows.map((row) => (
+            <TableRow
+              key={row.key}
+              className="hover:bg-blue-50 transition-colors"
+            >
+              <TableCell className="px-6 py-4 whitespace-nowrap text-sm font-bold ">
+                {row.year}
+              </TableCell>
+              <TableCell className="px-6 py-4 whitespace-nowrap text-sm ">
+                {row.month}
+              </TableCell>
+              <TableCell className="px-6 py-4 whitespace-nowrap text-sm ">
+                {row.iiat}
+              </TableCell>
+              <TableCell className="px-6 py-4 whitespace-nowrap text-sm ">
+                {row.iem}
+              </TableCell>
+              <TableCell className="px-6 py-4 whitespace-nowrap text-sm ">
+                {row.ihtwm}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 };
