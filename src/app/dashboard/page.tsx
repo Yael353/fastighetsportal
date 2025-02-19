@@ -5,17 +5,17 @@ import ProtectedRoute from "../components/ProtectedRoute";
 export default function DashboardPage() {
   return (
     <ProtectedRoute>
-      <div className="w-full min-h-screen flex flex-col">
+      <div className="w-full min-h-screen flex flex-col bg-gray-900 pt-3">
         <h1
-          className="text-3xl font-bold p-6  flex justify-center items-center 
-             text-blue-700 bg-gradient-to-r from-blue-100 to-blue-300 
-             rounded-xl shadow-lg border border-blue-300 
+          className="text-3xl font-bold w-[31.5%] text-white p-3 pt-3 mx-4 flex justify-start items-center 
+             bg-gray-700 
+             rounded-xl shadow-lg
              tracking-wide"
         >
           Fastighetsöversikt
         </h1>
 
-        <div className="flex-grow pt-4">
+        <div className="flex-grow">
           <PropertyList />
         </div>
       </div>

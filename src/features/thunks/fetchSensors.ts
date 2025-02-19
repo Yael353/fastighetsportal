@@ -103,6 +103,8 @@ export const fetchBatchSensorData = createAsyncThunk<
         // Parsar och lagrar varje batchs svar
         const responseJson = await response.json();
 
+        console.log("BatchResponse: ", responseJson);
+
         allResponses.push(responseJson);
       }
 

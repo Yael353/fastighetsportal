@@ -110,64 +110,56 @@ export function PropertyList() {
   }
 
   return (
-    <div className="w-full flex flex-col space-y-6 justify-center items-center">
-      <div className="w-full px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {currentSensorDomains.map((domain: SensorDomain) => {
+    <div className="w-full flex flex-col space-y-6 justify-center items-center bg-gray-900 py-10">
+      <div className="w-full px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {currentSensorDomains.map((domain: SensorDomain, index: number) => {
           const { ucSensors, apartments } =
             getSensorDomainSensorDescription(domain);
 
           return (
             <div
               key={domain.id}
-              className="p-4 border rounded-lg shadow-md bg-white hover:scale-105 hover:shadow-lg transition-transform duration-200 hover:bg-blue-100"
+              className={`relative p-6 rounded-lg shadow-lg bg-gray-700 text-white hover:scale-105 transition-transform duration-200`}
             >
-              {/* status badge */}
-              <span
-                className={` top-0 right-0 transform translate-x-1/2 -translate-y-1/2 px-3 py-1 text-xs font-semibold uppercase rounded-full ${
-                  domain.harvester.active
-                    ? "bg-green-100 text-green-800"
-                    : "bg-gray-200 text-gray-600"
-                }`}
-              >
-                {domain.harvester.active ? "Active" : "Inactive"}
-              </span>
+              {/* Ikon i övre vänstra hörnet */}
+              <div className="absolute top-4 left-5 w-12 h-12 flex items-center justify-center bg-blue-500 text-white text-xl font-extrabold rounded-md">
+                {domain.name.charAt(0).toUpperCase()}
+              </div>
 
               <Link href={`/dashboard/detailedPage/${domain.id}`}>
-                <div className="flex items-center p-4 space-x-4">
-                  <div className="w-12 h-12 flex items-center justify-center bg-blue-500 text-white text-xl font-extrabold rounded-full">
-                    {domain.name.charAt(0).toLocaleUpperCase()}
-                  </div>
-
-                  <h2 className="text-xl font-bold text-gray-800 tracking-wide first-letter:uppercase">
+                <div className="flex flex-col items-start mt-16">
+                  {/* Status-badge i övre högra hörnet */}
+                  <span
+                    className={`px-3 py-1 text-xs font-semibold uppercase rounded-md ${
+                      domain.harvester.active
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-500 text-white"
+                    }`}
+                  >
+                    {domain.harvester.active ? "Active" : "Inactive"}
+                  </span>
+                  {/* Platsnamn */}
+                  <h2 className="text-xl font-bold text-white first-letter:uppercase">
                     {domain.name}
                   </h2>
-                </div>
 
-                {/* Detaljer om sensorer och lägenheter */}
-                <div className="flex justify-between text-sm text-gray-700 space-x-4 mb-4">
-                  <div className="flex flex-col items-center">
-                    <span className="text-sm font-medium text-indigo-600">
-                      Uc Sensorer
-                    </span>
-                    <span className="text-lg font-semibold">{ucSensors}</span>
+                  {/* Sensorer och lägenheter */}
+                  <div className="mt-4 flex items-center gap-2">
+                    <p className="text-sm font-medium text-gray-400">
+                      Uc Sensorer:
+                    </p>
+                    <p className="text-sm font-semibold text-white">
+                      {ucSensors}
+                    </p>
                   </div>
-                  <div className="flex flex-col items-center">
-                    <span className="text-sm font-medium text-gray-600">
-                      Lägenheter
-                    </span>
-                    <span className="text-lg font-semibold">{apartments}</span>
+
+                  <div className="mt-2 flex items-center gap-2">
+                    <p className="text-sm font-medium text-gray-400">
+                      Lägenheter:
+                    </p>
+                    <p className="text-sm font-semibold white">{apartments}</p>
                   </div>
                 </div>
-
-                {/* Diagram */}
-                {/* <div className="flex flex-col items-center">
-                  <p className="text-sm font-semibold text-indigo-500 mb-2">
-                    Temperatur inomhus:
-                  </p>
-                  <div className="h-35 w-[50%] flex items-center justify-center rounded-lg ">
-                    <ChartTest />
-                  </div>
-                </div> */}
               </Link>
             </div>
           );
@@ -175,14 +167,22 @@ export function PropertyList() {
       </div>
 
       {/* Pagination */}
-      <div className="w-full px-4 flex justify-between items-center mt-6">
-        <Button className="" onClick={prevPage} disabled={currentPage === 1}>
+      <div className="w-full px-4 flex justify-between items-center mt-6 text-white">
+        <Button
+          className="bg-gray-700"
+          onClick={prevPage}
+          disabled={currentPage === 1}
+        >
           <ChevronLeft className="mr-2 h-4 w-4" /> Föregående
         </Button>
         <span>
           Sida {currentPage} av {totalPages}
         </span>
-        <Button onClick={nextPage} disabled={currentPage === totalPages}>
+        <Button
+          className="bg-gray-700"
+          onClick={nextPage}
+          disabled={currentPage === totalPages}
+        >
           Nästa <ChevronRight className="ml-2 h-4 w-4" />
         </Button>
       </div>

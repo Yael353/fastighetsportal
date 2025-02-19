@@ -56,13 +56,39 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
 
   // Hämta sensor-domän
   const sensorDomain = useSelector((state: RootState) => state.property.data);
-  const sensorsState = useSelector((state: RootState) => state.sensorData.sensors);
+  const sensorsState = useSelector(
+    (state: RootState) => state.sensorData.sensors
+  );
 
   // Filtrera sensorer baserat på deras typ
-  const filteredOAT = useMemo(() => sensorDomain?.sensors?.filter(s => s.vala_description?.name === "OAT") || [], [sensorDomain]);
-  const filteredIAT = useMemo(() => sensorDomain?.sensors?.filter(s => s.vala_description?.name === "IAT") || [], [sensorDomain]);
-  const filteredFWT = useMemo(() => sensorDomain?.sensors?.filter(s => s.vala_description?.name === "FWT") || [], [sensorDomain]);
-  const filteredRWT = useMemo(() => sensorDomain?.sensors?.filter(s => s.vala_description?.name === "RWT") || [], [sensorDomain]);
+  const filteredOAT = useMemo(
+    () =>
+      sensorDomain?.sensors?.filter(
+        (s) => s.vala_description?.name === "OAT"
+      ) || [],
+    [sensorDomain]
+  );
+  const filteredIAT = useMemo(
+    () =>
+      sensorDomain?.sensors?.filter(
+        (s) => s.vala_description?.name === "IAT"
+      ) || [],
+    [sensorDomain]
+  );
+  const filteredFWT = useMemo(
+    () =>
+      sensorDomain?.sensors?.filter(
+        (s) => s.vala_description?.name === "FWT"
+      ) || [],
+    [sensorDomain]
+  );
+  const filteredRWT = useMemo(
+    () =>
+      sensorDomain?.sensors?.filter(
+        (s) => s.vala_description?.name === "RWT"
+      ) || [],
+    [sensorDomain]
+  );
 
   // Ladda sensor-domän vid behov
   useEffect(() => {
@@ -72,18 +98,32 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
   // Ladda sensordata när sensorDomain finns
   useEffect(() => {
     if (!sensorDomain) return;
-    
-    const sensorIds = [...filteredOAT, ...filteredIAT, ...filteredFWT, ...filteredRWT].map(s => s.id);
+
+    const sensorIds = [
+      ...filteredOAT,
+      ...filteredIAT,
+      ...filteredFWT,
+      ...filteredRWT,
+    ].map((s) => s.id);
     if (sensorIds.length === 0) return;
 
-    dispatch(fetchBatchSensorData({
-      sensorDomainId: sensorDomain.id,
-      sensorIds,
-      startUtc: moment().subtract(1, "day"),
-      endUtc: moment(),
-      freq: BatchSensorDataFreq.raw,
-    }));
-  }, [dispatch, sensorDomain, filteredOAT, filteredIAT, filteredFWT, filteredRWT]);
+    dispatch(
+      fetchBatchSensorData({
+        sensorDomainId: sensorDomain.id,
+        sensorIds,
+        startUtc: moment().subtract(1, "day"),
+        endUtc: moment(),
+        freq: BatchSensorDataFreq.raw,
+      })
+    );
+  }, [
+    dispatch,
+    sensorDomain,
+    filteredOAT,
+    filteredIAT,
+    filteredFWT,
+    filteredRWT,
+  ]);
 
   // Funktion för att bygga chartData
   const buildChartData = (filteredSensors) => {
@@ -104,39 +144,99 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
   };
 
   // Generera chartData
-  const chartDataOAT = useMemo(() => buildChartData(filteredOAT), [filteredOAT, sensorsState]);
-  const chartDataIAT = useMemo(() => buildChartData(filteredIAT), [filteredIAT, sensorsState]);
-  const chartDataFWT = useMemo(() => buildChartData(filteredFWT), [filteredFWT, sensorsState]);
-  const chartDataRWT = useMemo(() => buildChartData(filteredRWT), [filteredRWT, sensorsState]);
+  const chartDataOAT = useMemo(
+    () => buildChartData(filteredOAT),
+    [filteredOAT, sensorsState]
+  );
+  const chartDataIAT = useMemo(
+    () => buildChartData(filteredIAT),
+    [filteredIAT, sensorsState]
+  );
+  const chartDataFWT = useMemo(
+    () => buildChartData(filteredFWT),
+    [filteredFWT, sensorsState]
+  );
+  const chartDataRWT = useMemo(
+    () => buildChartData(filteredRWT),
+    [filteredRWT, sensorsState]
+  );
 
   // Slå ihop data för OAT/IAT och FWT/RWT
-  const mergedChartDataOAT_IAT = useMemo(() => mergeChartData(chartDataOAT, chartDataIAT, filteredOAT[0]?.id, filteredIAT[0]?.id), [chartDataOAT, chartDataIAT]);
-  const mergedChartDataFWT_RWT = useMemo(() => mergeChartData(chartDataFWT, chartDataRWT, filteredFWT[0]?.id, filteredRWT[0]?.id), [chartDataFWT, chartDataRWT]);
+  const mergedChartDataOAT_IAT = useMemo(
+    () =>
+      mergeChartData(
+        chartDataOAT,
+        chartDataIAT,
+        filteredOAT[0]?.id,
+        filteredIAT[0]?.id
+      ),
+    [chartDataOAT, chartDataIAT]
+  );
+  const mergedChartDataFWT_RWT = useMemo(
+    () =>
+      mergeChartData(
+        chartDataFWT,
+        chartDataRWT,
+        filteredFWT[0]?.id,
+        filteredRWT[0]?.id
+      ),
+    [chartDataFWT, chartDataRWT]
+  );
 
   return (
     <div className="flex flex-col gap-2">
       {/* OAT & IAT - Dual Axis Chart */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-center">Inomhus- och Utomhustemperatur</CardTitle>
+          <CardTitle className="text-center">
+            Inomhus- och Utomhustemperatur
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
             <LineChart data={mergedChartDataOAT_IAT}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="time" />
-              
-              <YAxis yAxisId="left" label={{ value: "°C", angle: 0, position: "insideLeft" }} stroke={sensorColors.OAT} />
-              <YAxis yAxisId="right" label={{ value: "°C", angle: 0, position: "insideRight" }} stroke={sensorColors.IAT} orientation="right" domain={[18, 23]}  />
+
+              <YAxis
+                yAxisId="left"
+                label={{ value: "°C", angle: 0, position: "insideLeft" }}
+                stroke={sensorColors.OAT}
+              />
+              <YAxis
+                yAxisId="right"
+                label={{ value: "°C", angle: 0, position: "insideRight" }}
+                stroke={sensorColors.IAT}
+                orientation="right"
+                domain={[18, 23]}
+              />
 
               <Tooltip />
               <Legend />
 
               {filteredOAT.map((sensor) => (
-                <Line key={sensor.id} type="monotone" dataKey={sensor.id} stroke={sensorColors.OAT} name="Utomhustemperatur" dot={false} strokeWidth={2} yAxisId="left" />
+                <Line
+                  key={sensor.id}
+                  type="monotone"
+                  dataKey={sensor.id}
+                  stroke={sensorColors.OAT}
+                  name="Utomhustemperatur"
+                  dot={false}
+                  strokeWidth={2}
+                  yAxisId="left"
+                />
               ))}
               {filteredIAT.map((sensor) => (
-                <Line key={sensor.id} type="monotone" dataKey={sensor.id} stroke={sensorColors.IAT} name="Inomhustemperatur" dot={false} strokeWidth={2} yAxisId="right" />
+                <Line
+                  key={sensor.id}
+                  type="monotone"
+                  dataKey={sensor.id}
+                  stroke={sensorColors.IAT}
+                  name="Inomhustemperatur"
+                  dot={false}
+                  strokeWidth={2}
+                  yAxisId="right"
+                />
               ))}
             </LineChart>
           </ResponsiveContainer>
@@ -157,10 +257,26 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
               <Tooltip />
               <Legend />
               {filteredFWT.map((sensor) => (
-                <Line key={sensor.id} type="monotone" dataKey={sensor.id} stroke={sensorColors.FWT} name="Framlednings temperatur" dot={false} strokeWidth={2} />
+                <Line
+                  key={sensor.id}
+                  type="monotone"
+                  dataKey={sensor.id}
+                  stroke={sensorColors.FWT}
+                  name="Framlednings temperatur"
+                  dot={false}
+                  strokeWidth={2}
+                />
               ))}
               {filteredRWT.map((sensor) => (
-                <Line key={sensor.id} type="monotone" dataKey={sensor.id} stroke={sensorColors.RWT} name="Returlednings temperatur" dot={false} strokeWidth={2} />
+                <Line
+                  key={sensor.id}
+                  type="monotone"
+                  dataKey={sensor.id}
+                  stroke={sensorColors.RWT}
+                  name="Returlednings temperatur"
+                  dot={false}
+                  strokeWidth={2}
+                />
               ))}
             </LineChart>
           </ResponsiveContainer>
