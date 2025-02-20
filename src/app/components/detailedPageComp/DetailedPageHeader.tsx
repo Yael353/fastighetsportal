@@ -4,47 +4,31 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bar, BarChart } from "recharts";
+import { Bar, BarChart, YAxis, Tooltip } from "recharts"; // Importera Tooltip
 import { ChartContainer } from "@/components/ui/chart";
 import { AppDispatch, RootState } from "@/features/store/store";
 import { fetchSensorDomain } from "@/features/thunks/fetchSensors";
 import { FaHome } from "react-icons/fa";
-import { ArrowUpIcon, Clock } from "lucide-react";
 import {
   LineChart,
   Line,
   XAxis,
-  YAxis,
   CartesianGrid,
-  Tooltip,
   Legend,
   ResponsiveContainer,
 } from "recharts";
 import { useSensorData } from "@/hooks/useSensorData";
+import SensorDataComp from "./SensorDataComp";
 
-const deliveryRequestsData = [
-  { value: 30 },
-  { value: 40 },
-  { value: 45 },
-  { value: 50 },
-  { value: 55 },
-];
+// Typer för sensordata
+interface SensorData {
+  value: number;
+}
 
-const assignedDeliveriesData = [
-  { value: 50 },
-  { value: 45 },
-  { value: 30 },
-  { value: 20 },
-  { value: 10 },
-];
-
-const completedDeliveriesData = [
-  { value: 10 },
-  { value: 20 },
-  { value: 30 },
-  { value: 40 },
-  { value: 50 },
-];
+interface Domain {
+  min: number;
+  max: number;
+}
 
 export default function DetailedPageHeader() {
   const { id } = useParams(); // Hämta ID från URL
@@ -60,13 +44,17 @@ export default function DetailedPageHeader() {
     filteredFWT,
     filteredRWT,
     latestIAT,
-    latestOAT, // Utomhustemperatur
-    latestFWT, // Framledningstemperatur
+    latestOAT,
+    latestFWT,
     latestRWT,
-    latestIATTime, // Tidpunkt för senaste IAT-värde
-    latestOATTime, // Tidpunkt för senaste OAT-värde
-    latestFWTTime, // Tidpunkt för senaste FWT-värde
-    latestRWTTime, // Tidpunkt för senaste RWT-värde
+    latestIATTime,
+    latestOATTime,
+    latestFWTTime,
+    latestRWTTime,
+    barChartDataIAT,
+    barChartDataOAT,
+    barChartDataFWT,
+    barChartDataRWT,
   } = useSensorData(id);
 
   // Hämta sensordomain-data från Redux-storen
@@ -81,6 +69,31 @@ export default function DetailedPageHeader() {
     }
   }, [id, dispatch]);
 
+  // Beräkna domain för BarChart
+  const calculateDomain = (data: SensorData[]): [number, number] => {
+    if (!data || data.length === 0) return [0, 0];
+
+    const values = data.map((item) => item.value);
+    const maxValue = Math.max(...values);
+    const minValue = Math.min(...values);
+
+    // Lägg till en marginal på 10% av intervallet
+    const margin = (maxValue - minValue) * 0.1;
+
+    // Säkerställ att minValue inte blir negativ om margin är större än minValue
+    const adjustedMin = Math.max(minValue - margin, 0);
+
+    return [adjustedMin, maxValue + margin];
+  };
+
+  // Använd calculateDomain för att sätta domain för varje BarChart
+  const domains = [
+    calculateDomain(barChartDataIAT),
+    calculateDomain(barChartDataOAT),
+    calculateDomain(barChartDataFWT),
+    calculateDomain(barChartDataRWT),
+  ];
+
   // Hantering av olika tillstånd
   if (loading) return <p>Loading property data...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -89,28 +102,17 @@ export default function DetailedPageHeader() {
   const { name, location } = data;
 
   // Bygg URL för den statiska kartan med satellitbild
-  const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${location.latitude},${location.longitude}&zoom=15&size=700x200&maptype=roadmap&markers=color:red|${location.latitude},${location.longitude}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`;
+  const staticMapUrl = location
+    ? `https://maps.googleapis.com/maps/api/staticmap?center=${location.latitude},${location.longitude}&zoom=15&size=300x300&maptype=satellite&markers=color:blue|${location.latitude},${location.longitude}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
+    : "";
 
   return (
-    <div className="">
-      {/* Static Satellite Map */}
-      <div className="">
-        <img
-          src={staticMapUrl}
-          alt="Static roadmap"
-          className="rounded-md sm:w-[100%] 2xl:w-[100%] h-[450px]"
-          style={{
-            maskImage:
-              "linear-gradient(to bottom, rgba(255, 255, 255, 1) 85%, rgba(255, 255, 255, 0) 90%)",
-          }}
-        />
-      </div>
-
+    <div className="bg-gray-900 p-4 w-full">
       {/* Property Information */}
-      <Card>
+      <Card className="bg-gray-900">
         <CardHeader>
           <div className="flex items-center justify-center gap-x-5">
-            <CardTitle className="text-3xl font-bold text-gray-800 tracking-wide first-letter:uppercase">
+            <CardTitle className="text-3xl bg-gray-900 font-bold text-white tracking-wide first-letter:uppercase">
               {name.charAt(0).toUpperCase() + name.slice(1)}
             </CardTitle>
             <FaHome size={30} />
@@ -118,127 +120,85 @@ export default function DetailedPageHeader() {
         </CardHeader>
       </Card>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              INOMHUS TEMPERATUR
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-2xl font-bold">
-                  {latestIAT !== null ? latestIAT.toFixed(1) + "°C" : "N/A"}
-                </div>
-
-                {/* <p className="text-xs text-muted-foreground">
-                  <span className="flex items-center text-green-500">
-                    <ArrowUpIcon className="mr-1 h-4 w-4" />
-                    12
-                  </span>
-                  up from yesterday
-                </p> */}
-              </div>
-              <ChartContainer className="h-12 w-[100px]">
-                <BarChart data={deliveryRequestsData}>
-                  <Bar
-                    dataKey="value"
-                    fill="hsl(var(--chart-1))"
-                    radius={[2, 2, 0, 0]}
-                  />
-                </BarChart>
-              </ChartContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              UTOMHUS TEMPERATUR
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-2xl font-bold">
-                  {latestOAT !== null ? latestOAT.toFixed(1) + "°C" : "N/A"}
-                </div>
-                {/* <p className="text-xs text-muted-foreground">
-                  <span className="text-green-500">2</span> on the way to pick
-                </p> */}
-              </div>
-              <ChartContainer className="h-12 w-[100px]">
-                <BarChart data={assignedDeliveriesData}>
-                  <Bar
-                    dataKey="value"
-                    fill="hsl(var(--chart-1))"
-                    radius={[2, 2, 0, 0]}
-                  />
-                </BarChart>
-              </ChartContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              FRAMLEDNINGS TEMPERATUR
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-2xl font-bold">
-                  {latestFWT !== null ? latestFWT.toFixed(1) + "°C" : "N/A"}
-                </div>
-                <div className="h-4" />
-              </div>
-              <ChartContainer className="h-12 w-[100px]">
-                <BarChart data={assignedDeliveriesData}>
-                  <Bar
-                    dataKey="value"
-                    fill="hsl(var(--chart-1))"
-                    radius={[2, 2, 0, 0]}
-                  />
-                </BarChart>
-              </ChartContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              RETURLEDNINGS TEMPERATUR
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-2xl font-bold">
-                  {latestRWT !== null ? latestRWT.toFixed(1) + "°C" : "N/A"}
-                </div>
-                {/* <p className="text-xs text-muted-foreground">
-                  
-                  avg late
-                </p> */}
-              </div>
-              <ChartContainer className="h-12 w-[100px]">
-                <BarChart data={completedDeliveriesData}>
-                  <Bar
-                    dataKey="value"
-                    fill="hsl(var(--chart-2))"
-                    radius={[2, 2, 0, 0]}
-                  />
-                </BarChart>
-              </ChartContainer>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Höger sida: Kartan */}
+      <div className="flex justify-center">
+        {location && (
+          <div className="w-[35%] h-full">
+            <img
+              src={staticMapUrl}
+              alt="Static satellite"
+              className="rounded-sm w-full h-full object-cover"
+              style={{
+                maskImage:
+                  "linear-gradient(to bottom, rgba(255, 255, 255, 1) 85%, rgba(255, 255, 255, 0) 80%)",
+              }}
+            />
+          </div>
+        )}
       </div>
+
+      {/* Layout med kort och karta */}
+      <div className="flex flex-row gap-3">
+        {[
+          {
+            title: "INOMHUS TEMPERATUR",
+            value: latestIAT,
+            data: barChartDataIAT,
+            domain: domains[0],
+          },
+          {
+            title: "UTOMHUS TEMPERATUR",
+            value: latestOAT,
+            data: barChartDataOAT,
+            domain: domains[1],
+          },
+          {
+            title: "FRAMLEDNINGS TEMPERATUR",
+            value: latestFWT,
+            data: barChartDataFWT,
+            domain: domains[2],
+          },
+          {
+            title: "RETURLEDNINGS TEMPERATUR",
+            value: latestRWT,
+            data: barChartDataRWT,
+            domain: domains[3],
+          },
+        ].map(({ title, value, data, domain }, index) => (
+          <Card
+            key={index}
+            className="flex flex-row items-center justify-between p-4 w-full max-w-xl h-24 rounded-lg shadow-md border border-gray-700"
+          >
+            <div className="flex flex-col justify-center">
+              <CardTitle className="text-xs font-medium text-gray-400">
+                {title}
+              </CardTitle>
+              <div className="text-4xl font-bold text-gray-200">
+                {value !== null ? value.toFixed(1) + "°C" : "N/A"}
+              </div>
+            </div>
+            <ChartContainer className="h-16 w-[150px]">
+              <BarChart data={data}>
+                <Bar dataKey="value" fill="#00699f" radius={[2, 2, 0, 0]} />
+                <YAxis domain={domain} hide />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "hsl(var(--background))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "4px",
+                    padding: "8px",
+                  }}
+                  formatter={(value) => `${value}°C`}
+                />
+              </BarChart>
+            </ChartContainer>
+          </Card>
+        ))}
+      </div>
+
+      {/* <div className="w-full">
+        <SensorDataComp />
+      </div> */}
     </div>
   );
 }

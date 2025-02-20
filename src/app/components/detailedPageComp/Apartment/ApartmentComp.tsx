@@ -70,13 +70,13 @@ export default function ApartmentComp() {
   }
 
   return (
-    <div>
-      <div className="p-4 bg-white shadow-md rounded-md max-w-full mx-auto h-auto ">
-        <h2 className="text-lg font-bold text-blue-900 mb-4">
+    <div className="rounded-lg p-2">
+      <div className=" bg-gray-900 shadow-md rounded-lg max-w-full mx-auto h-auto ">
+        <h2 className="text-lg font-bold text-white mb-4">
           Medelvärde för lägenheter de 30 senaste dagarna
         </h2>
-        <Table className="border border-gray-300 text-sm">
-          <TableHeader className="bg-blue-100 text-gray-700">
+        <Table className="border border-gray-700 text-sm">
+          <TableHeader className="bg-gray-800 text-gray-200">
             <TableRow>
               <TableHead className="text-left font-extrabold">
                 Antal rum
@@ -91,7 +91,7 @@ export default function ApartmentComp() {
               Object.entries(summaryStatistics).map(([size, stats]) => (
                 <TableRow
                   key={size}
-                  className="hover:bg-blue-50 hover:transition-transform duration-150 hover:scale-103"
+                  className="hover:bg-gray-400 bg-gray-700 text-white hover:transition-transform duration-150 hover:scale-103"
                 >
                   <TableCell>{size}</TableCell>
                   {["kWh", "L", "C"].map((unit) => (

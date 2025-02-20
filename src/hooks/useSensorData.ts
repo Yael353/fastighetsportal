@@ -152,6 +152,26 @@ export const useSensorData = (id: string) => {
   const latestFWTTime = getLatestTimestamp(chartDataFWT);
   const latestRWTTime = getLatestTimestamp(chartDataRWT);
 
+  // Funktion för att formatera data för BarChart
+  const getBarChartData = (chartData: any[], filteredSensors: any[]) => {
+    if (!chartData || chartData.length === 0 || filteredSensors.length === 0)
+      return [];
+
+    const sensorId = filteredSensors[0]?.id; // Använd första sensorn i listan
+
+    return chartData
+      .slice(-5) // Hämta de senaste 5 värdena
+      .map((dataPoint) => ({
+        value: dataPoint[sensorId], // Hämta värdet för aktuell sensor
+      }));
+  };
+
+  // Formaterad data för BarChart för varje sensor
+  const barChartDataIAT = getBarChartData(chartDataIAT, filteredIAT);
+  const barChartDataOAT = getBarChartData(chartDataOAT, filteredOAT);
+  const barChartDataFWT = getBarChartData(chartDataFWT, filteredFWT);
+  const barChartDataRWT = getBarChartData(chartDataRWT, filteredRWT);
+
   // Lägg till senaste värdena i return-objektet
   return {
     chartDataOAT,
@@ -170,5 +190,9 @@ export const useSensorData = (id: string) => {
     latestOATTime, // Senaste tidpunkt för OAT
     latestFWTTime, // Senaste tidpunkt för FWT
     latestRWTTime, // Senaste tidpunkt för RWT
+    barChartDataIAT, // 🚀 Lägger till bar chart-data för IAT
+    barChartDataOAT, // 🚀 Lägger till bar chart-data för OAT
+    barChartDataFWT, // 🚀 Lägger till bar chart-data för FWT
+    barChartDataRWT,
   };
 };

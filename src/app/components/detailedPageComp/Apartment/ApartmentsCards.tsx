@@ -33,7 +33,7 @@ export default function ApartmentsCards() {
   }, [id, dispatch]);
 
   if (loading) {
-    return <div>Laddar...</div>;
+    return <div className="bg-gray-900">Laddar...</div>;
   }
 
   if (error) {
@@ -84,7 +84,7 @@ export default function ApartmentsCards() {
           value={searchQuery}
           onChange={handleSearchChange}
           placeholder="Sök efter lägenhetsnummer..."
-          className="px-4 py-2 border rounded-lg w-full max-w-md"
+          className="px-4 py-2 border border-gray-700 rounded-lg w-full max-w-md"
         />
       </div>
 
@@ -94,23 +94,23 @@ export default function ApartmentsCards() {
           currentApartments.map((apartment: ApartmentResponse) => (
             <div
               key={apartment.apt_id}
-              className="border p-4 rounded-lg shadow hover:shadow-lg transition-shadow duration-200 flex justify-center items-center"
+              className="border bg-gray-700 p-4 rounded-lg shadow hover:shadow-lg transition-shadow duration-200 flex justify-center items-center"
             >
               <Link
                 href={`/dashboard/detailedPage/${id}/singleApartment/${apartment.apt_id}`}
                 className="block h-full w-full text-center"
               >
-                <h2 className="text-2xl font-bold mb-2">
+                <h2 className="text-2xl font-bold mb-2 text-white">
                   Lgh: {apartment.apt_id}
                 </h2>
-                <p className="text-gray-600">
+                <p className="text-gray-400">
                   {apartment.size_type} - {apartment.size_kvm} kvm
                 </p>
               </Link>
             </div>
           ))
         ) : (
-          <div className="col-span-full text-center text-gray-600">
+          <div className="col-span-full text-center text-white ">
             Inga lägenheter matchar sökningen.
           </div>
         )}
@@ -122,17 +122,17 @@ export default function ApartmentsCards() {
           <button
             onClick={handlePrevPage}
             disabled={currentPage === 1}
-            className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+            className="px-4 py-2 bg-gray-700 text-gray-200 rounded disabled:opacity-50"
           >
             Föregående
           </button>
-          <span>
+          <span className="text-white">
             Sida {currentPage} av {totalPages}
           </span>
           <button
             onClick={handleNextPage}
             disabled={currentPage === totalPages}
-            className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+            className="px-4 py-2 bg-gray-700 text-gray-200  rounded disabled:opacity-50"
           >
             Nästa
           </button>

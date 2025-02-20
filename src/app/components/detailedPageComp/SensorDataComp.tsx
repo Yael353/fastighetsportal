@@ -10,25 +10,29 @@ interface SensorDataCompProps {
 
 export default function SensorDataComp({ id }: SensorDataCompProps) {
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <Tabs defaultValue="overview" className="space-y-4">
+    <div className="w-full py-6 space-y-6 bg-gray-900">
+      <div className="space-y-6">
+        <ChartsLayout id={id} />
+      <ApartmentComp />
+      </div>
+      {/* <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">UC Sensorer</TabsTrigger>
           <TabsTrigger value="apartments">Lägenheter</TabsTrigger>
           {/* <TabsTrigger value="maintenance">Underhåll</TabsTrigger>
           <TabsTrigger value="finances">Ekonomi</TabsTrigger> */}
-        </TabsList>
+      {/* </TabsList>
         <TabsContent value="overview" className="space-y-4">
-          <div className="container mx-auto ">
+          <div className="mx-auto ">
             <ChartsLayout id={id} />
           </div>
         </TabsContent>
 
         <TabsContent value="apartments">
           <ApartmentComp />
-        </TabsContent>
+        </TabsContent> */}
 
-        {/*
+      {/*
         <TabsContent value="maintenance">
           <Card>
             <CardHeader>
@@ -111,7 +115,7 @@ export default function SensorDataComp({ id }: SensorDataCompProps) {
             </Card>
           </div>
         </TabsContent> */}
-      </Tabs>
+      {/* // </Tabs> */}
     </div>
   );
 }

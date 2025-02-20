@@ -184,20 +184,19 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
   );
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex gap-3 w-full pt-5 p-2">
       {/* OAT & IAT - Dual Axis Chart */}
-      <Card>
+      <Card className="flex-1">
         <CardHeader>
           <CardTitle className="text-center">
             Inomhus- och Utomhustemperatur
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={400}>
+          <ResponsiveContainer width="100%" height={300}>
             <LineChart data={mergedChartDataOAT_IAT}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="time" />
-
               <YAxis
                 yAxisId="left"
                 label={{ value: "°C", angle: 0, position: "insideLeft" }}
@@ -210,10 +209,8 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
                 orientation="right"
                 domain={[18, 23]}
               />
-
               <Tooltip />
               <Legend />
-
               {filteredOAT.map((sensor) => (
                 <Line
                   key={sensor.id}
@@ -244,12 +241,12 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
       </Card>
 
       {/* FWT & RWT - Standard Chart */}
-      <Card>
+      <Card className="flex-1 ">
         <CardHeader>
           <CardTitle className="text-center">Jämförelse</CardTitle>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={400}>
+          <ResponsiveContainer width="100%" height={300}>
             <LineChart data={mergedChartDataFWT_RWT}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="time" />
@@ -284,6 +281,8 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
       </Card>
     </div>
   );
+
+
 };
 
 export default ChartsLayout;
