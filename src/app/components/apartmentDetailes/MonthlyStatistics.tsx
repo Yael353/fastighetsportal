@@ -106,7 +106,7 @@ const MonthlyStatistics: React.FC<Props> = ({ data, loading, error }) => {
     <div className="bg-white shadow-md rounded-xl overflow-hidden border border-blue-100">
       <Table>
         <TableHeader className="bg-blue-50 font-extrabold">
-          <TableRow>
+          <TableRow className="">
             <TableHead className="px-6 py-3 text-left text-xs font-extrabold uppercase tracking-wider">
               År
             </TableHead>

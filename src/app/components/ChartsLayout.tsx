@@ -184,7 +184,7 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
   );
 
   return (
-    <div className="flex gap-3 w-full pt-5 p-2">
+    <div className="flex gap-4 w-full pt-5 py-2">
       {/* OAT & IAT - Dual Axis Chart */}
       <Card className="flex-1">
         <CardHeader>

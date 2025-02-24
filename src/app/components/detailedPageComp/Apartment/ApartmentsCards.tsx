@@ -76,7 +76,7 @@ export default function ApartmentsCards() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 py-10">
       {/* Sökfält */}
       <div className="flex justify-center">
         <input
@@ -84,12 +84,12 @@ export default function ApartmentsCards() {
           value={searchQuery}
           onChange={handleSearchChange}
           placeholder="Sök efter lägenhetsnummer..."
-          className="px-4 py-2 border border-gray-700 rounded-lg w-full max-w-md"
+          className="py-2 border border-gray-700 rounded-lg w-full max-w-md"
         />
       </div>
 
       {/* Lägenhetskort */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 py-10">
         {currentApartments.length > 0 ? (
           currentApartments.map((apartment: ApartmentResponse) => (
             <div

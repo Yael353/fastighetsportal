@@ -7,7 +7,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/features/store/store";
 import { useParams } from "next/navigation";
 import { getAuthToken } from "@/utils/auth";
-import { getList } from "@/features/slices/overviewSlice";
 import { fetchSensorDomain } from "@/features/thunks/fetchSensors";
 
 export default function DetailedPage() {
@@ -26,9 +25,13 @@ export default function DetailedPage() {
   }, [id, authToken, dispatch]);
 
   return (
-    <>
-      <DetailedPageHeader />
-      <SensorDataComp id={id} />
-    </>
+    <div className="bg-gray-900">
+      <div className="">
+        <DetailedPageHeader />
+      </div>
+      <div className="">
+        <SensorDataComp id={id} />
+      </div>
+    </div>
   );
 }

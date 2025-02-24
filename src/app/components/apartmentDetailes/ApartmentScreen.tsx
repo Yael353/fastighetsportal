@@ -16,8 +16,11 @@ import {
   BatchSensorDataFreq,
 } from "@/features/models/sensor-data";
 
-import SingleApartmentChart from "./SingleApartmentChart";
+import SingleApartmentChart from "./TemperatureChart";
 import MonthlyStatistics from "./MonthlyStatistics";
+import ElectricityChart from "./ElectricityChart";
+import HotWaterChart from "./HotWaterChart";
+import TemperatureChart from "./TemperatureChart";
 
 export default function ApartmentScreen() {
   const dispatch = useDispatch<AppDispatch>();
@@ -47,6 +50,8 @@ export default function ApartmentScreen() {
   const monthlyError = useSelector(
     (state: RootState) => state.monthlyStatistics.error
   );
+
+  console.log("MonthlyStatistics!", monthlyStatistics);
 
   const apartmentConsumption = useSelector(
     (state: RootState) => state.apartmentConsumption.data?.data
@@ -142,36 +147,37 @@ export default function ApartmentScreen() {
   );
 
   return (
-    <div>
-      <div className="flex flex-col justify-center items-center">
-        <h1 className="text-3xl font-extrabold bg-blue-100 p-4 rounded-xl shadow-md">
+    <div className="bg-gray-900 p-4">
+      {/* Byggnads- och lägenhetsinformation */}
+      <div className="flex flex-col w-[25%] rounded-lg px-2 bg-gray-700">
+        <h1 className="text-3xl font-extrabold text-white   pt-2">
           {building?.name ?? "Okänd byggnad"}
         </h1>
-        <h3 className="text-lg font-semibold mt-1 p-2 bg-blue-50 rounded-lg shadow-sm">
+        <h3 className="text-lg font-semibold  p-2 text-gray-300  shadow-sm rounded-b-lg">
           Lägenhet: {apartment?.apt_id ?? "N/A"}
         </h3>
       </div>
 
       {/* Konsumtionskorten */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-4">
-        <div className="p-4 bg-white shadow rounded">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-4 bg-gray-900">
+        <div className="p-4 bg-gray-700 text-gray-300 shadow rounded-md flex flex-col justify-center items-center">
           <h4 className="font-semibold">Medeltemperatur</h4>
           <p className="text-2xl">
             {temperatureData ? temperatureData.average.toFixed(2) : "-"}{" "}
             {temperatureData?.vala_description.unit || ""}
           </p>
         </div>
-        <div className="p-4 bg-white shadow rounded">
+        <div className="p-4 bg-gray-700 text-gray-300 shadow rounded-md flex flex-col justify-center items-center">
           <h4 className="font-semibold">Elförbrukning</h4>
           <p className="text-2xl">
             {electricityData ? electricityData.difference.toFixed(2) : "-"}{" "}
             {electricityData?.vala_description.unit || ""}
           </p>
         </div>
-        <div className="p-4 bg-white shadow rounded">
+        <div className="p-4 bg-gray-700 text-gray-300 shadow rounded-md flex flex-col justify-center items-center">
           <h4 className="font-semibold">Varmvattenförbrukning</h4>
           <p className="text-2xl">
-            {hotWaterData ? hotWaterData.difference : "-"}{" "}
+            {hotWaterData ? hotWaterData.difference.toFixed(0) : "-"}{" "}
             {hotWaterData?.vala_description.unit || ""}
           </p>
         </div>
@@ -185,29 +191,78 @@ export default function ApartmentScreen() {
         </div>
       )}
 
-      <Tabs defaultValue="charts" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="charts">Grafer</TabsTrigger>
-          <TabsTrigger value="monthlyStatistics">Tabell</TabsTrigger>
-        </TabsList>
+      {/* Diagram och Statistik - Grid Layout */}
+      {/* Inomhustemperatur-grafen */}
+      <div className="bg-gray-900 ">
+        <div className="grid grid-cols-2 grid-rows-2 gap-4 h-[900px]">
+          <div>
+            <h3 className="text-lg text-white font-semibold mb-2">
+              Inomhustemperatur
+            </h3>
+            <div className="shadow-md rounded-lg  flex flex-col bg-gray-900 w-full h-[400px]">
+              <div className="flex-1">
+                <TemperatureChart batchData={batchData} />
+              </div>
+            </div>
+          </div>
 
-        <TabsContent value="charts" className="space-y-4">
-          <SingleApartmentChart
-            data={apartmentConsumption} // befintlig prop (aggregerad data)
-            loading={apartmentConsumptionLoading}
-            error={apartmentConsumptionError}
-            batchData={batchData} // NY prop med batch-svar
-          />
-        </TabsContent>
+          {/* Monthly Statistics */}
+          <div className="bg-gray-900 shadow-md rounded-lg overflow-auto flex flex-col w-full h-full">
+            <h3 className="text-lg text-white font-semibold mb-2">
+              Månadsvisa Medelvärden
+            </h3>
+            <div className="flex-1">
+              <MonthlyStatistics
+                data={monthlyStatistics}
+                loading={monthlyLoading}
+                error={monthlyError}
+              />
+            </div>
+          </div>
 
-        <TabsContent value="monthlyStatistics">
-          <MonthlyStatistics
-            data={monthlyStatistics}
-            loading={monthlyLoading}
-            error={monthlyError}
-          />
-        </TabsContent>
-      </Tabs>
+          {/* Elförbrukning */}
+          <div className=" shadow-md bg-gray-900 rounded-lg p-4 flex flex-col w-full h-full">
+            <h3 className="text-lg text-white font-semibold mb-2">Elförbrukning</h3>
+            <div className="flex-1 ">
+              <ElectricityChart batchData={batchData} />
+            </div>
+          </div>
+
+          {/* Varmvattenförbrukning */}
+          <div className="bg-gray-700 shadow-md rounded-lg p-4 flex flex-col w-full h-full">
+            <h3 className="text-lg font-semibold mb-2">
+              Varmvattenförbrukning
+            </h3>
+            <div className="flex-1">
+              <HotWaterChart batchData={batchData} />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
+}
+
+{
+  /* <Tabs defaultValue="charts" className="space-y-4">
+  <TabsList>
+    <TabsTrigger value="charts">Grafer</TabsTrigger>
+    <TabsTrigger value="monthlyStatistics">Tabell</TabsTrigger>
+  </TabsList> */
+}
+{
+  /* <TabsContent value="charts" className="space-y-4"> */
+}
+{
+  /* </TabsContent> */
+}
+
+{
+  /* <TabsContent value="monthlyStatistics"> */
+}
+{
+  /* </TabsContent> */
+}
+{
+  /* </Tabs> */
 }

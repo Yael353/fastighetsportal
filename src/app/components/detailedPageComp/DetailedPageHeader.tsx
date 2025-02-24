@@ -107,9 +107,9 @@ export default function DetailedPageHeader() {
     : "";
 
   return (
-    <div className="bg-gray-900 p-4 w-full">
+    <div className="bg-gray-900 px-4 w-full">
       {/* Property Information */}
-      <Card className="bg-gray-900">
+      <Card className="bg-gray-900 pb-10">
         <CardHeader>
           <div className="flex items-center justify-center gap-x-5">
             <CardTitle className="text-3xl bg-gray-900 font-bold text-white tracking-wide first-letter:uppercase">
@@ -121,9 +121,9 @@ export default function DetailedPageHeader() {
       </Card>
 
       {/* Höger sida: Kartan */}
-      <div className="flex justify-center">
+      {/* <div className="flex justify-center">
         {location && (
-          <div className="w-[35%] h-full">
+          <div className="w-[35%] h-full ">
             <img
               src={staticMapUrl}
               alt="Static satellite"
@@ -135,10 +135,10 @@ export default function DetailedPageHeader() {
             />
           </div>
         )}
-      </div>
+      </div> */}
 
       {/* Layout med kort och karta */}
-      <div className="flex flex-row gap-3">
+      <div className="flex flex-row gap-3 py-10">
         {[
           {
             title: "INOMHUS TEMPERATUR",
@@ -167,7 +167,7 @@ export default function DetailedPageHeader() {
         ].map(({ title, value, data, domain }, index) => (
           <Card
             key={index}
-            className="flex flex-row items-center justify-between p-4 w-full max-w-xl h-24 rounded-lg shadow-md border border-gray-700"
+            className="flex flex-row items-center justify-between px-4 w-full max-w-xl h-24 rounded-lg shadow-md border border-gray-700"
           >
             <div className="flex flex-col justify-center">
               <CardTitle className="text-xs font-medium text-gray-400">
@@ -177,21 +177,26 @@ export default function DetailedPageHeader() {
                 {value !== null ? value.toFixed(1) + "°C" : "N/A"}
               </div>
             </div>
-            <ChartContainer className="h-16 w-[150px]">
-              <BarChart data={data}>
-                <Bar dataKey="value" fill="#00699f" radius={[2, 2, 0, 0]} />
-                <YAxis domain={domain} hide />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--background))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "4px",
-                    padding: "8px",
-                  }}
-                  formatter={(value) => `${value}°C`}
-                />
-              </BarChart>
-            </ChartContainer>
+            <div className="">
+              <ChartContainer className="h-16 w-[150px]">
+                <BarChart data={data}>
+                  <Bar dataKey="value" fill="#00699f" radius={[2, 2, 0, 0]} />
+                  <YAxis domain={domain} hide />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--background))",
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "4px",
+                      padding: "8px",
+                    }}
+                    formatter={(value) => `${value}°C`}
+                  />
+                </BarChart>
+                <div>
+                  
+                </div>
+              </ChartContainer>
+            </div>
           </Card>
         ))}
       </div>

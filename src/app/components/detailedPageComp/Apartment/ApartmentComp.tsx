@@ -70,7 +70,7 @@ export default function ApartmentComp() {
   }
 
   return (
-    <div className="rounded-lg p-2">
+    <div className="rounded-lg py-20 ">
       <div className=" bg-gray-900 shadow-md rounded-lg max-w-full mx-auto h-auto ">
         <h2 className="text-lg font-bold text-white mb-4">
           Medelvärde för lägenheter de 30 senaste dagarna
@@ -81,9 +81,15 @@ export default function ApartmentComp() {
               <TableHead className="text-left font-extrabold">
                 Antal rum
               </TableHead>
-              <TableHead className="text-center font-extrabold">kWh</TableHead>
-              <TableHead className="text-center font-extrabold">L</TableHead>
-              <TableHead className="text-center font-extrabold">°C</TableHead>
+              <TableHead className="text-center font-extrabold text-xl">
+                kWh
+              </TableHead>
+              <TableHead className="text-center font-extrabold text-xl">
+                L
+              </TableHead>
+              <TableHead className="text-center font-extrabold text-xl">
+                °C
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -95,7 +101,10 @@ export default function ApartmentComp() {
                 >
                   <TableCell>{size}</TableCell>
                   {["kWh", "L", "C"].map((unit) => (
-                    <TableCell key={unit} className="text-center">
+                    <TableCell
+                      key={unit}
+                      className="text-center font-extrabold text-white"
+                    >
                       {stats
                         .find((stat) => stat.u_name === unit)
                         ?.avg?.toFixed(1) || "-"}
