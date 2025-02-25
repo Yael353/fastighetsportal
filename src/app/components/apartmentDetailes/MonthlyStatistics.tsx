@@ -47,6 +47,7 @@ const MonthlyStatistics: React.FC<Props> = ({ data, loading, error }) => {
   if (error) return <p>{error}</p>;
   if (!data) return <p>Ingen data tillgänglig.</p>;
 
+  // --- Samma logik för att bygga rows som i din befintliga kod ---
   const tableData: Record<string, AggregatedEntry> = Object.values(data)
     .flat()
     .reduce((acc, entry: Entry) => {
@@ -103,46 +104,49 @@ const MonthlyStatistics: React.FC<Props> = ({ data, loading, error }) => {
     .slice(0, 18);
 
   return (
-    <div className="bg-white shadow-md rounded-xl overflow-hidden border border-blue-100">
-      <Table>
-        <TableHeader className="bg-blue-50 font-extrabold">
-          <TableRow className="">
-            <TableHead className="px-6 py-3 text-left text-xs font-extrabold uppercase tracking-wider">
+    <div className="bg-gray-700 shadow-md rounded-md w-full">
+      {/* table-fixed ger kolumnerna en fördelning och w-full låter tabellen fylla föräldern */}
+      <Table className="table-fixed w-full">
+        <TableHeader className="bg-gray-800 font-extrabold rounded-md">
+          <TableRow>
+            {/* Exempel: w-1/5 för att göra alla kolumner lika breda, samt break-words för att radbryta */}
+            <TableHead className="w-1/5 pl-2 py-3 text-left text-xs font-semibold uppercase  text-gray-300 break-words">
               År
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-extrabold uppercase tracking-wider">
+            <TableHead className="w-1/5  py-3 text-left text-xs font-semibold uppercase text-gray-300 break-words">
               Månad
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-extrabold  uppercase tracking-wider">
+            <TableHead className="w-1/5  py-3 text-left text-xs font-semibold uppercase text-gray-300 break-words">
               Medeltemperatur
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-extrabold  uppercase tracking-wider">
+            <TableHead className="w-1/5  py-3 text-left text-xs font-semibold uppercase text-gray-300 break-words">
               Elförbrukning
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-extrabold  uppercase tracking-wider">
+            <TableHead className="w-1/5 pr-2 py-3 text-left text-xs font-semibold uppercase text-gray-300 break-words">
               Varmvattenförbrukning
             </TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody className="divide-y divide-blue-100">
+        <TableBody className="divide-y divide-gray-800">
           {rows.map((row) => (
             <TableRow
               key={row.key}
-              className="hover:bg-blue-50 transition-colors"
+              className="hover:bg-gray-500 transition-colors"
             >
-              <TableCell className="px-6 py-4 whitespace-nowrap text-sm font-bold ">
+              {/* Ta bort whitespace-nowrap så text kan brytas om kolumnen blir smal */}
+              <TableCell className="pl-2 py-3 text-sm font-bold text-gray-300 break-words">
                 {row.year}
               </TableCell>
-              <TableCell className="px-6 py-4 whitespace-nowrap text-sm ">
+              <TableCell className="py-3 text-sm font-semibold text-white break-words">
                 {row.month}
               </TableCell>
-              <TableCell className="px-6 py-4 whitespace-nowrap text-sm ">
+              <TableCell className="py-3 text-sm text-white break-words">
                 {row.iiat}
               </TableCell>
-              <TableCell className="px-6 py-4 whitespace-nowrap text-sm ">
+              <TableCell className="py-3 text-sm text-white break-words">
                 {row.iem}
               </TableCell>
-              <TableCell className="px-6 py-4 whitespace-nowrap text-sm ">
+              <TableCell className="pr-2 py-3 text-sm text-white break-words">
                 {row.ihtwm}
               </TableCell>
             </TableRow>

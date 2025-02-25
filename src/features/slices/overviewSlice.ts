@@ -19,7 +19,7 @@ const initialState: OverviewState = {
 
 // AsyncThunk för att hämta sensor-domäner
 export const getList = createAsyncThunk<
-  SensorDomain[],
+   { data: SensorDomain[]; total: number },
   { offset?: number; limit?: number } | undefined, // 🔹 Gör argumenten valfria
   { state: RootState; dispatch: AppDispatch; rejectValue: string }
 >(
@@ -39,7 +39,7 @@ export const getList = createAsyncThunk<
       const responseJson = await response.json();
 
       // console.log("responseJson ", responseJson);
-      return responseJson as SensorDomain[];
+       return { data: responseJson.data, total: responseJson.total };
     } catch (error: any) {
       return rejectWithValue(
         error.message || "Ett fel uppstod vid hämtning av sensor-domäner"

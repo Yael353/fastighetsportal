@@ -25,6 +25,7 @@ interface SensorData {
   value: number;
 }
 
+
 interface Domain {
   min: number;
   max: number;
@@ -33,6 +34,10 @@ interface Domain {
 export default function DetailedPageHeader() {
   const { id } = useParams(); // Hämta ID från URL
   const dispatch = useDispatch<AppDispatch>();
+
+   if (typeof id !== "string") {
+     return <p>Ogiltigt ID: {JSON.stringify(id)}</p>;
+   }
 
   const {
     chartDataOAT,
@@ -55,7 +60,7 @@ export default function DetailedPageHeader() {
     barChartDataOAT,
     barChartDataFWT,
     barChartDataRWT,
-  } = useSensorData(id);
+  } = useSensorData(id);  
 
   // Hämta sensordomain-data från Redux-storen
   const { data, loading, error } = useSelector(
@@ -102,9 +107,9 @@ export default function DetailedPageHeader() {
   const { name, location } = data;
 
   // Bygg URL för den statiska kartan med satellitbild
-  const staticMapUrl = location
-    ? `https://maps.googleapis.com/maps/api/staticmap?center=${location.latitude},${location.longitude}&zoom=15&size=300x300&maptype=satellite&markers=color:blue|${location.latitude},${location.longitude}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
-    : "";
+  // const staticMapUrl = location
+  //   ? `https://maps.googleapis.com/maps/api/staticmap?center=${location.latitude},${location.longitude}&zoom=15&size=300x300&maptype=satellite&markers=color:blue|${location.latitude},${location.longitude}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
+  //   : "";
 
   return (
     <div className="bg-gray-900 px-4 w-full">
@@ -189,12 +194,11 @@ export default function DetailedPageHeader() {
                       borderRadius: "4px",
                       padding: "8px",
                     }}
-                    formatter={(value) => `${value}°C`}
+                    formatter={(value) => `${Number(value).toFixed(2)}°C`}
+                    itemStyle={{ color: "#fff" }}
                   />
                 </BarChart>
-                <div>
-                  
-                </div>
+                <div></div>
               </ChartContainer>
             </div>
           </Card>

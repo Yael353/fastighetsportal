@@ -16,16 +16,10 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-const sidebarItems = [
-  { name: "Översikt", href: "/dashboard" },
-  { name: "Fastigheter", href: "/dashboard/properties" },
-  { name: "Rapporter", href: "/dashboard/reports" },
-  { name: "Inställningar", href: "/dashboard/settings" },
-];
+const sidebarItems = [{ name: "Översikt", href: "/dashboard" }];
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
 
   const handleLogout = () => {
@@ -33,14 +27,18 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar className=" bg-gray-900">
-      <SidebarHeader className="pt-0 px-0 bg-gray-900 ">
-        <h2 className=" w-full px-4 py-1 text-lg font-semibold tracking-tight text-white bg-gray-900">
+    <Sidebar
+      variant="floating"
+      collapsible="offcanvas"
+      className=" bg-gray-900 flex"
+    >
+      <SidebarHeader className=" flex justify-center items-center">
+        <h2 className=" w-full flex justify-center px-4 py-1 text-lg font-semibold tracking-tight text-white bg-gray-900">
           Tornets Portal
         </h2>
       </SidebarHeader>
       <SidebarContent className="text-white">
-        <SidebarMenu>
+        <SidebarMenu className="flex justify-center items-center">
           {sidebarItems.map((item) => (
             <SidebarMenuItem key={item.name}>
               <SidebarMenuButton asChild isActive={pathname === item.href}>

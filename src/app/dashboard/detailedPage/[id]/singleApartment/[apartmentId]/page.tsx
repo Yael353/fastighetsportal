@@ -6,7 +6,7 @@ export default function ApartmentDetails() {
   const { id, apartmentId } = useParams();
 
   return (
-    <div>
+    <div className="bg-gray-900 h-screen">
       <ApartmentScreen />
     </div>
   );

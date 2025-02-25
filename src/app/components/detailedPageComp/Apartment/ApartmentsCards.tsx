@@ -33,15 +33,19 @@ export default function ApartmentsCards() {
   }, [id, dispatch]);
 
   if (loading) {
-    return <div className="bg-gray-900">Laddar...</div>;
+    return <div className="bg-gray-900 text-white">Laddar...</div>;
   }
 
   if (error) {
-    return <div>Fel: {error}</div>;
+    return <div className="bg-gray-900 text-white">Fel: {error}</div>;
   }
 
   if (!buildingsData) {
-    return <div>Ingen byggnadsdata tillgänglig.</div>;
+    return (
+      <div className="bg-gray-900 text-white">
+        Ingen byggnadsdata tillgänglig.
+      </div>
+    );
   }
 
   // Extrahera alla lägenheter från buildingsData
@@ -76,7 +80,7 @@ export default function ApartmentsCards() {
   };
 
   return (
-    <div className="space-y-6 py-10">
+    <div className="space-y-6 py-10 bg-gray-900">
       {/* Sökfält */}
       <div className="flex justify-center">
         <input

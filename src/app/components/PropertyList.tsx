@@ -1,19 +1,10 @@
-"use client";
+"use client"
 
 import { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getList } from "@/features/slices/overviewSlice";
 import { RootState, AppDispatch } from "@/features/store/store";
 import Link from "next/link";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { SensorDomain } from "@/features/models/sensor-data";
@@ -33,7 +24,6 @@ export function PropertyList() {
 
   useEffect(() => {
     if (authToken) {
-      // Om token finns, hämta sensor-domäner
       dispatch(
         getList({
           offset: (currentPage - 1) * sensorDomainsPerPage,
@@ -45,21 +35,16 @@ export function PropertyList() {
     }
   }, [currentPage, dispatch, authToken]);
 
-  // Hämta sensor-domäner från sensorDomains.data
   const sensorDomainsArray = useMemo(() => {
     return Array.isArray(sensorDomains?.data) ? sensorDomains.data : [];
   }, [sensorDomains]);
 
-  //  console.count("sensorDomäner:");
-  //  console.log("sensorDomäner: ", sensorDomainsArray);
-
-  const totalPages = sensorDomainsArray.length
-    ? Math.ceil(sensorDomainsArray.length / sensorDomainsPerPage)
+  const totalPages = sensorDomains?.total
+    ? Math.ceil(sensorDomains.total / sensorDomainsPerPage)
     : 1;
 
   const nextPage = () => {
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-
     window.scrollTo(0, 0);
   };
 
@@ -68,13 +53,32 @@ export function PropertyList() {
     window.scrollTo(0, 0);
   };
 
-  // Dela upp sensorDomainsArray baserat på sidnummer
-  const currentSensorDomains = sensorDomainsArray.slice(
-    (currentPage - 1) * sensorDomainsPerPage,
-    currentPage * sensorDomainsPerPage
-  );
+  const goToPage = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
+  };
 
-  // Rendera när datan laddas
+  // Skapa en array med sidnummer
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxPagesToShow = 5; // Max antal sidnummer som visas samtidigt
+    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+    // Justera startPage om vi närmar oss slutet
+    if (endPage - startPage + 1 < maxPagesToShow) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return pages;
+  };
+
+  const currentSensorDomains = sensorDomains?.data || [];
+
   if (loading) {
     return <div>Laddar...</div>;
   }
@@ -83,28 +87,10 @@ export function PropertyList() {
     return <div>Fel: {error}</div>;
   }
 
-  // Rendera tom lista om inga sensor-domäner finns
   if (currentSensorDomains.length === 0) {
     return (
-      <div className="w-full flex flex-col">
-        <div className="w-full overflow-x-auto">
-          <Table>
-            <TableCaption>En lista över sensor-domäner</TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Namn</TableHead>
-                <TableHead>Harvester Aktiv</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell colSpan={2} className="text-center">
-                  Inga sensor-domäner tillgängliga
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </div>
+      <div className="w-full flex flex-col pt-10 text-center text-white border-t">
+        Inga sensor-domäner tillgängliga
       </div>
     );
   }
@@ -121,14 +107,12 @@ export function PropertyList() {
               key={domain.id}
               className={`relative p-6 rounded-lg shadow-lg bg-gray-700 text-white hover:scale-105 transition-transform duration-200`}
             >
-              {/* Ikon i övre vänstra hörnet */}
               <div className="absolute top-4 left-5 w-12 h-12 flex items-center justify-center bg-blue-500 text-white text-xl font-extrabold rounded-md">
                 {domain.name.charAt(0).toUpperCase()}
               </div>
 
               <Link href={`/dashboard/detailedPage/${domain.id}`}>
                 <div className="flex flex-col items-start mt-16">
-                  {/* Status-badge i övre högra hörnet */}
                   <span
                     className={`px-3 py-1 text-xs font-semibold uppercase rounded-md ${
                       domain.harvester.active
@@ -138,12 +122,10 @@ export function PropertyList() {
                   >
                     {domain.harvester.active ? "Active" : "Inactive"}
                   </span>
-                  {/* Platsnamn */}
                   <h2 className="text-xl font-bold text-white first-letter:uppercase">
                     {domain.name}
                   </h2>
 
-                  {/* Sensorer och lägenheter */}
                   <div className="mt-4 flex items-center gap-2">
                     <p className="text-sm font-medium text-gray-400">
                       Uc Sensorer:
@@ -175,9 +157,21 @@ export function PropertyList() {
         >
           <ChevronLeft className="mr-2 h-4 w-4" /> Föregående
         </Button>
-        <span>
-          Sida {currentPage} av {totalPages}
-        </span>
+
+        <div className="flex gap-2">
+          {getPageNumbers().map((page) => (
+            <Button
+              key={page}
+              className={`bg-gray-700 ${
+                currentPage === page ? "bg-blue-500 text-white" : ""
+              }`}
+              onClick={() => goToPage(page)}
+            >
+              {page}
+            </Button>
+          ))}
+        </div>
+
         <Button
           className="bg-gray-700"
           onClick={nextPage}

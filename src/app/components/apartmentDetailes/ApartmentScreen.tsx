@@ -147,9 +147,9 @@ export default function ApartmentScreen() {
   );
 
   return (
-    <div className="bg-gray-900 p-4">
+    <div className="bg-gray-900">
       {/* Byggnads- och lägenhetsinformation */}
-      <div className="flex flex-col w-[25%] rounded-lg px-2 bg-gray-700">
+      <div className="flex flex-col w-[25%] rounded-lg px-4 pb-10">
         <h1 className="text-3xl font-extrabold text-white   pt-2">
           {building?.name ?? "Okänd byggnad"}
         </h1>
@@ -159,7 +159,7 @@ export default function ApartmentScreen() {
       </div>
 
       {/* Konsumtionskorten */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-4 bg-gray-900">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-4 px-4 bg-gray-900 py-10">
         <div className="p-4 bg-gray-700 text-gray-300 shadow rounded-md flex flex-col justify-center items-center">
           <h4 className="font-semibold">Medeltemperatur</h4>
           <p className="text-2xl">
@@ -184,58 +184,58 @@ export default function ApartmentScreen() {
       </div>
 
       {/* Visa fel eller laddning om det behövs */}
-      {apartmentConsumptionLoading && <div>Laddar konsumtionsdata...</div>}
+      {apartmentConsumptionLoading && (
+        <div className="bg-gray-900 text-white">Laddar konsumtionsdata...</div>
+      )}
       {apartmentConsumptionError && (
-        <div>
+        <div className="bg-gray-900 text-white">
           Fel vid hämtning av konsumtionsdata: {apartmentConsumptionError}
         </div>
       )}
 
       {/* Diagram och Statistik - Grid Layout */}
-      {/* Inomhustemperatur-grafen */}
-      <div className="bg-gray-900 ">
-        <div className="grid grid-cols-2 grid-rows-2 gap-4 h-[900px]">
-          <div>
-            <h3 className="text-lg text-white font-semibold mb-2">
-              Inomhustemperatur
-            </h3>
-            <div className="shadow-md rounded-lg  flex flex-col bg-gray-900 w-full h-[400px]">
-              <div className="flex-1">
-                <TemperatureChart batchData={batchData} />
-              </div>
-            </div>
+      <div className="grid grid-cols-2 px-4 grid-rows-2 gap-6 h-[900px]">
+        {/* Indoor Air temp */}
+        <div className="rounded-lg flex flex-col w-full h-full">
+          <h3 className="text-lg text-white font-semibold mb-2">
+            Inomhustemperatur
+          </h3>
+          <div className="rounded-md flex flex-col flex-1">
+            <TemperatureChart batchData={batchData} />
           </div>
+        </div>
 
-          {/* Monthly Statistics */}
-          <div className="bg-gray-900 shadow-md rounded-lg overflow-auto flex flex-col w-full h-full">
-            <h3 className="text-lg text-white font-semibold mb-2">
-              Månadsvisa Medelvärden
-            </h3>
-            <div className="flex-1">
-              <MonthlyStatistics
-                data={monthlyStatistics}
-                loading={monthlyLoading}
-                error={monthlyError}
-              />
-            </div>
+        {/* Monthly Statistics */}
+        <div className="rounded-lg flex flex-col w-full h-full">
+          <h3 className="text-lg text-white font-semibold mb-2">
+            Månadsvisa Medelvärden
+          </h3>
+          <div className="flex-1 rounded-md overflow-auto min-h-0">
+            <MonthlyStatistics
+              data={monthlyStatistics}
+              loading={monthlyLoading}
+              error={monthlyError}
+            />
           </div>
+        </div>
 
-          {/* Elförbrukning */}
-          <div className=" shadow-md bg-gray-900 rounded-lg p-4 flex flex-col w-full h-full">
-            <h3 className="text-lg text-white font-semibold mb-2">Elförbrukning</h3>
-            <div className="flex-1 ">
-              <ElectricityChart batchData={batchData} />
-            </div>
+        {/* Electricity Consumption */}
+        <div className="rounded-lg flex flex-col w-full h-full py-5">
+          <h3 className="text-lg text-white font-semibold mb-2">
+            Elförbrukning
+          </h3>
+          <div className="rounded-md flex flex-col flex-1">
+            <ElectricityChart batchData={batchData} />
           </div>
+        </div>
 
-          {/* Varmvattenförbrukning */}
-          <div className="bg-gray-700 shadow-md rounded-lg p-4 flex flex-col w-full h-full">
-            <h3 className="text-lg font-semibold mb-2">
-              Varmvattenförbrukning
-            </h3>
-            <div className="flex-1">
-              <HotWaterChart batchData={batchData} />
-            </div>
+        {/* Hot Water Consumption */}
+        <div className="rounded-lg flex flex-col w-full h-full py-5">
+          <h3 className="text-lg text-white font-semibold mb-2">
+            Varmvattenförbrukning
+          </h3>
+          <div className="rounded-md flex flex-col flex-1">
+            <HotWaterChart batchData={batchData} />
           </div>
         </div>
       </div>

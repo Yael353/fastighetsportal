@@ -18,7 +18,8 @@ import {
 export default function ApartmentComp() {
   const dispatch = useDispatch<AppDispatch>();
   const authToken = getAuthToken();
-  const { id: sensorDomainId } = useParams(); // Hämta sensorDomainId från URL:en
+  const { id } = useParams();
+  const sensorDomainId = Array.isArray(id) ? id[0] : id;
 
   // Hämta controllers från property-store
   const property = useSelector((state: RootState) => state.property.data);
@@ -44,16 +45,29 @@ export default function ApartmentComp() {
   useEffect(() => {
     if (authToken && controllers.length > 0) {
       controllers.forEach((controller) => {
-        dispatch(fetchAlgoConfig({ controllerId: controller.id })).catch(
-          (error) =>
-            console.error(
-              `Fel vid hämtning av algoConfig för ${controller.id}:`,
-              error
-            )
-        );
+        if (!algoConfig?.[controller.id]) {
+          dispatch(fetchAlgoConfig({ controllerId: controller.id })).catch(
+            (error) => {
+              if (error.response?.status === 404) {
+                console.warn(`Ingen algoConfig hittades för ${controller.id}`);
+              } else {
+                console.error(
+                  `Fel vid hämtning av algoConfig för ${controller.id}:`,
+                  error
+                );
+              }
+            }
+          );
+        }
       });
     }
+  }, [
+    authToken,
+    JSON.stringify(controllers.map((c) => c.id)),
+    Object.keys(algoConfig || {}).length,
+  ]);
 
+  useEffect(() => {
     if (sensorDomainId) {
       dispatch(fetchSummaryApartmentStatistics({ sensorDomainId }))
         .catch((error) =>
@@ -63,10 +77,15 @@ export default function ApartmentComp() {
     } else {
       setIsLoading(false);
     }
-  }, [authToken, JSON.stringify(controllers), sensorDomainId, dispatch]);
+  }, [sensorDomainId]);
 
   if (isLoading || algoLoading || summaryLoading) {
-    return <div>Laddar...</div>;
+    return (
+      <div className="bg-gray-900 text-white flex items-center justify-center h-20">
+        <div className="w-6 h-6 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+        <span className="ml-2">Laddar...</span>
+      </div>
+    );
   }
 
   return (

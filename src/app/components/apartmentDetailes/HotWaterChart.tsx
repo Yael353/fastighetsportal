@@ -1,7 +1,7 @@
 import React from "react";
 import {
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -10,6 +10,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { BatchSensorDataResponse } from "@/features/models/sensor-data";
+import moment from "moment"; // Importera moment.js för att formatera tid i X-axeln och Tooltip
+import { formatData } from "@/utils/date";
 
 interface Props {
   batchData: BatchSensorDataResponse[] | null;
@@ -19,26 +21,38 @@ export default function HotWaterChart({ batchData }: Props) {
   if (!batchData)
     return <div>Ingen varmvattenförbrukningsdata tillgänglig</div>;
 
+  // Filtrera ut alla VV-sensorer
   const allSensors = batchData.flatMap((res) => res.sensor_data);
   const vvSensors = allSensors.filter((sensor) => sensor.name.includes("VV"));
-  const vvChartData = vvSensors.length > 0 ? vvSensors[0].data : [];
+
+  // Omvandla data med formatData
+  const vvChartData =
+    vvSensors.length > 0
+      ? formatData(
+          vvSensors[0].data.map((entry) => ({
+            time_utc: entry.time_utc,
+            value: entry.value / 1000, // Omvandla till m³ istället för liter om så behövs
+          }))
+        )
+      : [];
 
   return (
-    <div className="p-4 bg-gray-700 shadow-md rounded-lg">
-      <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={vvChartData}>
+    <div className="bg-gray-700 shadow-md rounded-lg p-2">
+      <ResponsiveContainer width="100%" height={350}>
+        <BarChart data={vvChartData}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="time_utc" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Line
-            type="monotone"
-            dataKey="value"
-            stroke="#ffc658"
-            activeDot={{ r: 8 }}
+          <XAxis
+            dataKey="time"
+            tickFormatter={(time) => moment(time).format("HH:mm")} // Visa endast timmar och minuter
           />
-        </LineChart>
+          <YAxis tickFormatter={(value) => value.toFixed(0)} />
+          <Tooltip
+            labelFormatter={(label) => moment(label).format("YYYY-MM-DD HH:mm")}
+            formatter={(value: number) => value.toFixed(2)}
+          />
+          <Legend />
+          <Bar dataKey="value" fill="#8884d8" />
+        </BarChart>
       </ResponsiveContainer>
     </div>
   );
