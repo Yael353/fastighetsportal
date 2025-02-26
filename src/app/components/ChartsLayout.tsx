@@ -250,7 +250,7 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
             <LineChart data={mergedChartDataFWT_RWT}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="time" />
-              <YAxis domain={[25, 50]} />
+              <YAxis domain={[25, 45]} />
               <Tooltip />
               <Legend />
               {filteredFWT.map((sensor) => (

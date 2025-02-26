@@ -25,7 +25,6 @@ interface SensorData {
   value: number;
 }
 
-
 interface Domain {
   min: number;
   max: number;
@@ -35,9 +34,9 @@ export default function DetailedPageHeader() {
   const { id } = useParams(); // Hämta ID från URL
   const dispatch = useDispatch<AppDispatch>();
 
-   if (typeof id !== "string") {
-     return <p>Ogiltigt ID: {JSON.stringify(id)}</p>;
-   }
+  if (typeof id !== "string") {
+    return <p>Ogiltigt ID: {JSON.stringify(id)}</p>;
+  }
 
   const {
     chartDataOAT,
@@ -60,7 +59,7 @@ export default function DetailedPageHeader() {
     barChartDataOAT,
     barChartDataFWT,
     barChartDataRWT,
-  } = useSensorData(id);  
+  } = useSensorData(id);
 
   // Hämta sensordomain-data från Redux-storen
   const { data, loading, error } = useSelector(
@@ -184,8 +183,14 @@ export default function DetailedPageHeader() {
             </div>
             <div className="">
               <ChartContainer className="h-16 w-[150px]">
-                <BarChart data={data}>
-                  <Bar dataKey="value" fill="#00699f" radius={[2, 2, 0, 0]} />
+                <LineChart data={data}>
+                  <Line
+                    type="monotone"
+                    dataKey="value"
+                    stroke="#00699f"
+                    strokeWidth={2}
+                    dot={false}
+                  />
                   <YAxis domain={domain} hide />
                   <Tooltip
                     contentStyle={{
@@ -194,11 +199,9 @@ export default function DetailedPageHeader() {
                       borderRadius: "4px",
                       padding: "8px",
                     }}
-                    formatter={(value) => `${Number(value).toFixed(2)}°C`}
-                    itemStyle={{ color: "#fff" }}
+                    formatter={(value) => `${value}°C`}
                   />
-                </BarChart>
-                <div></div>
+                </LineChart>
               </ChartContainer>
             </div>
           </Card>
