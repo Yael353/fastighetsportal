@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { RootState, AppDispatch } from "@/features/store/store";
 import { fetchBatchSensorData } from "@/features/thunks/fetchSensors";
 import moment from "moment";
@@ -11,7 +11,7 @@ export const useSensorData = (id: string) => {
 
   // Hämta sensor-domain från Redux-storen
   const sensorDomain = useSelector((state: RootState) => state.property.data);
-  // Hämta batch-sensor data från Redux-storen
+  // Hämta batch-sensordata från Redux-storen
   const sensorsState = useSelector(
     (state: RootState) => state.sensorData.sensors
   );
@@ -52,9 +52,20 @@ export const useSensorData = (id: string) => {
     }
   }, [dispatch, sensorDomain, id]);
 
-  // Hämta batch-sensor data när sensorDomain har laddats
+  // Ref för att säkerställa att batch-fetch bara sker en gång per sensorDomain
+  const hasFetchedBatchData = useRef(false);
+  const lastFetchedSensorDomainId = useRef<string | null>(null);
+
   useEffect(() => {
     if (!sensorDomain) return;
+
+    // Om sensorDomain.id har ändrats, tillåt en ny hämtning
+    if (lastFetchedSensorDomainId.current !== sensorDomain.id) {
+      hasFetchedBatchData.current = false;
+    }
+
+    // Om vi redan har hämtat batch-data för denna sensorDomain, hoppa över
+    if (hasFetchedBatchData.current) return;
 
     const sensorIds = [
       ...filteredOAT.map((sensor) => sensor.id),
@@ -77,6 +88,10 @@ export const useSensorData = (id: string) => {
         freq: BatchSensorDataFreq.raw,
       })
     );
+
+    // Markera att fetch har körts och spara senaste sensorDomain.id
+    hasFetchedBatchData.current = true;
+    lastFetchedSensorDomainId.current = sensorDomain.id;
   }, [
     dispatch,
     sensorDomain,
@@ -129,8 +144,8 @@ export const useSensorData = (id: string) => {
     chartData: typeof chartDataIAT,
     filteredSensors: typeof filteredIAT
   ) => {
-    if (!chartData || chartData.length === 0) return null; // Om ingen data, returnera null
-    return chartData[chartData.length - 1]?.[filteredSensors[0]?.id] || null; // Returnera senaste värdet
+    if (!chartData || chartData.length === 0) return null;
+    return chartData[chartData.length - 1]?.[filteredSensors[0]?.id] || null;
   };
 
   // Hämta senaste värdena för varje sensor
@@ -141,9 +156,9 @@ export const useSensorData = (id: string) => {
 
   // Hämta och formatera tiden för senaste värdet från en sensor
   const getLatestTimestamp = (chartData: typeof chartDataIAT) => {
-    if (!chartData || chartData.length === 0) return null; // Om ingen data, returnera null
-    const latestTime = chartData[chartData.length - 1]?.time; // Hämta senaste tidstämpeln
-    return latestTime ? moment(latestTime).format("YYYY-MM-DD HH:mm") : null; // Formatera till 'YYYY-MM-DD HH:mm'
+    if (!chartData || chartData.length === 0) return null;
+    const latestTime = chartData[chartData.length - 1]?.time;
+    return latestTime ? moment(latestTime).format("YYYY-MM-DD HH:mm") : null;
   };
 
   // Hämta formaterade tider för varje sensor
@@ -157,13 +172,11 @@ export const useSensorData = (id: string) => {
     if (!chartData || chartData.length === 0 || filteredSensors.length === 0)
       return [];
 
-    const sensorId = filteredSensors[0]?.id; // Använd första sensorn i listan
+    const sensorId = filteredSensors[0]?.id;
 
-    return chartData
-      .slice(-5) // Hämta de senaste 5 värdena
-      .map((dataPoint) => ({
-        value: dataPoint[sensorId], // Hämta värdet för aktuell sensor
-      }));
+    return chartData.slice(-5).map((dataPoint) => ({
+      value: dataPoint[sensorId],
+    }));
   };
 
   // Formaterad data för BarChart för varje sensor
@@ -172,7 +185,6 @@ export const useSensorData = (id: string) => {
   const barChartDataFWT = getBarChartData(chartDataFWT, filteredFWT);
   const barChartDataRWT = getBarChartData(chartDataRWT, filteredRWT);
 
-  // Lägg till senaste värdena i return-objektet
   return {
     chartDataOAT,
     chartDataIAT,
@@ -182,17 +194,17 @@ export const useSensorData = (id: string) => {
     filteredIAT,
     filteredFWT,
     filteredRWT,
-    latestIAT, // Senaste inomhustemperatur
-    latestOAT, // Senaste utomhustemperatur
-    latestFWT, // Senaste framledningstemperatur
-    latestRWT, // Senaste returledningstemperatur
-    latestIATTime, // Senaste tidpunkt för IAT
-    latestOATTime, // Senaste tidpunkt för OAT
-    latestFWTTime, // Senaste tidpunkt för FWT
-    latestRWTTime, // Senaste tidpunkt för RWT
-    barChartDataIAT, // 🚀 Lägger till bar chart-data för IAT
-    barChartDataOAT, // 🚀 Lägger till bar chart-data för OAT
-    barChartDataFWT, // 🚀 Lägger till bar chart-data för FWT
+    latestIAT,
+    latestOAT,
+    latestFWT,
+    latestRWT,
+    latestIATTime,
+    latestOATTime,
+    latestFWTTime,
+    latestRWTTime,
+    barChartDataIAT,
+    barChartDataOAT,
+    barChartDataFWT,
     barChartDataRWT,
   };
 };

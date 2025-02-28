@@ -25,11 +25,11 @@ export default function DetailedPage() {
   }, [id, authToken, dispatch]);
 
   return (
-    <div className="bg-gray-900">
+    <div className="bg-gray-900 h-screen">
       <div className="">
         <DetailedPageHeader />
       </div>
-      <div className="">
+      <div className="bg-gray-900">
         <SensorDataComp id={id} />
       </div>
     </div>

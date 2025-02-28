@@ -4,7 +4,7 @@ import { AppDispatch, RootState } from "@/features/store/store";
 import { getAuthToken } from "@/utils/auth";
 import { fetchAlgoConfig } from "@/features/thunks/algoConfig";
 import { fetchSummaryApartmentStatistics } from "@/features/thunks/fetchSensors";
-import { useParams } from "next/navigation"; // Importera useParams
+import { useParams } from "next/navigation";
 import ApartmentsCards from "./ApartmentsCards";
 import {
   Table,
@@ -40,36 +40,42 @@ export default function ApartmentComp() {
   );
 
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedControllerId, setSelectedControllerId] = useState<
+    string | null
+  >(null);
 
   // Hämta AlgoConfig & Lägenhetsstatistik vid komponentens mount
   useEffect(() => {
-    if (authToken && controllers.length > 0) {
-      controllers.forEach((controller) => {
-        if (!algoConfig?.[controller.id]) {
-          dispatch(fetchAlgoConfig({ controllerId: controller.id })).catch(
-            (error) => {
-              if (error.response?.status === 404) {
-                console.warn(`Ingen algoConfig hittades för ${controller.id}`);
-              } else {
-                console.error(
-                  `Fel vid hämtning av algoConfig för ${controller.id}:`,
-                  error
-                );
-              }
-            }
+    if (authToken && selectedControllerId) {
+      // Fetch algoConfig only for the selected controller ID
+      if (!algoConfig?.[selectedControllerId]) {
+        const fetchAlgo = async () => {
+          const data = await dispatch(
+            fetchAlgoConfig({ controllerId: selectedControllerId })
           );
-        }
-      });
+          if (data) {
+            console.log(`Hämtade algoConfig för ${selectedControllerId}`);
+          } else {
+            console.warn(
+              `Ingen algoConfig hittades för ${selectedControllerId}`
+            );
+          }
+        };
+        fetchAlgo();
+      }
     }
-  }, [
-    authToken,
-    JSON.stringify(controllers.map((c) => c.id)),
-    Object.keys(algoConfig || {}).length,
-  ]);
+  }, [authToken, selectedControllerId, Object.keys(algoConfig || {}).length]);
 
   useEffect(() => {
     if (sensorDomainId) {
       dispatch(fetchSummaryApartmentStatistics({ sensorDomainId }))
+        .then((data) => {
+          if (!data) {
+            console.warn(
+              `Ingen summaryStatistics hittades för ${sensorDomainId}`
+            );
+          }
+        })
         .catch((error) =>
           console.error("Fel vid hämtning av summaryStatistics:", error)
         )
@@ -79,17 +85,20 @@ export default function ApartmentComp() {
     }
   }, [sensorDomainId]);
 
-  if (isLoading || algoLoading || summaryLoading) {
+  if (summaryLoading) {
+    return <div>Laddar...</div>;
+  }
+
+  if (summaryStatistics == null) {
     return (
-      <div className="bg-gray-900 text-white flex items-center justify-center h-20">
-        <div className="w-6 h-6 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-        <span className="ml-2">Laddar...</span>
+      <div className="flex justify-center text-lg font-bold bg-gray-900 text-white mb-4">
+        Medelvärde för detta objekt saknas
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg py-20 ">
+    <div className="rounded-lg py-20 bg-gray-900">
       <div className=" bg-gray-900 shadow-md rounded-lg max-w-full mx-auto h-auto ">
         <h2 className="text-lg font-bold text-white mb-4">
           Medelvärde för lägenheter de 30 senaste dagarna
@@ -122,7 +131,7 @@ export default function ApartmentComp() {
                   {["kWh", "L", "C"].map((unit) => (
                     <TableCell
                       key={unit}
-                      className="text-center font-extrabold text-white"
+                      className="text-center  font-extrabold text-white"
                     >
                       {stats
                         .find((stat) => stat.u_name === unit)
@@ -134,7 +143,7 @@ export default function ApartmentComp() {
           </TableBody>
         </Table>
       </div>
-      <div className="pt-8">
+      <div className="pt-8 bg-slate-900">
         <ApartmentsCards />
       </div>
     </div>

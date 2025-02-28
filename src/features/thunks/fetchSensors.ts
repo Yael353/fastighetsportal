@@ -224,7 +224,7 @@ export const fetchApartmentConsumptionLastXDays = createAsyncThunk<
 
 //KLAR OCH ANVÄND?????
 export const fetchSummaryApartmentStatistics = createAsyncThunk<
-  SummarySensorDomainApartmentStatisticsResponse,
+  SummarySensorDomainApartmentStatisticsResponse | null, // Returnera null vid 404
   { sensorDomainId: string },
   { state: RootState; dispatch: AppDispatch; rejectValue: string }
 >(
@@ -245,11 +245,13 @@ export const fetchSummaryApartmentStatistics = createAsyncThunk<
       );
 
       if (!response.ok) {
+        if (response.status === 404) {
+          return null; // Returnera null vid 404
+        }
         throw new Error(`Error: ${response.status}`);
       }
 
       const responseJson = await response.json();
-
       return responseJson as SummarySensorDomainApartmentStatisticsResponse;
     } catch (error: any) {
       console.error(

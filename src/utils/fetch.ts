@@ -1,6 +1,7 @@
 import { logout } from "@/features/slices/authSlice";
 import { AppDispatch } from "@/features/store/store";
 import { getAuthToken } from "./auth";
+import { RESPONSE_404 } from "@/features/errors/errors"; // Importera RESPONSE_404
 
 export const authFetch = async (
   url: string | URL | Request,
@@ -50,7 +51,8 @@ export const authFetch = async (
         console.warn("Unauthorized or expired token. Logging out...");
         dispatch(logout());
       }
-      throw new Error(`Fetch failed with status: ${response.status}`);
+      // Returnera response även vid 404
+      return response;
     }
 
     return response;

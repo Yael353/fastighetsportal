@@ -12,127 +12,78 @@ import {
 } from "recharts";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/features/store/store";
-import {
-  fetchBatchSensorData,
-  fetchSensorDomain,
-} from "@/features/thunks/fetchSensors";
-import moment from "moment";
-import { BatchSensorDataFreq } from "@/features/models/sensor-data";
+import { Sensor } from "@/features/models/sensor-data";
 
 interface ApartmentCompProps {
   id: string;
 }
 
-const sensorColors = {
-  FWT: "#6f42c1", // Lila
-  RWT: "#007bff", // Blå
-  OAT: "#28a745", // Grön
-  IAT: "#dc3545", // Röd
+const sensorColors: Record<string, string> = {
+  FWT: "#6f42c1",
+  RWT: "#007bff",
+  OAT: "#28a745",
+  IAT: "#dc3545",
 };
 
-// Funktion för att slå ihop två dataset baserat på tid
-const mergeChartData = (dataA, dataB, keyA, keyB) => {
-  const mergedData = new Map();
+interface ChartDataPoint {
+  time: string;
+  [key: string]: number | string;
+}
+
+const mergeChartData = (
+  dataA: ChartDataPoint[],
+  dataB: ChartDataPoint[],
+  keyA?: string,
+  keyB?: string
+): ChartDataPoint[] => {
+  const mergedData = new Map<string, ChartDataPoint>();
 
   dataA.forEach((item) => {
-    mergedData.set(item.time, { time: item.time, [keyA]: item[keyA] });
+    mergedData.set(item.time, {
+      time: item.time,
+      [keyA || "keyA"]: item[keyA || "keyA"],
+    });
   });
 
   dataB.forEach((item) => {
     if (mergedData.has(item.time)) {
-      mergedData.get(item.time)[keyB] = item[keyB];
+      mergedData.get(item.time)![keyB || "keyB"] = item[keyB || "keyB"];
     } else {
-      mergedData.set(item.time, { time: item.time, [keyB]: item[keyB] });
+      mergedData.set(item.time, {
+        time: item.time,
+        [keyB || "keyB"]: item[keyB || "keyB"],
+      });
     }
   });
 
   return Array.from(mergedData.values()).sort(
-    (a, b) => new Date(a.time) - new Date(b.time)
+    (a, b) => new Date(a.time).getTime() - new Date(b.time).getTime()
   );
 };
 
-const ChartsLayout = ({ id }: ApartmentCompProps) => {
+const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
   const dispatch = useDispatch<AppDispatch>();
-
-  // Hämta sensor-domän
   const sensorDomain = useSelector((state: RootState) => state.property.data);
   const sensorsState = useSelector(
     (state: RootState) => state.sensorData.sensors
   );
 
-  // Filtrera sensorer baserat på deras typ
-  const filteredOAT = useMemo(
-    () =>
-      sensorDomain?.sensors?.filter(
-        (s) => s.vala_description?.name === "OAT"
-      ) || [],
-    [sensorDomain]
-  );
-  const filteredIAT = useMemo(
-    () =>
-      sensorDomain?.sensors?.filter(
-        (s) => s.vala_description?.name === "IAT"
-      ) || [],
-    [sensorDomain]
-  );
-  const filteredFWT = useMemo(
-    () =>
-      sensorDomain?.sensors?.filter(
-        (s) => s.vala_description?.name === "FWT"
-      ) || [],
-    [sensorDomain]
-  );
-  const filteredRWT = useMemo(
-    () =>
-      sensorDomain?.sensors?.filter(
-        (s) => s.vala_description?.name === "RWT"
-      ) || [],
-    [sensorDomain]
-  );
+  const filterSensors = (name: string): Sensor[] =>
+    sensorDomain?.sensors?.filter((s) => s.vala_description?.name === name) ||
+    [];
 
-  // Ladda sensor-domän vid behov
-  useEffect(() => {
-    if (!sensorDomain) dispatch(fetchSensorDomain({ id }));
-  }, [dispatch, sensorDomain, id]);
+  const filteredOAT = useMemo(() => filterSensors("OAT"), [sensorDomain]);
+  const filteredIAT = useMemo(() => filterSensors("IAT"), [sensorDomain]);
+  const filteredFWT = useMemo(() => filterSensors("FWT"), [sensorDomain]);
+  const filteredRWT = useMemo(() => filterSensors("RWT"), [sensorDomain]);
 
-  // Ladda sensordata när sensorDomain finns
-  useEffect(() => {
-    if (!sensorDomain) return;
-
-    const sensorIds = [
-      ...filteredOAT,
-      ...filteredIAT,
-      ...filteredFWT,
-      ...filteredRWT,
-    ].map((s) => s.id);
-    if (sensorIds.length === 0) return;
-
-    dispatch(
-      fetchBatchSensorData({
-        sensorDomainId: sensorDomain.id,
-        sensorIds,
-        startUtc: moment().subtract(1, "day"),
-        endUtc: moment(),
-        freq: BatchSensorDataFreq.raw,
-      })
-    );
-  }, [
-    dispatch,
-    sensorDomain,
-    filteredOAT,
-    filteredIAT,
-    filteredFWT,
-    filteredRWT,
-  ]);
-
-  // Funktion för att bygga chartData
-  const buildChartData = (filteredSensors) => {
+  const buildChartData = (filteredSensors: Sensor[]): ChartDataPoint[] => {
     if (!filteredSensors.length) return [];
     const sensorIds = filteredSensors.map((sensor) => sensor.id);
     const baseData = sensorsState[sensorIds[0]]?.sensorData || [];
 
     return baseData.map((dataPoint, index) => {
-      const point = { time: dataPoint.time_utc };
+      const point: ChartDataPoint = { time: dataPoint.time_utc };
       sensorIds.forEach((sensorId) => {
         const sensorDataArr = sensorsState[sensorId]?.sensorData;
         if (sensorDataArr && sensorDataArr[index]) {
@@ -143,7 +94,6 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
     });
   };
 
-  // Generera chartData
   const chartDataOAT = useMemo(
     () => buildChartData(filteredOAT),
     [filteredOAT, sensorsState]
@@ -161,7 +111,6 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
     [filteredRWT, sensorsState]
   );
 
-  // Slå ihop data för OAT/IAT och FWT/RWT
   const mergedChartDataOAT_IAT = useMemo(
     () =>
       mergeChartData(
@@ -185,7 +134,6 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
 
   return (
     <div className="flex gap-4 w-full pt-5 py-2">
-      {/* OAT & IAT - Dual Axis Chart */}
       <Card className="flex-1">
         <CardHeader>
           <CardTitle className="text-center">
@@ -197,14 +145,9 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
             <LineChart data={mergedChartDataOAT_IAT}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="time" />
-              <YAxis
-                yAxisId="left"
-                label={{ value: "°C", angle: 0, position: "insideLeft" }}
-                stroke={sensorColors.OAT}
-              />
+              <YAxis yAxisId="left" stroke={sensorColors.OAT} />
               <YAxis
                 yAxisId="right"
-                label={{ value: "°C", angle: 0, position: "insideRight" }}
                 stroke={sensorColors.IAT}
                 orientation="right"
                 domain={[18, 23]}
@@ -216,8 +159,8 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
                   key={sensor.id}
                   type="monotone"
                   dataKey={sensor.id}
-                  stroke={sensorColors.OAT}
                   name="Utomhustemperatur"
+                  stroke={sensorColors.OAT}
                   dot={false}
                   strokeWidth={2}
                   yAxisId="left"
@@ -239,9 +182,7 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
           </ResponsiveContainer>
         </CardContent>
       </Card>
-
-      {/* FWT & RWT - Standard Chart */}
-      <Card className="flex-1 ">
+      <Card className="flex-1">
         <CardHeader>
           <CardTitle className="text-center">Jämförelse</CardTitle>
         </CardHeader>
@@ -258,8 +199,8 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
                   key={sensor.id}
                   type="monotone"
                   dataKey={sensor.id}
+                  name="Framledningstemperatur"
                   stroke={sensorColors.FWT}
-                  name="Framlednings temperatur"
                   dot={false}
                   strokeWidth={2}
                 />
@@ -269,8 +210,8 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
                   key={sensor.id}
                   type="monotone"
                   dataKey={sensor.id}
+                  name="Returledningstemperatur"
                   stroke={sensorColors.RWT}
-                  name="Returlednings temperatur"
                   dot={false}
                   strokeWidth={2}
                 />
@@ -281,8 +222,6 @@ const ChartsLayout = ({ id }: ApartmentCompProps) => {
       </Card>
     </div>
   );
-
-
 };
 
 export default ChartsLayout;

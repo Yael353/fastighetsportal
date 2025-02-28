@@ -27,9 +27,7 @@ export default function ApartmentsCards() {
   const apartmentsPerPage = 9;
 
   useEffect(() => {
-    if (id) {
-      dispatch(fetchBuildings({ id }));
-    }
+    dispatch(fetchBuildings({ id }));
   }, [id, dispatch]);
 
   if (loading) {
@@ -93,7 +91,7 @@ export default function ApartmentsCards() {
       </div>
 
       {/* Lägenhetskort */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 py-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 py-10 bg-gray-900">
         {currentApartments.length > 0 ? (
           currentApartments.map((apartment: ApartmentResponse) => (
             <div
@@ -114,7 +112,7 @@ export default function ApartmentsCards() {
             </div>
           ))
         ) : (
-          <div className="col-span-full text-center text-white ">
+          <div className="col-span-full text-center bg-gray-900 text-white ">
             Inga lägenheter matchar sökningen.
           </div>
         )}
