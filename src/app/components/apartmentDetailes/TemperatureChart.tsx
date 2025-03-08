@@ -20,6 +20,10 @@ interface Props {
 export default function TemperatureChart({ batchData }: Props) {
   if (!batchData) return <div>Ingen temperaturdata tillgänglig</div>;
 
+
+  console.log("Batchdata?",batchData);
+  
+
   // Filtrera ut alla GT_GM-sensorer
   const allSensors = batchData.flatMap((res) => res.sensor_data);
   const gtGmSensors = allSensors.filter((sensor) =>
@@ -32,7 +36,7 @@ export default function TemperatureChart({ batchData }: Props) {
       ? formatData(
           gtGmSensors[0].data.map((entry) => ({
             time_utc: entry.time_utc,
-            value: entry.value, // Behåller temperaturen som den är
+            value: entry.value, 
           }))
         )
       : [];
@@ -49,8 +53,9 @@ export default function TemperatureChart({ batchData }: Props) {
           <LineChart data={gtGmChartData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
+            className=""
               dataKey="time"
-              tickFormatter={(time) => moment(time).format("HH:mm")} // Visa tid i format "12:30"
+              tickFormatter={(time) => moment(time).format("YY:MM:DD HH:mm")} // Visa tid i format "12:30"
             />
             <YAxis domain={[minValue, maxValue]} allowDecimals={false} />
             <Tooltip

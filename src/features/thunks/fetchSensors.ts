@@ -147,7 +147,7 @@ export const fetchBuildings = createAsyncThunk<
 
     const responseJson = await response.json();
 
-    console.log("Raw API response JSON:", responseJson);
+    // console.log("Raw API response JSON:", responseJson);
 
     const responseObject = Object.fromEntries(Object.entries(responseJson));
 

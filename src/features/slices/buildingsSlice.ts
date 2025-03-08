@@ -25,7 +25,7 @@ const buildingsSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchBuildings.fulfilled, (state, action) => {
-        console.log("Payload:", action.payload); // Kontrollera att detta är ett objekt
+        // console.log("Payload:", action.payload);
         state.loading = false;
         state.data = action.payload;
       })

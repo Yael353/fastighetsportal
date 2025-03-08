@@ -1,9 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 import { useParams } from "next/navigation";
 import moment from "moment";
-import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs";
-
 import { AppDispatch, RootState } from "@/features/store/store";
 import {
   fetchApartmentConsumptionLastXDays,
@@ -16,7 +14,6 @@ import {
   BatchSensorDataFreq,
 } from "@/features/models/sensor-data";
 
-import SingleApartmentChart from "./TemperatureChart";
 import MonthlyStatistics from "./MonthlyStatistics";
 import ElectricityChart from "./ElectricityChart";
 import HotWaterChart from "./HotWaterChart";
@@ -51,7 +48,6 @@ export default function ApartmentScreen() {
     (state: RootState) => state.monthlyStatistics.error
   );
 
-  console.log("MonthlyStatistics!", monthlyStatistics);
 
   const apartmentConsumption = useSelector(
     (state: RootState) => state.apartmentConsumption.data?.data
@@ -62,6 +58,8 @@ export default function ApartmentScreen() {
   const apartmentConsumptionError = useSelector(
     (state: RootState) => state.apartmentConsumption.error
   );
+
+  
 
   useEffect(() => {
     if (!buildings || Object.keys(buildings).length === 0) {
@@ -103,13 +101,15 @@ export default function ApartmentScreen() {
     [apartmentConsumption]
   );
 
+    console.log("apartmentkonsumption", apartmentConsumption);
+    
   useEffect(() => {
     if (sensorDomainId) {
       dispatch(
         fetchBatchSensorData({
           sensorDomainId,
           sensorIds,
-          startUtc: moment().utc().subtract(1, "day"),
+          startUtc: moment().utc().subtract(1, "days"),
           endUtc: moment().utc(),
           freq: BatchSensorDataFreq.raw,
         })
@@ -120,6 +120,7 @@ export default function ApartmentScreen() {
     }
   }, [sensorDomainId, sensorIds, dispatch]);
 
+  
   if (buildingsLoading) {
     return <div>Laddar byggnader...</div>;
   }
@@ -137,14 +138,17 @@ export default function ApartmentScreen() {
 
   // Korten
   const temperatureData = apartmentConsumption?.find(
-    (item) => item.vala_description.name === "IIAT"
+    (item) => item.vala_description.measurement_type === "temp"
   );
   const electricityData = apartmentConsumption?.find(
-    (item) => item.vala_description.name === "IEM"
+    (item) => item.vala_description.measurement_type === "energy"
   );
   const hotWaterData = apartmentConsumption?.find(
-    (item) => item.vala_description.name === "IHTWM"
+    (item) => item.vala_description.measurement_type === "volume"
   );
+
+  console.log("från apartmentscreen batchsensorDAta", batchData);
+  
 
   return (
     <div className="bg-gray-900">
@@ -163,14 +167,14 @@ export default function ApartmentScreen() {
         <div className="p-4 bg-gray-700 text-gray-300 shadow rounded-md flex flex-col justify-center items-center">
           <h4 className="font-semibold">Medeltemperatur</h4>
           <p className="text-2xl">
-            {temperatureData ? temperatureData.average.toFixed(2) : "-"}{" "}
+            {temperatureData ? temperatureData.average.toFixed(1) : "-"}{" "}
             {temperatureData?.vala_description.unit || ""}
           </p>
         </div>
         <div className="p-4 bg-gray-700 text-gray-300 shadow rounded-md flex flex-col justify-center items-center">
           <h4 className="font-semibold">Elförbrukning</h4>
           <p className="text-2xl">
-            {electricityData ? electricityData.difference.toFixed(2) : "-"}{" "}
+            {electricityData ? electricityData.difference.toFixed(1) : "-"}{" "}
             {electricityData?.vala_description.unit || ""}
           </p>
         </div>

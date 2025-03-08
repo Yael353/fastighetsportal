@@ -89,7 +89,6 @@ export const useSensorData = (id: string) => {
       })
     );
 
-    // Markera att fetch har körts och spara senaste sensorDomain.id
     hasFetchedBatchData.current = true;
     lastFetchedSensorDomainId.current = sensorDomain.id;
   }, [

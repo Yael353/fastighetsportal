@@ -54,7 +54,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   }, [router]);
 
   if (isValidating) {
-    return <div style={{ backgroundColor: "white", height: "100vh" }}></div>;
+    return <div style={{ backgroundColor: "#111827", height: "100vh" }}></div>;
   }
 
   return <>{children}</>;

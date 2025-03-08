@@ -72,55 +72,51 @@ export function LoginForm() {
 
   return (
     <ProtectedRoute>
-      <div
-        className="flex justify-center items-center w-full h-screen bg-no-repeat bg-center bg-[length:110%] relative"
-        style={{ backgroundImage: "url('/images/loginbg.jpg')" }}
-      >
-        <div className="absolute inset-0 bg-gray-900 bg-opacity-60"></div>
+      <div className="flex justify-center items-center w-full h-screen bg-darkBg relative">
+        {/* Bakgrundsbilden */}
+        <div
+          className="absolute top-0 left-0 w-full opacity-50 h-full bg-cover bg-center z-0"
+          style={{ backgroundImage: "url('images/loginbg.jpg')" }}
+        ></div>
 
         <div className="relative w-[500px] h-auto z-10">
-        
-          <Card
-            className={`w-full mt-10 shadow-lg rounded-lg bg-gray-700 ${
-              isError
-                ? "animate-shake border border-gradient-to-r m-4 from-gray-200 to-gray-800"
-                : "border border-gray-200"
-            }`}
-          >
-            <CardHeader className="h-40 flex flex-col justify-center items-center w-full bg-gradient-to-r from-gray-500 to-gray-900 text-white rounded-t-lg">
+          <Card className="w-full mt-5 rounded-lg bg-darkBg/70 border border-neonBlue shadow-md shadow-neonBlue/30 transition-all">
+            <CardHeader className="h-40 flex flex-col justify-center items-center w-full bg-darkBg/100 text-white rounded-t-lg">
               <img
                 src="images/logo.jpg"
                 alt="logo"
-                className="w-24 h-24 rounded-full border-4 border-gray-700 mb-2"
+                className="w-24 h-24 rounded-full border-2 border-neonBlue mb-2"
               />
-              <CardTitle className="text-2xl font-semibold">Logga in</CardTitle>
-              <CardDescription className="text-gray-50">
+              <CardTitle className="text-2xl font-semibold text-neonBlue">
+                Logga in
+              </CardTitle>
+              <CardDescription className="text-gray-300">
                 Webbportalen
               </CardDescription>
             </CardHeader>
             <CardContent>
               {isError && (
-                <div className="m-4 p-4 text-red-600 border border-red-500 rounded bg-red-50">
+                <div className="flex justify-center items-center mt-4 p-4 mx-4 text-red-600 border border-red-500 rounded bg-red-50">
                   {errorMessage}
                 </div>
               )}
               <form onSubmit={handleSubmit}>
                 <div className="grid w-full items-center gap-6">
-                  <div className="flex flex-col space-y-2">
+                  <div className="flex flex-col space-y-2 pt-10">
                     <Label
                       htmlFor="username"
-                      className="text-gray-700 font-medium mt-4"
+                      className="text-gray-300 font-medium mt-4"
                     >
                       Användarnamn
                     </Label>
                     <div className="relative">
-                      <User className="absolute left-2 top-3 h-5 w-5 text-gray-400" />
+                      <User className="absolute left-2 top-3 h-5 w-5 text-neonBlue" />
                       <Input
                         id="username"
                         placeholder="Ange användarnamn"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        className="pl-10 py-2 border rounded-md focus:ring-2 focus:ring-gray-400 focus:outline-none transition-shadow text-gray-400"
+                        className="pl-10 py-2 border border-neonBlue rounded-md focus:ring-2 focus:ring-neonBlue focus:outline-none  bg-darkBg/90"
                         required
                       />
                     </div>
@@ -128,19 +124,19 @@ export function LoginForm() {
                   <div className="flex flex-col space-y-2">
                     <Label
                       htmlFor="password"
-                      className="text-gray-700 font-medium"
+                      className="text-gray-300 font-medium"
                     >
                       Lösenord
                     </Label>
                     <div className="relative">
-                      <Lock className="absolute left-2 top-3 h-5 w-5 text-gray-400" />
+                      <Lock className="absolute left-2 top-3 h-5 w-5 text-neonBlue" />
                       <Input
                         id="password"
                         type="password"
                         placeholder="Ange lösenord"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="pl-10 py-2 border rounded-md focus:ring-2 focus:ring-gray-400 text-black focus:outline-none transition-shadow"
+                        className="pl-10 py-2 border border-neonBlue rounded-md focus:ring-2 focus:ring-neonBlue bg-darkBg/90 text-gray-200 focus:outline-none"
                         required
                       />
                     </div>
@@ -151,7 +147,7 @@ export function LoginForm() {
                     size="lg"
                     type="submit"
                     disabled={isLoading}
-                    className="w-[50%] bg-gray-600 hover:bg-gray-500 text-white font-semibold transition-colors rounded-lg"
+                    className="w-[50%] bg-neonBlue hover:bg-neonBlue/90 text-darkBg font-semibold transition-colors rounded-lg"
                   >
                     {isLoading ? (
                       <>

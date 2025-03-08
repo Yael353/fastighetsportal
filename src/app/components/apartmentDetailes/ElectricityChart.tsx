@@ -22,18 +22,21 @@ export default function ElectricityChart({ batchData }: Props) {
 
   // Filtrera ut alla EL-sensorer
   const allSensors = batchData.flatMap((res) => res.sensor_data);
+
+  console.log("allsensors",allSensors);
+  
   const elSensors = allSensors.filter((sensor) => sensor.name.includes("EL"));
 
   // Omvandla data och skala ner värdena
-  const elChartDataArray =
-    elSensors.length > 0
-      ? formatData(
-          elSensors[0].data.map((entry) => ({
-            time_utc: entry.time_utc,
-            value: entry.value / 1000,
-          }))
-        )
-      : [];
+ const elChartDataArray =
+   elSensors.length > 0
+     ? formatData(
+         elSensors[0].data.map((entry) => ({
+           time_utc: entry.time_utc,
+           value: Math.round(entry.value * 100) / 100, // Här avrundar vi värdet till en decimal
+         }))
+       )
+     : [];
 
   return (
     <div className="bg-gray-700 rounded-lg p-2">

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -80,11 +80,17 @@ export function PropertyList() {
   const currentSensorDomains = sensorDomains?.data || [];
 
   if (loading) {
-    return <div>Laddar...</div>;
+    return (
+      <div className="w-full bg-gray-900 pt-10 text-center text-white">
+        Laddar...
+      </div>
+    );
   }
 
   if (error) {
-    return <div>Fel: {error}</div>;
+    return (
+      <div className="w-full pt-10 text-center text-white">Fel: {error}</div>
+    );
   }
 
   if (currentSensorDomains.length === 0) {
@@ -96,8 +102,8 @@ export function PropertyList() {
   }
 
   return (
-    <div className="w-full flex flex-col space-y-6 justify-center items-center bg-gray-900 py-10">
-      <div className="w-full px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+    <div className="w-full flex flex-col justify-center items-center bg-darkBg py-10">
+      <div className="w-full px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {currentSensorDomains.map((domain: SensorDomain, index: number) => {
           const { ucSensors, apartments } =
             getSensorDomainSensorDescription(domain);
@@ -105,29 +111,31 @@ export function PropertyList() {
           return (
             <div
               key={domain.id}
-              className={`relative p-6 rounded-lg shadow-lg bg-gray-700 text-white hover:scale-105 transition-transform duration-200`}
+              className="relative p-6 rounded-lg border border-neonBlue shadow-lg shadow-neonBlue/50 text-white hover:scale-105 transition-transform duration-200 bg-darkBg/80 bg-no-repeat bg-center bg-[length:110%]"
+              style={{ backgroundImage: "url('/images/bgcard.jpg')" }}
             >
-              <div className="absolute top-4 left-5 w-12 h-12 flex items-center justify-center bg-blue-500 text-white text-xl font-extrabold rounded-md">
-                {domain.name.charAt(0).toUpperCase()}
-              </div>
-
               <Link href={`/dashboard/detailedPage/${domain.id}`}>
+                <div className="absolute top-4 left-5 w-12 h-12 flex items-center justify-center bg-neonBlue text-darkBg text-xl font-extrabold rounded-md">
+                  {domain.name.charAt(0).toUpperCase()}
+                </div>
+
+                <span
+                  className={`px-3 py-1 text-xs flex float-end font-semibold uppercase rounded-md ${
+                    domain.harvester.active
+                      ? "bg-neonGreen text-darkBg"
+                      : "bg-gray-500 text-white"
+                  }`}
+                >
+                  {domain.harvester.active ? "Active" : "Inactive"}
+                </span>
+
                 <div className="flex flex-col items-start mt-16">
-                  <span
-                    className={`px-3 py-1 text-xs font-semibold uppercase rounded-md ${
-                      domain.harvester.active
-                        ? "bg-green-500 text-white"
-                        : "bg-gray-500 text-white"
-                    }`}
-                  >
-                    {domain.harvester.active ? "Active" : "Inactive"}
-                  </span>
-                  <h2 className="text-xl font-bold text-white first-letter:uppercase">
+                  <h2 className="text-xl font-bold text-neonBlue first-letter:uppercase">
                     {domain.name}
                   </h2>
 
                   <div className="mt-4 flex items-center gap-2">
-                    <p className="text-sm font-medium text-gray-400">
+                    <p className="text-sm font-medium text-gray-300">
                       Uc Sensorer:
                     </p>
                     <p className="text-sm font-semibold text-white">
@@ -136,10 +144,12 @@ export function PropertyList() {
                   </div>
 
                   <div className="mt-2 flex items-center gap-2">
-                    <p className="text-sm font-medium text-gray-400">
+                    <p className="text-sm font-medium text-gray-300">
                       Lägenheter:
                     </p>
-                    <p className="text-sm font-semibold white">{apartments}</p>
+                    <p className="text-sm font-semibold text-white">
+                      {apartments}
+                    </p>
                   </div>
                 </div>
               </Link>
@@ -149,9 +159,9 @@ export function PropertyList() {
       </div>
 
       {/* Pagination */}
-      <div className="w-full px-4 flex justify-between items-center mt-6 text-white">
+      <div className="w-full px-4 flex justify-between items-center pt-10 text-white">
         <Button
-          className="bg-gray-700"
+          className="bg-darkBg border border-neonBlue"
           onClick={prevPage}
           disabled={currentPage === 1}
         >
@@ -162,8 +172,10 @@ export function PropertyList() {
           {getPageNumbers().map((page) => (
             <Button
               key={page}
-              className={`bg-gray-700 ${
-                currentPage === page ? "bg-blue-500 text-white" : ""
+              className={`border border-neonBlue ${
+                currentPage === page
+                  ? "bg-neonBlue text-darkBg"
+                  : "bg-darkBg text-white"
               }`}
               onClick={() => goToPage(page)}
             >
@@ -173,7 +185,7 @@ export function PropertyList() {
         </div>
 
         <Button
-          className="bg-gray-700"
+          className="bg-darkBg border border-neonBlue"
           onClick={nextPage}
           disabled={currentPage === totalPages}
         >
@@ -182,4 +194,5 @@ export function PropertyList() {
       </div>
     </div>
   );
+
 }
