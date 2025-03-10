@@ -1,7 +1,7 @@
 import { logout } from "@/features/slices/authSlice";
 import { AppDispatch } from "@/features/store/store";
 import { getAuthToken } from "./auth";
-import { RESPONSE_404 } from "@/features/errors/errors"; // Importera RESPONSE_404
+import { RESPONSE_404 } from "@/features/errors/errors";
 
 export const authFetch = async (
   url: string | URL | Request,
@@ -16,7 +16,6 @@ export const authFetch = async (
     throw new Error("No access token. You have been logged out.");
   }
 
-  // Kontrollera token expiration om du sparar expiresAt i localStorage
   const expiresAt = Number(localStorage.getItem("expiresAt")) || 0;
   if (expiresAt && expiresAt - Date.now() < 0) {
     console.warn("Token has expired. Logging out...");
@@ -24,7 +23,6 @@ export const authFetch = async (
     throw new Error("Auth token expired.");
   }
 
-  // Hantera headers
   const existingHeaders =
     init.headers instanceof Headers
       ? Object.fromEntries(init.headers.entries())
@@ -51,8 +49,7 @@ export const authFetch = async (
         console.warn("Unauthorized or expired token. Logging out...");
         dispatch(logout());
       }
-      // Returnera response även vid 404
-      return response;
+      return response; // Returnera response även vid 404
     }
 
     return response;

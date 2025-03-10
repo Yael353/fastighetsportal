@@ -21,4 +21,3 @@ export const getSensorDomainSensorDescription = (
 
 
 
-// 584a7bcd-7efa-4d61-b538-127a08fd5f0f

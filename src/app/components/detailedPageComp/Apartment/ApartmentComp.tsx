@@ -25,6 +25,9 @@ export default function ApartmentComp() {
   const property = useSelector((state: RootState) => state.property.data);
   const controllers = property?.controllers || [];
 
+  console.log("cont", controllers);
+  
+
   // Hämta algoConfig (vi visar bara iat_sp från denna)
   const algoConfig = useSelector((state: RootState) => state.algoConfig.data);
   const algoLoading = useSelector(
@@ -84,7 +87,9 @@ export default function ApartmentComp() {
       setIsLoading(false);
     }
   }, [sensorDomainId]);
-
+  
+  console.log("Summarystat ", summaryStatistics);
+  
   if (summaryLoading) {
     return <div>Laddar...</div>;
   }
@@ -99,7 +104,7 @@ export default function ApartmentComp() {
 
   return (
     <div className="rounded-lg py-20 bg-gray-900">
-      <div className=" bg-gray-900 shadow-md rounded-lg max-w-full mx-auto h-auto ">
+      <div className="bg-gray-900 shadow-md rounded-lg max-w-full mx-auto h-auto">
         <h2 className="text-lg font-bold text-white mb-4">
           Medelvärde för lägenheter de 30 senaste dagarna
         </h2>
@@ -131,7 +136,7 @@ export default function ApartmentComp() {
                   {["kWh", "L", "C"].map((unit) => (
                     <TableCell
                       key={unit}
-                      className="text-center  font-extrabold text-white"
+                      className="text-center font-extrabold text-white"
                     >
                       {stats
                         .find((stat) => stat.u_name === unit)
@@ -142,9 +147,6 @@ export default function ApartmentComp() {
               ))}
           </TableBody>
         </Table>
-      </div>
-      <div className="pt-8 bg-slate-900">
-        <ApartmentsCards />
       </div>
     </div>
   );
