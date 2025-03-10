@@ -18,6 +18,9 @@ import MonthlyStatistics from "./MonthlyStatistics";
 import ElectricityChart from "./ElectricityChart";
 import HotWaterChart from "./HotWaterChart";
 import TemperatureChart from "./TemperatureChart";
+import { MdOutlineElectricalServices } from "react-icons/md";
+import { FaHandHoldingWater } from "react-icons/fa";
+import { FaTemperatureHigh } from "react-icons/fa";
 
 export default function ApartmentScreen() {
   const dispatch = useDispatch<AppDispatch>();
@@ -36,8 +39,6 @@ export default function ApartmentScreen() {
   const buildingsError = useSelector(
     (state: RootState) => state.buildings.error
   );
-  console.log("buildings från useSelector direkt", buildings);
-
   const monthlyStatistics = useSelector(
     (state: RootState) => state.monthlyStatistics.data
   );
@@ -48,7 +49,6 @@ export default function ApartmentScreen() {
     (state: RootState) => state.monthlyStatistics.error
   );
 
-
   const apartmentConsumption = useSelector(
     (state: RootState) => state.apartmentConsumption.data?.data
   );
@@ -58,8 +58,6 @@ export default function ApartmentScreen() {
   const apartmentConsumptionError = useSelector(
     (state: RootState) => state.apartmentConsumption.error
   );
-
-  
 
   useEffect(() => {
     if (!buildings || Object.keys(buildings).length === 0) {
@@ -101,8 +99,6 @@ export default function ApartmentScreen() {
     [apartmentConsumption]
   );
 
-    console.log("apartmentkonsumption", apartmentConsumption);
-    
   useEffect(() => {
     if (sensorDomainId) {
       dispatch(
@@ -120,7 +116,6 @@ export default function ApartmentScreen() {
     }
   }, [sensorDomainId, sensorIds, dispatch]);
 
-  
   if (buildingsLoading) {
     return <div>Laddar byggnader...</div>;
   }
@@ -147,40 +142,46 @@ export default function ApartmentScreen() {
     (item) => item.vala_description.measurement_type === "volume"
   );
 
-  console.log("från apartmentscreen batchsensorDAta", batchData);
-  
-
   return (
-    <div className="bg-gray-900">
+    <div className="bg-darkBg">
       {/* Byggnads- och lägenhetsinformation */}
-      <div className="flex flex-col w-[25%] rounded-lg px-4 pb-10">
-        <h1 className="text-3xl font-extrabold text-white   pt-2">
+      <div className="flex flex-col w-full md:w-1/4 rounded-lg px-6 py-6 shadow-lg">
+        <h1 className="text-3xl font-extrabold text-white pb-2 border-b border-gray-600">
           {building?.name ?? "Okänd byggnad"}
         </h1>
-        <h3 className="text-lg font-semibold  p-2 text-gray-300  shadow-sm rounded-b-lg">
+        <h3 className="text-lg font-semibold text-gray-300 mt-4 bg-gray-700 p-3 rounded-md shadow-md">
           Lägenhet: {apartment?.apt_id ?? "N/A"}
         </h3>
       </div>
 
       {/* Konsumtionskorten */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-4 px-4 bg-gray-900 py-10">
-        <div className="p-4 bg-gray-700 text-gray-300 shadow rounded-md flex flex-col justify-center items-center">
-          <h4 className="font-semibold">Medeltemperatur</h4>
-          <p className="text-2xl">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-6 px-6 py-10 bg-darkBg shadow-lg ">
+        <div className="p-6 bg-darkBgLight text-neonBlue shadow-md rounded-md flex flex-col justify-center items-center border border-neonBlue hover:shadow-neon transition-all">
+          <div className="flex flex-col justify-center items-center">
+            <h4 className="font-semibold text-lg ">Medeltemperatur</h4>
+            <FaTemperatureHigh size={50} className="pl-4" />
+          </div>
+          <p className="text-3xl font-bold text-white">
             {temperatureData ? temperatureData.average.toFixed(1) : "-"}{" "}
             {temperatureData?.vala_description.unit || ""}
           </p>
         </div>
-        <div className="p-4 bg-gray-700 text-gray-300 shadow rounded-md flex flex-col justify-center items-center">
-          <h4 className="font-semibold">Elförbrukning</h4>
-          <p className="text-2xl">
+        <div className="p-6 bg-darkBgLight text-neonBlue shadow-md rounded-md flex flex-col justify-center items-center border border-neonBlue hover:shadow-neon transition-all">
+          <div className="flex flex-col justify-center items-center">
+            <h4 className="font-semibold text-lg pr-4">Elförbrukning</h4>
+            <MdOutlineElectricalServices size={50} />
+          </div>
+          <p className="text-3xl font-bold text-white">
             {electricityData ? electricityData.difference.toFixed(1) : "-"}{" "}
             {electricityData?.vala_description.unit || ""}
           </p>
         </div>
-        <div className="p-4 bg-gray-700 text-gray-300 shadow rounded-md flex flex-col justify-center items-center">
-          <h4 className="font-semibold">Varmvattenförbrukning</h4>
-          <p className="text-2xl">
+        <div className="p-6 bg-darkBgLight text-neonBlue shadow-md rounded-md flex flex-col justify-center items-center border border-neonBlue hover:shadow-neon transition-all">
+          <div className="flex flex-col justify-center items-center">
+            <h4 className="font-semibold text-lg ">Varmvattenförbrukning</h4>
+            <FaHandHoldingWater size={50} className="pl-4" />
+          </div>
+          <p className="text-3xl font-bold text-white">
             {hotWaterData ? hotWaterData.difference.toFixed(0) : "-"}{" "}
             {hotWaterData?.vala_description.unit || ""}
           </p>
@@ -197,49 +198,53 @@ export default function ApartmentScreen() {
         </div>
       )}
 
-      {/* Diagram och Statistik - Grid Layout */}
-      <div className="grid grid-cols-2 px-4 grid-rows-2 gap-6 h-[900px]">
-        {/* Indoor Air temp */}
-        <div className="rounded-lg flex flex-col w-full h-full">
-          <h3 className="text-lg text-white font-semibold mb-2">
-            Inomhustemperatur
-          </h3>
-          <div className="rounded-md flex flex-col flex-1">
+      {/* Diagram och Statistik */}
+      <div className="flex flex-col justify-center items-center gap-8 px-6 py-6">
+        {/* Temperatur - vänster */}
+        <div className="w-[80%]  bg-gray-800 p-6 rounded-lg shadow-md flex flex-col">
+          <div className="flex justify-center">
+            <h3 className="text-lg font-semibold text-white mb-4">
+              Inomhustemperatur
+            </h3>
+          </div>
+          <div className="flex-grow h-[400px]">
             <TemperatureChart batchData={batchData} />
           </div>
         </div>
 
-        {/* Monthly Statistics */}
-        <div className="rounded-lg flex flex-col w-full h-full">
-          <h3 className="text-lg text-white font-semibold mb-2">
-            Månadsvisa Medelvärden
+        {/* Elförbrukning - höger */}
+        <div className="w-[80%] bg-gray-800 p-6 rounded-lg shadow-md">
+          <div className="flex justify-center">
+            <h3 className="text-lg font-semibold text-white mb-4">
+              Elförbrukning
+            </h3>
+          </div>
+          <ElectricityChart batchData={batchData} />
+        </div>
+
+        {/* Varmvatten - vänster */}
+
+        <div className="w-[80%] bg-gray-800 p-6 rounded-lg shadow-md">
+          <div className="flex justify-center">
+            <h3 className="text-lg font-semibold text-white mb-4">
+              Varmvattenförbrukning
+            </h3>
+          </div>
+          <HotWaterChart batchData={batchData} />
+        </div>
+
+        {/* Månadsstatistiken - tar hela bredden och kräver scroll */}
+
+        <div className="border-t border-neonBlue w-full shadow-md">
+          <h3 className="flex justify-center text-xl pt-5 font-semibold text-white mb-4">
+            Månadsstatistik
           </h3>
-          <div className="flex-1 rounded-md overflow-auto min-h-0">
+          <div className="w-full h-[400px] overflow-y-auto bg-gray-900 p-6 rounded-lg shadow-md">
             <MonthlyStatistics
               data={monthlyStatistics}
               loading={monthlyLoading}
               error={monthlyError}
             />
-          </div>
-        </div>
-
-        {/* Electricity Consumption */}
-        <div className="rounded-lg flex flex-col w-full h-full py-5">
-          <h3 className="text-lg text-white font-semibold mb-2">
-            Elförbrukning
-          </h3>
-          <div className="rounded-md flex flex-col flex-1">
-            <ElectricityChart batchData={batchData} />
-          </div>
-        </div>
-
-        {/* Hot Water Consumption */}
-        <div className="rounded-lg flex flex-col w-full h-full py-5">
-          <h3 className="text-lg text-white font-semibold mb-2">
-            Varmvattenförbrukning
-          </h3>
-          <div className="rounded-md flex flex-col flex-1">
-            <HotWaterChart batchData={batchData} />
           </div>
         </div>
       </div>

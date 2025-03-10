@@ -43,11 +43,10 @@ interface TableRowData {
 }
 
 const MonthlyStatistics: React.FC<Props> = ({ data, loading, error }) => {
-  if (loading) return <p>Laddar...</p>;
-  if (error) return <p>{error}</p>;
-  if (!data) return <p>Ingen data tillgänglig.</p>;
+  if (loading) return <p className="text-neonBlue">Laddar...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
+  if (!data) return <p className="text-gray-300">Ingen data tillgänglig.</p>;
 
-  // --- Samma logik för att bygga rows som i din befintliga kod ---
   const tableData: Record<string, AggregatedEntry> = Object.values(data)
     .flat()
     .reduce((acc, entry: Entry) => {
@@ -63,13 +62,9 @@ const MonthlyStatistics: React.FC<Props> = ({ data, loading, error }) => {
         };
       }
 
-      if (entry.v_name === "IEM") {
-        acc[key].iem = entry;
-      } else if (entry.v_name === "IIAT") {
-        acc[key].iiat = entry;
-      } else if (entry.v_name === "IHTWM") {
-        acc[key].ihtwm = entry;
-      }
+      if (entry.v_name === "IEM") acc[key].iem = entry;
+      else if (entry.v_name === "IIAT") acc[key].iiat = entry;
+      else if (entry.v_name === "IHTWM") acc[key].ihtwm = entry;
 
       return acc;
     }, {} as Record<string, AggregatedEntry>);
@@ -104,49 +99,46 @@ const MonthlyStatistics: React.FC<Props> = ({ data, loading, error }) => {
     .slice(0, 18);
 
   return (
-    <div className="bg-gray-700 shadow-md rounded-md w-full">
-      {/* table-fixed ger kolumnerna en fördelning och w-full låter tabellen fylla föräldern */}
+    <div className="bg-darkBg shadow-lg rounded-md w-full border border-neonBlue">
       <Table className="table-fixed w-full">
-        <TableHeader className="bg-gray-800 font-extrabold rounded-md">
-          <TableRow>
-            {/* Exempel: w-1/5 för att göra alla kolumner lika breda, samt break-words för att radbryta */}
-            <TableHead className="w-1/5 pl-2 py-3 text-left text-xs font-semibold uppercase  text-gray-300 break-words">
+        <TableHeader className="bg-darkBgLight text-neonBlue">
+          <TableRow className="sticky top-0 bg-darkBgLight text-neonBlue">
+            <TableHead className="w-1/5 px-4 py-3 text-left uppercase">
               År
             </TableHead>
-            <TableHead className="w-1/5  py-3 text-left text-xs font-semibold uppercase text-gray-300 break-words">
+            <TableHead className="w-1/5 px-4 py-3 text-left uppercase">
               Månad
             </TableHead>
-            <TableHead className="w-1/5  py-3 text-left text-xs font-semibold uppercase text-gray-300 break-words">
+            <TableHead className="w-1/5 px-4 py-3 text-left uppercase">
               Medeltemperatur
             </TableHead>
-            <TableHead className="w-1/5  py-3 text-left text-xs font-semibold uppercase text-gray-300 break-words">
+            <TableHead className="w-1/5 px-4 py-3 text-left uppercase">
               Elförbrukning
             </TableHead>
-            <TableHead className="w-1/5 pr-2 py-3 text-left text-xs font-semibold uppercase text-gray-300 break-words">
+            <TableHead className="w-1/5 px-4 py-3 text-left uppercase">
               Varmvattenförbrukning
             </TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody className="divide-y divide-gray-800">
+        <TableBody className="divide-y divide-gray-700">
           {rows.map((row) => (
             <TableRow
               key={row.key}
-              className="hover:bg-gray-500 transition-colors"
+              className="hover:bg-gray-600 transition-all duration-200"
             >
-              {/* Ta bort whitespace-nowrap så text kan brytas om kolumnen blir smal */}
-              <TableCell className="pl-2 py-3 text-sm font-bold text-gray-300 break-words">
+              <TableCell className="px-4 py-3 text-sm text-neonBlue">
                 {row.year}
               </TableCell>
-              <TableCell className="py-3 text-sm font-semibold text-white break-words">
+              <TableCell className="px-4 py-3 text-sm text-white">
                 {row.month}
               </TableCell>
-              <TableCell className="py-3 text-sm text-white break-words">
+              <TableCell className="px-4 py-3 text-sm text-white">
                 {row.iiat}
               </TableCell>
-              <TableCell className="py-3 text-sm text-white break-words">
+              <TableCell className="px-4 py-3 text-sm text-white">
                 {row.iem}
               </TableCell>
-              <TableCell className="pr-2 py-3 text-sm text-white break-words">
+              <TableCell className="px-4 py-3 text-sm text-white">
                 {row.ihtwm}
               </TableCell>
             </TableRow>
