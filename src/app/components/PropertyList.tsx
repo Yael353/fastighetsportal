@@ -20,6 +20,8 @@ export function PropertyList() {
     (state: RootState) => state.overview
   );
 
+  
+
   const authToken = getAuthToken();
 
   useEffect(() => {
@@ -79,10 +81,17 @@ export function PropertyList() {
 
   const currentSensorDomains = sensorDomains?.data || [];
 
+  const bgArray = [
+    "/images/bgcard.jpg",
+    "/images/loginbg.jpg",
+    "/images/aaa.jpg",
+  ];
+  
   if (loading) {
     return (
-      <div className="w-full bg-gray-900 pt-10 text-center text-white">
-        Laddar...
+      <div className="w-full bg-darkBg pt-10 text-center text-white flex flex-col items-center">
+        <div className="w-10 h-10 border-4 border-neonBlue border-t-transparent rounded-full animate-spin"></div>
+        <p className="mt-4 text-lg">Laddar...</p>
       </div>
     );
   }
@@ -108,19 +117,28 @@ export function PropertyList() {
           const { ucSensors, apartments } =
             getSensorDomainSensorDescription(domain);
 
+            const randomBg = bgArray[index % bgArray.length];
+
           return (
             <div
               key={domain.id}
-              className="relative p-6 rounded-lg border border-neonBlue shadow-lg shadow-neonBlue/50 text-white hover:scale-105 transition-transform duration-200 bg-darkBg/80 bg-no-repeat bg-center bg-[length:110%]"
-              style={{ backgroundImage: "url('/images/bgcard.jpg')" }}
+              className="relative p-6 rounded-lg border border-neonBlue shadow-sm shadow-neonBlue/50 text-white hover:scale-105 transition-transform duration-200"
             >
               <Link href={`/dashboard/detailedPage/${domain.id}`}>
+                <div
+                  className="absolute inset-0 bg-darkBg bg-no-repeat bg-center bg-[length:110%]"
+                  style={{
+                    backgroundImage: `url(${randomBg})`,
+                    opacity: 0.8,
+                  }}
+                ></div>
+
                 <div className="absolute top-4 left-5 w-12 h-12 flex items-center justify-center bg-neonBlue text-darkBg text-xl font-extrabold rounded-md">
                   {domain.name.charAt(0).toUpperCase()}
                 </div>
 
                 <span
-                  className={`px-3 py-1 text-xs flex float-end font-semibold uppercase rounded-md ${
+                  className={`px-3 absolute right-4 py-1 text-xs flex float-end font-semibold uppercase rounded-md ${
                     domain.harvester.active
                       ? "bg-neonGreen text-darkBg"
                       : "bg-gray-500 text-white"
@@ -130,12 +148,12 @@ export function PropertyList() {
                 </span>
 
                 <div className="flex flex-col items-start mt-16">
-                  <h2 className="text-xl font-bold text-neonBlue first-letter:uppercase">
+                  <h2 className="text-xl z-10 font-bold text-neonBlue first-letter:uppercase">
                     {domain.name}
                   </h2>
 
-                  <div className="mt-4 flex items-center gap-2">
-                    <p className="text-sm font-medium text-gray-300">
+                  <div className="mt-4 flex z-10 items-center gap-2">
+                    <p className="text-sm  font-medium text-gray-300">
                       Uc Sensorer:
                     </p>
                     <p className="text-sm font-semibold text-white">
@@ -143,8 +161,8 @@ export function PropertyList() {
                     </p>
                   </div>
 
-                  <div className="mt-2 flex items-center gap-2">
-                    <p className="text-sm font-medium text-gray-300">
+                  <div className="mt-2 flex z-10 items-center gap-2">
+                    <p className="text-sm  font-medium text-gray-300">
                       Lägenheter:
                     </p>
                     <p className="text-sm font-semibold text-white">
@@ -194,5 +212,4 @@ export function PropertyList() {
       </div>
     </div>
   );
-
 }

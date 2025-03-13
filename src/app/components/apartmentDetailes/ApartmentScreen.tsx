@@ -21,6 +21,7 @@ import TemperatureChart from "./TemperatureChart";
 import { MdOutlineElectricalServices } from "react-icons/md";
 import { FaHandHoldingWater } from "react-icons/fa";
 import { FaTemperatureHigh } from "react-icons/fa";
+import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default function ApartmentScreen() {
   const dispatch = useDispatch<AppDispatch>();
@@ -29,6 +30,9 @@ export default function ApartmentScreen() {
   const [batchData, setBatchData] = useState<BatchSensorDataResponse[] | null>(
     null
   );
+  const [activeView, setActiveView] = useState<
+    "temperature" | "electricity" | "hotWater" | "monthlyStatistics"
+  >("temperature");
 
   const buildings = useSelector(
     (state: RootState) => state.buildings.data ?? {}
@@ -143,13 +147,13 @@ export default function ApartmentScreen() {
   );
 
   return (
-    <div className="bg-darkBg">
+    <div className="bg-darkBg h-screen pb-10">
       {/* Byggnads- och lägenhetsinformation */}
       <div className="flex flex-col w-full md:w-1/4 rounded-lg px-6 py-6 shadow-lg">
         <h1 className="text-3xl font-extrabold text-white pb-2 border-b border-gray-600">
           {building?.name ?? "Okänd byggnad"}
         </h1>
-        <h3 className="text-lg font-semibold text-gray-300 mt-4 bg-gray-700 p-3 rounded-md shadow-md">
+        <h3 className="text-lg font-semibold text-gray-300 mt-4 px-3 rounded-md shadow-md">
           Lägenhet: {apartment?.apt_id ?? "N/A"}
         </h3>
       </div>
@@ -159,7 +163,7 @@ export default function ApartmentScreen() {
         <div className="p-6 bg-darkBgLight text-neonBlue shadow-md rounded-md flex flex-col justify-center items-center border border-neonBlue hover:shadow-neon transition-all">
           <div className="flex flex-col justify-center items-center">
             <h4 className="font-semibold text-lg ">Medeltemperatur</h4>
-            <FaTemperatureHigh size={50} className="pl-4" />
+            <FaTemperatureHigh size={50} className="py-1 my-1"/>
           </div>
           <p className="text-3xl font-bold text-white">
             {temperatureData ? temperatureData.average.toFixed(1) : "-"}{" "}
@@ -168,7 +172,7 @@ export default function ApartmentScreen() {
         </div>
         <div className="p-6 bg-darkBgLight text-neonBlue shadow-md rounded-md flex flex-col justify-center items-center border border-neonBlue hover:shadow-neon transition-all">
           <div className="flex flex-col justify-center items-center">
-            <h4 className="font-semibold text-lg pr-4">Elförbrukning</h4>
+            <h4 className="font-semibold text-lg ">Elförbrukning</h4>
             <MdOutlineElectricalServices size={50} />
           </div>
           <p className="text-3xl font-bold text-white">
@@ -199,53 +203,71 @@ export default function ApartmentScreen() {
       )}
 
       {/* Diagram och Statistik */}
-      <div className="flex flex-col justify-center items-center gap-8 px-6 py-6">
-        {/* Temperatur - vänster */}
-        <div className="w-[80%]  bg-gray-800 p-6 rounded-lg shadow-md flex flex-col">
-          <div className="flex justify-center">
-            <h3 className="text-lg font-semibold text-white mb-4">
-              Inomhustemperatur
-            </h3>
-          </div>
-          <div className="flex-grow h-[400px]">
-            <TemperatureChart batchData={batchData} />
-          </div>
+      <div className="bg-darkBg">
+        {/* Knappmeny för att välja visning */}
+        <div className="flex justify-center space-x-4 my-6 text-">
+          {[
+            { key: "temperature", label: "Temperatur" },
+            { key: "electricity", label: "Elförbrukning" },
+            { key: "hotWater", label: "Varmvattenförbrukning" },
+            { key: "monthlyStatistics", label: "Månadsstatistik" },
+          ].map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setActiveView(key)}
+              className={`px-6 py-3 font-semibold rounded-md transition-all duration-300 shadow-sm 
+        ${
+          activeView === key
+            ? "bg-neonBlue text-white shadow-neonBlue"
+            : "bg-gray-800 text-gray-300 hover:bg-neonBlue hover:text-white hover:shadow-neonBlue"
+        }`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
 
-        {/* Elförbrukning - höger */}
-        <div className="w-[80%] bg-gray-800 p-6 rounded-lg shadow-md">
-          <div className="flex justify-center">
-            <h3 className="text-lg font-semibold text-white mb-4">
-              Elförbrukning
-            </h3>
-          </div>
-          <ElectricityChart batchData={batchData} />
-        </div>
+        {/* Rendera endast den valda vyn */}
+        <div className="flex flex-col items-center">
+          {activeView === "temperature" && (
+            <div className="w-[80%]  p-6 rounded-lg shadow-md">
+              <h3 className="text-lg flex justify-center font-semibold text-white mb-4">
+                Inomhustemperatur
+              </h3>
+              <TemperatureChart batchData={batchData} />
+            </div>
+          )}
 
-        {/* Varmvatten - vänster */}
+          {activeView === "electricity" && (
+            <div className="w-[80%] p-6 rounded-lg shadow-md">
+              <h3 className="text-lg flex justify-center font-semibold text-white mb-4">
+                Elförbrukning
+              </h3>
+              <ElectricityChart batchData={batchData} />
+            </div>
+          )}
 
-        <div className="w-[80%] bg-gray-800 p-6 rounded-lg shadow-md">
-          <div className="flex justify-center">
-            <h3 className="text-lg font-semibold text-white mb-4">
-              Varmvattenförbrukning
-            </h3>
-          </div>
-          <HotWaterChart batchData={batchData} />
-        </div>
+          {activeView === "hotWater" && (
+            <div className="w-[80%]  p-6 rounded-lg shadow-md">
+              <h3 className="text-lg flex justify-center font-semibold text-white mb-4">
+                Varmvattenförbrukning
+              </h3>
+              <HotWaterChart batchData={batchData} />
+            </div>
+          )}
 
-        {/* Månadsstatistiken - tar hela bredden och kräver scroll */}
-
-        <div className="border-t border-neonBlue w-full shadow-md">
-          <h3 className="flex justify-center text-xl pt-5 font-semibold text-white mb-4">
-            Månadsstatistik
-          </h3>
-          <div className="w-full h-[400px] overflow-y-auto bg-gray-900 p-6 rounded-lg shadow-md">
-            <MonthlyStatistics
-              data={monthlyStatistics}
-              loading={monthlyLoading}
-              error={monthlyError}
-            />
-          </div>
+          {activeView === "monthlyStatistics" && (
+            <div className="w-[80%] h-auto p-6 rounded-lg shadow-md pb-10">
+              <h3 className="text-xl font-semibold flex justify-center text-white mb-4">
+                Månadsstatistik
+              </h3>
+              <MonthlyStatistics
+                data={monthlyStatistics}
+                loading={monthlyLoading}
+                error={monthlyError}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

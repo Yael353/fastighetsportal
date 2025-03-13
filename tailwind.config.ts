@@ -10,11 +10,15 @@ export default {
   theme: {
     extend: {
       colors: {
-        neonBlue: "#00d9ff",
-        neonGreen: "#28ff86",
-        darkBg: "#0a0f1f",
-        accentBlue: "#3b82f6",
-        neonPurple: "#8b5cf6",
+        neonBlue: "#5ec3ff", // Mjukare neonblå
+        neonGreen: "#52ff99", // Ljusare neon
+        neonPurple: "#a482ff", // Mildare neonlila
+        darkBg: "#0b1026", // Djup marinblå bakgrund
+        accentBlue: "#3b82f6", // Behaglig blå accent
+        deepBlue: "#090926", // Mörkare blå
+        softNavy: "#0b0b22", // Mjukare nattblå
+        midnight: "#0c1228", // Elegant mörkblå
+        twilight: "#090925", // Mörk skuggblå
         background: "var(--background)",
         foreground: "var(--foreground)",
         sidebar: {

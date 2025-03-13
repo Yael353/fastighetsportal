@@ -30,7 +30,7 @@ export function AppSidebar() {
     <Sidebar
       variant="floating"
       collapsible="offcanvas"
-      className="bg-darkBg border-r border-neonBlue shadow-lg shadow-neonBlue/50 flex flex-col"
+      className="bg-darkBg border-r border-neonBlue shadow-sm shadow-neonBlue/50 flex flex-col"
     >
       {/* Header */}
       <SidebarHeader className="flex justify-center items-center border-b border-neonBlue">

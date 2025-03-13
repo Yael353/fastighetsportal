@@ -5,7 +5,6 @@ import { getAuthToken } from "@/utils/auth";
 import { fetchAlgoConfig } from "@/features/thunks/algoConfig";
 import { fetchSummaryApartmentStatistics } from "@/features/thunks/fetchSensors";
 import { useParams } from "next/navigation";
-import ApartmentsCards from "./ApartmentsCards";
 import {
   Table,
   TableBody,
@@ -26,7 +25,6 @@ export default function ApartmentComp() {
   const controllers = property?.controllers || [];
 
   console.log("cont", controllers);
-  
 
   // Hämta algoConfig (vi visar bara iat_sp från denna)
   const algoConfig = useSelector((state: RootState) => state.algoConfig.data);
@@ -87,9 +85,9 @@ export default function ApartmentComp() {
       setIsLoading(false);
     }
   }, [sensorDomainId]);
-  
+
   console.log("Summarystat ", summaryStatistics);
-  
+
   if (summaryLoading) {
     return <div>Laddar...</div>;
   }
@@ -103,13 +101,13 @@ export default function ApartmentComp() {
   }
 
   return (
-    <div className="rounded-lg py-20 bg-gray-900">
-      <div className="bg-gray-900 shadow-md rounded-lg max-w-full mx-auto h-auto">
-        <h2 className="text-lg font-bold text-white mb-4">
+    <div className="rounded-lg bg-darkBg border border-x-neonBlue">
+      <div className="bg-darkBg rounded-lg max-w-full mx-auto h-auto">
+        <h2 className="text-lg font-bold text-neonBlue mb-4 p-4">
           Medelvärde för lägenheter de 30 senaste dagarna
         </h2>
-        <Table className="border border-gray-700 text-sm">
-          <TableHeader className="bg-gray-800 text-gray-200">
+        <Table className="border border-twilight text-sm">
+          <TableHeader className="bg-midnight text-neonBlue">
             <TableRow>
               <TableHead className="text-left font-extrabold">
                 Antal rum
@@ -128,11 +126,8 @@ export default function ApartmentComp() {
           <TableBody>
             {summaryStatistics &&
               Object.entries(summaryStatistics).map(([size, stats]) => (
-                <TableRow
-                  key={size}
-                  className="hover:bg-gray-400 bg-gray-700 text-white hover:transition-transform duration-150 hover:scale-103"
-                >
-                  <TableCell>{size}</TableCell>
+                <TableRow key={size} className="bg-softNavy text-white">
+                  <TableCell className="text-neonBlue ">{size}</TableCell>
                   {["kWh", "L", "C"].map((unit) => (
                     <TableCell
                       key={unit}

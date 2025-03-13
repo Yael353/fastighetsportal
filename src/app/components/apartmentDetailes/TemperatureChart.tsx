@@ -12,6 +12,7 @@ import {
 import { BatchSensorDataResponse } from "@/features/models/sensor-data";
 import moment from "moment"; // Importera moment.js för att formatera X-axeln och Tooltip
 import { formatData } from "@/utils/date";
+import { ChartContainer } from "@/components/ui/chart";
 
 interface Props {
   batchData: BatchSensorDataResponse[] | null;
@@ -19,7 +20,6 @@ interface Props {
 
 export default function TemperatureChart({ batchData }: Props) {
   if (!batchData) return <div>Ingen temperaturdata tillgänglig</div>;
-
 
   // Filtrera ut alla GT_GM-sensorer
   const allSensors = batchData.flatMap((res) => res.sensor_data);
@@ -45,35 +45,58 @@ export default function TemperatureChart({ batchData }: Props) {
 
   return (
     <div className="bg-darkBg shadow-lg rounded-lg p-4 border border-neonBlue">
-      <ResponsiveContainer width="100%" height={350}>
-        <LineChart data={gtGmChartData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="time"
-            tickFormatter={(time) => moment(time).format("YY:MM:DD HH:mm")} // Visa tid i format "12:30"
-          />
-          <YAxis domain={[minValue, maxValue]} allowDecimals={false} />
-          <Tooltip
-            labelFormatter={(label) => moment(label).format("YYYY-MM-DD HH:mm")}
-            formatter={(value: number) => value.toFixed(2)}
-          />
-          <Legend />
-          <Line
-            type="monotone"
-            dataKey="value"
-            stroke="#00BFFF" 
-            strokeWidth={3}
-            dot={false}
-            activeDot={{
-              r: 6,
-              stroke: "#00FFFF",
-              strokeWidth: 2,
-              fill: "#000",
-            }} 
-          />
-        </LineChart>
-      </ResponsiveContainer>
+      <ChartContainer
+        config={{
+          value: {
+            label: "Inomhustemperatur (C)",
+            theme: {
+              light: "#00BFFF",
+              dark: "#00BFFF",
+            },
+          },
+        }}
+      >
+        <ResponsiveContainer width="100%" height={350}>
+          <LineChart data={gtGmChartData}>
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="#00BFFF"
+              opacity={0.3}
+            />
+            <XAxis
+              dataKey="time"
+              tickFormatter={(time) => moment(time).format("HH:mm")}
+              stroke="#00BFFF"
+            />
+            <YAxis
+              domain={[minValue, maxValue]}
+              tickFormatter={(value) => value.toFixed(0)}
+              stroke="#00BFFF"
+              allowDecimals={false}
+            />
+            <Tooltip
+              labelFormatter={(label) =>
+                moment(label).format("YYYY-MM-DD HH:mm")
+              }
+              formatter={(value: number) => value.toFixed(2)}
+            />
+            <Legend />
+            <Line
+              type="monotone"
+              dataKey="value"
+              stroke="#00BFFF"
+              strokeWidth={3}
+              dot={false}
+              activeDot={{
+                r: 6,
+                stroke: "#00FFFF",
+                strokeWidth: 2,
+                fill: "#000",
+              }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </ChartContainer>
     </div>
   );
-
 }

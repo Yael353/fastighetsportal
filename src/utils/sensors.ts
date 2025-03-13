@@ -26,10 +26,8 @@ export const calculateDifferences = (
 ): { time: number; value: number }[] => {
   return data.map((entry, index) => {
     if (index === 0) {
-      // Första värdet har ingen differens, så vi sätter den till 0
       return { ...entry, value: 0 };
     } else {
-      // Beräkna differensen mellan det aktuella värdet och det föregående
       const difference = entry.value - data[index - 1].value;
       return { ...entry, value: difference };
     }

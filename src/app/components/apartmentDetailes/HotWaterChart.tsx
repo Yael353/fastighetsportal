@@ -43,7 +43,6 @@ export default function HotWaterChart({ batchData }: Props) {
         )
       : [];
 
-  // Beräkna differenserna med den importerade funktionen
   const vvChartDataWithDifferences = calculateDifferences(vvChartData);
 
   return (

@@ -45,7 +45,7 @@ export default function ElectricityChart({ batchData }: Props) {
         )
       : [];
 
-  // Beräkna differenserna med den importerade funktionen
+ 
   const elChartDataWithDifferences = calculateDifferences(elChartDataArray);
 
   return (
@@ -74,8 +74,8 @@ export default function ElectricityChart({ batchData }: Props) {
               stroke="#00BFFF"
             />
             <YAxis
-              tickFormatter={(value) => value.toFixed(0)}
               domain={["dataMin - 0.5", "dataMax + 0.5"]}
+              tickFormatter={(value) => value.toFixed(0)}
               stroke="#00BFFF"
             />
             {/* Använd ChartTooltip istället för Tooltip */}

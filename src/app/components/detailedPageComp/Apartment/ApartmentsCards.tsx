@@ -78,7 +78,7 @@ export default function ApartmentsCards() {
   };
 
   return (
-    <div className="space-y-6 py-10 bg-gray-900">
+    <div className="space-y-6 py-10 bg-darkBg rounded-lg">
       {/* Sökfält */}
       <div className="flex justify-center">
         <input
@@ -86,33 +86,33 @@ export default function ApartmentsCards() {
           value={searchQuery}
           onChange={handleSearchChange}
           placeholder="Sök efter lägenhetsnummer..."
-          className="py-2 border border-gray-700 rounded-lg w-full max-w-md"
+          className="pl-3 py-2 border border-neonBlue bg-midnight text-white placeholder-gray-400 rounded-lg w-full max-w-md focus:outline-none focus:ring-2 focus:ring-neonBlue"
         />
       </div>
 
       {/* Lägenhetskort */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 py-10 bg-gray-900">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 py-10">
         {currentApartments.length > 0 ? (
           currentApartments.map((apartment: ApartmentResponse) => (
             <div
               key={apartment.apt_id}
-              className="border bg-gray-700 p-4 rounded-lg shadow hover:shadow-lg transition-shadow duration-200 flex justify-center items-center"
+              className="border border-neonBlue bg-softNavy p-4 rounded-lg shadow-md shadow-neonBlue/50 transition-transform transform hover:scale-105"
             >
               <Link
                 href={`/dashboard/detailedPage/${id}/singleApartment/${apartment.apt_id}`}
                 className="block h-full w-full text-center"
               >
-                <h2 className="text-2xl font-bold mb-2 text-white">
+                <h2 className="text-2xl font-bold mb-2 text-neonBlue">
                   Lgh: {apartment.apt_id}
                 </h2>
-                <p className="text-gray-400">
+                <p className="text-gray-300">
                   {apartment.size_type} - {apartment.size_kvm} kvm
                 </p>
               </Link>
             </div>
           ))
         ) : (
-          <div className="col-span-full text-center bg-gray-900 text-white ">
+          <div className="col-span-full text-center text-neonBlue">
             Inga lägenheter matchar sökningen.
           </div>
         )}
@@ -124,17 +124,17 @@ export default function ApartmentsCards() {
           <button
             onClick={handlePrevPage}
             disabled={currentPage === 1}
-            className="px-4 py-2 bg-gray-700 text-gray-200 rounded disabled:opacity-50"
+            className="px-4 py-2 bg-midnight text-neonBlue border border-neonBlue rounded-lg disabled:opacity-50 hover:bg-softNavy transition"
           >
             Föregående
           </button>
-          <span className="text-white">
+          <span className="text-neonBlue">
             Sida {currentPage} av {totalPages}
           </span>
           <button
             onClick={handleNextPage}
             disabled={currentPage === totalPages}
-            className="px-4 py-2 bg-gray-700 text-gray-200  rounded disabled:opacity-50"
+            className="px-4 py-2 bg-midnight text-neonBlue border border-neonBlue rounded-lg disabled:opacity-50 hover:bg-softNavy transition"
           >
             Nästa
           </button>
@@ -142,4 +142,5 @@ export default function ApartmentsCards() {
       )}
     </div>
   );
+
 }
