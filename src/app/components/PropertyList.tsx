@@ -20,8 +20,6 @@ export function PropertyList() {
     (state: RootState) => state.overview
   );
 
-  
-
   const authToken = getAuthToken();
 
   useEffect(() => {
@@ -86,7 +84,7 @@ export function PropertyList() {
     "/images/loginbg.jpg",
     "/images/aaa.jpg",
   ];
-  
+
   if (loading) {
     return (
       <div className="w-full bg-darkBg pt-10 text-center text-white flex flex-col items-center">
@@ -117,7 +115,7 @@ export function PropertyList() {
           const { ucSensors, apartments } =
             getSensorDomainSensorDescription(domain);
 
-            const randomBg = bgArray[index % bgArray.length];
+          const randomBg = bgArray[index % bgArray.length];
 
           return (
             <div
@@ -129,7 +127,7 @@ export function PropertyList() {
                   className="absolute inset-0 bg-darkBg bg-no-repeat bg-center bg-[length:110%]"
                   style={{
                     backgroundImage: `url(${randomBg})`,
-                    opacity: 0.8,
+                    opacity: 0.6,
                   }}
                 ></div>
 

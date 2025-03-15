@@ -46,10 +46,24 @@ export default function ApartmentsCards() {
     );
   }
 
-  // Extrahera alla lägenheter från buildingsData
-  const apartments: ApartmentResponse[] = Object.values(
-    buildingsData as BuildingsResponse
-  ).flatMap((building: BuildingResponse) => building.apartments);
+  // Extrahera och gruppera lägenheter baserat på normaliserat husnummer
+  const normalizeHouseId = (api_id?: string) =>
+    api_id ? api_id.replace(/[^0-9]/g, "") : "unknown";
+
+  const groupedApartments: Record<string, ApartmentResponse[]> = {};
+
+  Object.values(buildingsData as BuildingsResponse).forEach(
+    (building: BuildingResponse) => {
+      const houseId = normalizeHouseId(building.api_id);
+      if (!groupedApartments[houseId]) {
+        groupedApartments[houseId] = [];
+      }
+      groupedApartments[houseId].push(...building.apartments);
+    }
+  );
+
+  const apartments: ApartmentResponse[] =
+    Object.values(groupedApartments).flat();
 
   // Filtrera på lägenhetsnr (apt_id) utifrån sökfrågan
   const filteredApartments = apartments.filter((apartment) =>
@@ -112,7 +126,7 @@ export default function ApartmentsCards() {
             </div>
           ))
         ) : (
-          <div className="col-span-full text-center text-neonBlue">
+          <div className="col-span-full text-center bg-darkBg text-neonBlue">
             Inga lägenheter matchar sökningen.
           </div>
         )}
@@ -142,5 +156,4 @@ export default function ApartmentsCards() {
       )}
     </div>
   );
-
 }

@@ -21,12 +21,11 @@ import TemperatureChart from "./TemperatureChart";
 import { MdOutlineElectricalServices } from "react-icons/md";
 import { FaHandHoldingWater } from "react-icons/fa";
 import { FaTemperatureHigh } from "react-icons/fa";
-import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default function ApartmentScreen() {
   const dispatch = useDispatch<AppDispatch>();
   const { id: sensorDomainId, apartmentId } = useParams();
-
+  const [selectedDays, setSelectedDays] = useState(1);
   const [batchData, setBatchData] = useState<BatchSensorDataResponse[] | null>(
     null
   );
@@ -104,12 +103,12 @@ export default function ApartmentScreen() {
   );
 
   useEffect(() => {
-    if (sensorDomainId) {
+    if (sensorDomainId && sensorIds.length > 0) {
       dispatch(
         fetchBatchSensorData({
           sensorDomainId,
           sensorIds,
-          startUtc: moment().utc().subtract(1, "days"),
+          startUtc: moment().utc().subtract(selectedDays, "days"),
           endUtc: moment().utc(),
           freq: BatchSensorDataFreq.raw,
         })
@@ -118,7 +117,7 @@ export default function ApartmentScreen() {
         .then(setBatchData)
         .catch(console.error);
     }
-  }, [sensorDomainId, sensorIds, dispatch]);
+  }, [sensorDomainId, sensorIds, selectedDays, dispatch]);
 
   if (buildingsLoading) {
     return <div>Laddar byggnader...</div>;
@@ -149,7 +148,7 @@ export default function ApartmentScreen() {
   return (
     <div className="bg-darkBg h-screen pb-10">
       {/* Byggnads- och lägenhetsinformation */}
-      <div className="flex flex-col w-full md:w-1/4 rounded-lg px-6 py-6 shadow-lg">
+      <div className="flex flex-col w-full md:w-1/4 rounded-lg px-6 py-6 ">
         <h1 className="text-3xl font-extrabold text-white pb-2 border-b border-gray-600">
           {building?.name ?? "Okänd byggnad"}
         </h1>
@@ -159,15 +158,15 @@ export default function ApartmentScreen() {
       </div>
 
       {/* Konsumtionskorten */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-6 px-6 py-10 bg-darkBg shadow-lg ">
-        <div className="p-6 bg-darkBgLight text-neonBlue shadow-md rounded-md flex flex-col justify-center items-center border border-neonBlue hover:shadow-neon transition-all">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-6 px-6 py-10 bg-darkBg ">
+        <div className="p-6 bg-darkBgLight text-neonBlue rounded-md flex flex-col justify-center items-center border border-neonBlue hover:shadow-neon transition-all">
           <div className="flex flex-col justify-center items-center">
             <h4 className="font-semibold text-lg ">Medeltemperatur</h4>
-            <FaTemperatureHigh size={50} className="py-1 my-1"/>
+            <FaTemperatureHigh size={50} className="py-1 my-1" />
           </div>
           <p className="text-3xl font-bold text-white">
             {temperatureData ? temperatureData.average.toFixed(1) : "-"}{" "}
-            {temperatureData?.vala_description.unit || ""}
+            {temperatureData?.vala_description.unit || ""}°
           </p>
         </div>
         <div className="p-6 bg-darkBgLight text-neonBlue shadow-md rounded-md flex flex-col justify-center items-center border border-neonBlue hover:shadow-neon transition-all">
@@ -230,7 +229,7 @@ export default function ApartmentScreen() {
         {/* Rendera endast den valda vyn */}
         <div className="flex flex-col items-center">
           {activeView === "temperature" && (
-            <div className="w-[80%]  p-6 rounded-lg shadow-md">
+            <div className="w-[80%]  p-6 rounded-lg ">
               <h3 className="text-lg flex justify-center font-semibold text-white mb-4">
                 Inomhustemperatur
               </h3>
@@ -239,7 +238,7 @@ export default function ApartmentScreen() {
           )}
 
           {activeView === "electricity" && (
-            <div className="w-[80%] p-6 rounded-lg shadow-md">
+            <div className="w-[80%] p-6 rounded-lg ">
               <h3 className="text-lg flex justify-center font-semibold text-white mb-4">
                 Elförbrukning
               </h3>
@@ -248,7 +247,7 @@ export default function ApartmentScreen() {
           )}
 
           {activeView === "hotWater" && (
-            <div className="w-[80%]  p-6 rounded-lg shadow-md">
+            <div className="w-[80%]  p-6 rounded-lg">
               <h3 className="text-lg flex justify-center font-semibold text-white mb-4">
                 Varmvattenförbrukning
               </h3>
@@ -257,7 +256,7 @@ export default function ApartmentScreen() {
           )}
 
           {activeView === "monthlyStatistics" && (
-            <div className="w-[80%] h-auto p-6 rounded-lg shadow-md pb-10">
+            <div className="w-[80%] h-auto p-6 rounded-lg pb-10">
               <h3 className="text-xl font-semibold flex justify-center text-white mb-4">
                 Månadsstatistik
               </h3>
@@ -269,31 +268,30 @@ export default function ApartmentScreen() {
             </div>
           )}
         </div>
+        {activeView !== "monthlyStatistics" && (
+          <div className="flex justify-center space-x-4 my-6 pb-20 flex-col">
+            <h3 className="text-white text-xl font-semibold justify-center items-center flex p-3">
+              Välj tidsintervall
+            </h3>
+            <div className="flex justify-center items-center gap-3">
+              {[1, 7, 14, 30].map((days) => (
+                <button
+                  key={days}
+                  onClick={() => setSelectedDays(days)}
+                  className={`px-6 py-2 font-semibold rounded-md transition-all 
+            ${
+              selectedDays === days
+                ? "bg-neonBlue text-white"
+                : "bg-gray-800 text-gray-300 hover:bg-neonBlue hover:text-white"
+            }`}
+                >
+                  {days} dagar
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
-}
-
-{
-  /* <Tabs defaultValue="charts" className="space-y-4">
-  <TabsList>
-    <TabsTrigger value="charts">Grafer</TabsTrigger>
-    <TabsTrigger value="monthlyStatistics">Tabell</TabsTrigger>
-  </TabsList> */
-}
-{
-  /* <TabsContent value="charts" className="space-y-4"> */
-}
-{
-  /* </TabsContent> */
-}
-
-{
-  /* <TabsContent value="monthlyStatistics"> */
-}
-{
-  /* </TabsContent> */
-}
-{
-  /* </Tabs> */
 }

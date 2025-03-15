@@ -46,7 +46,7 @@ export function AppSidebar() {
             <SidebarMenuItem key={item.name}>
               <SidebarMenuButton asChild isActive={pathname === item.href}>
                 <Link
-                  className={`block w-full px-4 py-3 rounded-lg transition-all border border-neonBlue shadow-md shadow-neonBlue/50 ${
+                  className={`block w-full px-4 py-3 rounded-lg transition-all border border-neonBlue shadow-sm shadow-neonBlue/50 ${
                     pathname === item.href
                       ? "bg-neonBlue text-darkBg font-semibold"
                       : "bg-darkBg/80 text-white hover:bg-gray-700"

@@ -19,7 +19,8 @@ interface Props {
 }
 
 export default function TemperatureChart({ batchData }: Props) {
-  if (!batchData) return <div>Ingen temperaturdata tillgänglig</div>;
+  if (!batchData)
+    return <div className="text-white">Ingen temperaturdata tillgänglig</div>;
 
   // Filtrera ut alla GT_GM-sensorer
   const allSensors = batchData.flatMap((res) => res.sensor_data);
@@ -65,7 +66,7 @@ export default function TemperatureChart({ batchData }: Props) {
             />
             <XAxis
               dataKey="time"
-              tickFormatter={(time) => moment(time).format("HH:mm")}
+              tickFormatter={(time) => moment(time).format("YY-MM-DD \n HH:mm")}
               stroke="#00BFFF"
             />
             <YAxis
@@ -80,7 +81,7 @@ export default function TemperatureChart({ batchData }: Props) {
               }
               formatter={(value: number) => value.toFixed(2)}
             />
-            <Legend />
+
             <Line
               type="monotone"
               dataKey="value"

@@ -17,7 +17,6 @@ import {
   ChartTooltipContent,
   ChartLegend,
   ChartLegendContent,
-  ChartStyle,
 } from "@/components/ui/chart"; // Importera komponenter från chart.tsx
 
 interface Props {
@@ -40,13 +39,14 @@ export default function ElectricityChart({ batchData }: Props) {
       ? formatData(
           elSensors[0].data.map((entry) => ({
             time_utc: entry.time_utc,
-            value: Math.round(entry.value * 100) / 100, 
+            value: Math.round(entry.value * 100) / 100,
           }))
         )
       : [];
 
- 
   const elChartDataWithDifferences = calculateDifferences(elChartDataArray);
+
+  console.log("Processed Chart Data:", elChartDataWithDifferences);
 
   return (
     <div className="bg-darkBg shadow-lg rounded-lg p-4 border border-neonBlue">
@@ -56,7 +56,7 @@ export default function ElectricityChart({ batchData }: Props) {
             label: "Elförbrukning (kWh)",
             theme: {
               light: "#00BFFF",
-              dark: "#00BFFF", 
+              dark: "#00BFFF",
             },
           },
         }}
@@ -70,7 +70,7 @@ export default function ElectricityChart({ batchData }: Props) {
             />
             <XAxis
               dataKey="time"
-              tickFormatter={(time) => moment(time).format("HH:mm")}
+              tickFormatter={(time) => moment(time).format("YY-MM-DD \n HH:mm")}
               stroke="#00BFFF"
             />
             <YAxis
@@ -82,9 +82,12 @@ export default function ElectricityChart({ batchData }: Props) {
             <ChartTooltip
               content={
                 <ChartTooltipContent
-                  labelFormatter={(label) =>
-                    moment(label).format("YYYY-MM-DD HH:mm")
-                  }
+                  labelFormatter={(label, payload) => {
+                    console.log("Tooltip label:", label, "Payload:", payload);
+                    return moment(payload?.[0]?.payload?.time ?? label).format(
+                      "YY-MM-DD HH:mm"
+                    );
+                  }}
                   valueFormatter={(value: number) => value.toFixed(2)}
                   contentStyle={{
                     backgroundColor: "#001220",
@@ -95,11 +98,7 @@ export default function ElectricityChart({ batchData }: Props) {
               }
             />
             {/* Använd ChartLegend istället för Legend */}
-            <ChartLegend
-              content={
-                <ChartLegendContent wrapperStyle={{ color: "#00BFFF" }} />
-              }
-            />
+            
             <Line
               type="monotone"
               dataKey="value"

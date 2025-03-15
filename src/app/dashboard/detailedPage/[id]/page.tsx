@@ -26,11 +26,11 @@ export default function DetailedPage() {
   }, [id, authToken, dispatch]);
 
   return (
-    <div className="bg-gray-900 h-screen">
+    <div className="bg-darkBg h-screen">
       <div className="">
         <DetailedPageHeader />
       </div>
-      <div className="bg-gray-900">
+      <div className="bg-darkBg">
         <SensorDataComp id={id} />
         {/* <ApartmentsCards /> */}
       </div>

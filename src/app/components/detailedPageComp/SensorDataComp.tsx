@@ -11,7 +11,7 @@ interface SensorDataCompProps {
 
 export default function SensorDataComp({ id }: SensorDataCompProps) {
   return (
-    <div className="w-full py-6 space-y-6 bg-gray-900 px-4">
+    <div className="w-full py-6 space-y-6 bg-darkBg px-4">
       <div className="space-y-6">
         <ChartsLayout id={id} />
         <ApartmentComp />

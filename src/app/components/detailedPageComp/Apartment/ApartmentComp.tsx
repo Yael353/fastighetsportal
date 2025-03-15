@@ -94,7 +94,7 @@ export default function ApartmentComp() {
 
   if (summaryStatistics == null) {
     return (
-      <div className="flex justify-center text-lg font-bold bg-gray-900 text-white mb-4">
+      <div className="flex justify-center text-lg font-bold bg-darkBg text-white mb-4">
         Medelvärde för detta objekt saknas
       </div>
     );
@@ -119,7 +119,7 @@ export default function ApartmentComp() {
                 L
               </TableHead>
               <TableHead className="text-center font-extrabold text-xl">
-                °C
+                C°
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -131,7 +131,7 @@ export default function ApartmentComp() {
                   {["kWh", "L", "C"].map((unit) => (
                     <TableCell
                       key={unit}
-                      className="text-center font-extrabold text-white"
+                      className="text-center font-semibold text-gray-300"
                     >
                       {stats
                         .find((stat) => stat.u_name === unit)
