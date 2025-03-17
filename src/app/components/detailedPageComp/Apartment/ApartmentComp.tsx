@@ -103,7 +103,7 @@ export default function ApartmentComp() {
   return (
     <div className="rounded-lg bg-darkBg border border-neonBlue">
       <div className="bg-darkBg rounded-lg max-w-full mx-auto h-auto">
-        <h2 className="text-lg font-bold text-neonBlue mb-4 p-4">
+        <h2 className="text-lg font-bold text-neonBlue mb-4 p-4 flex justify-center">
           Medelvärde för lägenheter de 30 senaste dagarna
         </h2>
         <Table className="border border-twilight text-sm">
@@ -119,7 +119,7 @@ export default function ApartmentComp() {
                 L
               </TableHead>
               <TableHead className="text-center font-extrabold text-xl">
-                C°
+                °C
               </TableHead>
             </TableRow>
           </TableHeader>

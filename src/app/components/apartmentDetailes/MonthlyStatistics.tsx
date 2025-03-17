@@ -124,7 +124,7 @@ const MonthlyStatistics: React.FC<Props> = ({ data, loading, error }) => {
           {rows.map((row) => (
             <TableRow
               key={row.key}
-              className="hover:bg-gray-600 transition-all duration-200"
+              className="hover:bg-darkBg transition-all duration-200"
             >
               <TableCell className="px-4 py-3 text-sm text-neonBlue">
                 {row.year}
