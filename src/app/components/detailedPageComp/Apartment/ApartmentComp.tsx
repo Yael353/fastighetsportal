@@ -94,20 +94,20 @@ export default function ApartmentComp() {
 
   if (summaryStatistics == null) {
     return (
-      <div className="flex justify-center text-lg font-bold bg-darkBg text-white mb-4">
-        Medelvärde för detta objekt saknas
+      <div className="flex justify-center text-lg font-bold bg-darkBg text-neonBlue mb-4">
+        Statestik saknas
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg bg-darkBg border border-x-neonBlue">
+    <div className="rounded-lg bg-darkBg border border-neonBlue">
       <div className="bg-darkBg rounded-lg max-w-full mx-auto h-auto">
         <h2 className="text-lg font-bold text-neonBlue mb-4 p-4">
           Medelvärde för lägenheter de 30 senaste dagarna
         </h2>
         <Table className="border border-twilight text-sm">
-          <TableHeader className="bg-midnight text-neonBlue">
+          <TableHeader className="bg-darkBgLight text-neonBlue">
             <TableRow>
               <TableHead className="text-left font-extrabold">
                 Antal rum
@@ -126,8 +126,11 @@ export default function ApartmentComp() {
           <TableBody>
             {summaryStatistics &&
               Object.entries(summaryStatistics).map(([size, stats]) => (
-                <TableRow key={size} className="bg-softNavy text-white">
-                  <TableCell className="text-neonBlue ">{size}</TableCell>
+                <TableRow
+                  key={size}
+                  className="bg-darkBgLight text-white hover:bg-transparent"
+                >
+                  <TableCell className="text-neonBlue">{size}</TableCell>
                   {["kWh", "L", "C"].map((unit) => (
                     <TableCell
                       key={unit}

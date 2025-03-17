@@ -99,8 +99,8 @@ const MonthlyStatistics: React.FC<Props> = ({ data, loading, error }) => {
     .slice(0, 18);
 
   return (
-    <div className="bg-darkBg shadow-lg rounded-md w-full border border-neonBlue">
-      <Table className="w-full ">
+    <div className="bg-gradient-to-br from-[#0A192F] to-[#112240] shadow-lg rounded-md w-full border border-blue-500">
+      <Table className="w-full">
         <TableHeader className="bg-darkBgLight text-neonBlue">
           <TableRow className="sticky top-0 bg-darkBgLight text-neonBlue">
             <TableHead className="w-1/5 px-4 py-3 text-left uppercase">

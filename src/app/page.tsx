@@ -4,7 +4,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 export default function Home() {
   return (
     <ProtectedRoute>
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-l from-midNightBlue to-darkBg">
         <LoginForm />
       </div>
     </ProtectedRoute>

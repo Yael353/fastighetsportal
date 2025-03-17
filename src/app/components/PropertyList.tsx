@@ -87,7 +87,7 @@ export function PropertyList() {
 
   if (loading) {
     return (
-      <div className="w-full bg-darkBg pt-10 text-center text-white flex flex-col items-center">
+      <div className="w-full  pt-10 text-center text-white flex flex-col items-center">
         <div className="w-10 h-10 border-4 border-neonBlue border-t-transparent rounded-full animate-spin"></div>
         <p className="mt-4 text-lg">Laddar...</p>
       </div>
@@ -109,7 +109,7 @@ export function PropertyList() {
   }
 
   return (
-    <div className="w-full flex flex-col justify-center items-center bg-darkBg py-10">
+    <div className="w-full flex flex-col justify-center items-center  py-10">
       <div className="w-full px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {currentSensorDomains.map((domain: SensorDomain, index: number) => {
           const { ucSensors, apartments } =
@@ -124,7 +124,7 @@ export function PropertyList() {
             >
               <Link href={`/dashboard/detailedPage/${domain.id}`}>
                 <div
-                  className="absolute inset-0 bg-darkBg bg-no-repeat bg-center bg-[length:110%]"
+                  className="absolute inset-0 bg-no-repeat bg-center bg-[length:110%]"
                   style={{
                     backgroundImage: `url(${randomBg})`,
                     opacity: 0.6,
@@ -136,10 +136,10 @@ export function PropertyList() {
                 </div>
 
                 <span
-                  className={`px-3 absolute right-4 py-1 text-xs flex float-end font-semibold uppercase rounded-md ${
+                  className={`px-3 absolute z-10 right-4 py-1 text-xs flex float-end font-semibold uppercase rounded-md ${
                     domain.harvester.active
-                      ? "bg-neonGreen text-darkBg"
-                      : "bg-gray-500 text-white"
+                      ? "bg-neonGreen text-darkBg absolute z-10"
+                      : "bg-gray-500 text-white absolute z-10"
                   }`}
                 >
                   {domain.harvester.active ? "Active" : "Inactive"}

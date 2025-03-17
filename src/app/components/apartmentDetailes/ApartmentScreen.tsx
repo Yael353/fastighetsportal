@@ -146,43 +146,49 @@ export default function ApartmentScreen() {
   );
 
   return (
-    <div className="bg-darkBg h-screen pb-10">
+    <div className="">
       {/* Byggnads- och lägenhetsinformation */}
       <div className="flex flex-col w-full md:w-1/4 rounded-lg px-6 py-6 ">
-        <h1 className="text-3xl font-extrabold text-white pb-2 border-b border-gray-600">
+        <h1 className="text-3xl font-extrabold text-white pb-2 border-b border-neonBlue">
           {building?.name ?? "Okänd byggnad"}
         </h1>
-        <h3 className="text-lg font-semibold text-gray-300 mt-4 px-3 rounded-md shadow-md">
+        <h3 className="text-lg font-semibold text-gray-300 mt-2 px-1 rounded-md shadow-md">
           Lägenhet: {apartment?.apt_id ?? "N/A"}
         </h3>
       </div>
 
       {/* Konsumtionskorten */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-6 px-6 py-10 bg-darkBg ">
-        <div className="p-6 bg-darkBgLight text-neonBlue rounded-md flex flex-col justify-center items-center border border-neonBlue hover:shadow-neon transition-all">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-6 px-6 py-10 bg-gradient-to-r from-midNightBlue to-darkBg">
+        <div className="p-6 bg-gradient-to-r from-midNightBlue to-darkBg text-neonBlue rounded-md flex flex-col justify-center items-center border border-neonBlue hover:shadow-neon transition-all">
           <div className="flex flex-col justify-center items-center">
-            <h4 className="font-semibold text-lg ">Medeltemperatur</h4>
-            <FaTemperatureHigh size={50} className="py-1 my-1" />
+            <h4 className="font-semibold text-lg text-neonBlue">
+              Medeltemperatur
+            </h4>
+            <FaTemperatureHigh size={50} className="py-1 my-1 text-neonBlue" />
           </div>
           <p className="text-3xl font-bold text-white">
-            {temperatureData ? temperatureData.average.toFixed(1) : "-"}{" "}
-            {temperatureData?.vala_description.unit || ""}°
+            {temperatureData ? temperatureData.average.toFixed(1) : "-"} °
+            {temperatureData?.vala_description.unit || ""}
           </p>
         </div>
-        <div className="p-6 bg-darkBgLight text-neonBlue shadow-md rounded-md flex flex-col justify-center items-center border border-neonBlue hover:shadow-neon transition-all">
+        <div className="p-6 bg-gradient-to-r from-midNightBlue to-darkBg text-neonBlue shadow-md rounded-md flex flex-col justify-center items-center border border-neonBlue hover:shadow-neon transition-all">
           <div className="flex flex-col justify-center items-center">
-            <h4 className="font-semibold text-lg ">Elförbrukning</h4>
-            <MdOutlineElectricalServices size={50} />
+            <h4 className="font-semibold text-lg text-neonBlue">
+              Elförbrukning
+            </h4>
+            <MdOutlineElectricalServices size={50} className="text-neonBlue" />
           </div>
           <p className="text-3xl font-bold text-white">
             {electricityData ? electricityData.difference.toFixed(1) : "-"}{" "}
             {electricityData?.vala_description.unit || ""}
           </p>
         </div>
-        <div className="p-6 bg-darkBgLight text-neonBlue shadow-md rounded-md flex flex-col justify-center items-center border border-neonBlue hover:shadow-neon transition-all">
+        <div className="p-6 bg-gradient-to-r from-midNightBlue to-darkBg text-neonBlue shadow-md rounded-md flex flex-col justify-center items-center border border-neonBlue hover:shadow-neon transition-all">
           <div className="flex flex-col justify-center items-center">
-            <h4 className="font-semibold text-lg ">Varmvattenförbrukning</h4>
-            <FaHandHoldingWater size={50} className="pl-4" />
+            <h4 className="font-semibold text-lg text-neonBlue">
+              Varmvattenförbrukning
+            </h4>
+            <FaHandHoldingWater size={50} className="pl-4 text-neonBlue" />
           </div>
           <p className="text-3xl font-bold text-white">
             {hotWaterData ? hotWaterData.difference.toFixed(0) : "-"}{" "}
@@ -202,7 +208,7 @@ export default function ApartmentScreen() {
       )}
 
       {/* Diagram och Statistik */}
-      <div className="bg-darkBg">
+      <div className="bg-gradient-to-r from-midNightBlue to-darkBg">
         {/* Knappmeny för att välja visning */}
         <div className="flex justify-center space-x-4 my-6 text-">
           {[
@@ -215,11 +221,11 @@ export default function ApartmentScreen() {
               key={key}
               onClick={() => setActiveView(key)}
               className={`px-6 py-3 font-semibold rounded-md transition-all duration-300 shadow-sm 
-        ${
-          activeView === key
-            ? "bg-neonBlue text-white shadow-neonBlue"
-            : "bg-gray-800 text-gray-300 hover:bg-neonBlue hover:text-white hover:shadow-neonBlue"
-        }`}
+          ${
+            activeView === key
+              ? "bg-neonBlue text-white shadow-neonBlue"
+              : "bg-darkBgLight text-neonBlue hover:bg-neonBlue hover:text-white hover:shadow-neonBlue"
+          }`}
             >
               {label}
             </button>
@@ -278,11 +284,11 @@ export default function ApartmentScreen() {
                 <button
                   key={days}
                   onClick={() => setSelectedDays(days)}
-                  className={`px-6 py-2 font-semibold rounded-md transition-all 
+                  className={`px-6 py-2 font-semibold rounded-md transition-all
             ${
               selectedDays === days
-                ? "bg-neonBlue text-white"
-                : "bg-gray-800 text-gray-300 hover:bg-neonBlue hover:text-white"
+                ? "bg-neonBlue text-white shadow-neonBlue"
+                : "bg-darkBgLight text-neonBlue hover:bg-neonBlue hover:text-white hover:shadow-neonBlue"
             }`}
                 >
                   {days} dagar

@@ -40,7 +40,7 @@ export default function ApartmentsCards() {
 
   if (!buildingsData) {
     return (
-      <div className="bg-gray-900 text-white">
+      <div className="bg-darkBg text-white">
         Ingen byggnadsdata tillgänglig.
       </div>
     );
@@ -94,15 +94,17 @@ export default function ApartmentsCards() {
   return (
     <div className="space-y-6 py-10 bg-darkBg rounded-lg">
       {/* Sökfält */}
-      <div className="flex justify-center">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          placeholder="Sök efter lägenhetsnummer..."
-          className="pl-3 py-2 border border-neonBlue bg-midnight text-white placeholder-gray-400 rounded-lg w-full max-w-md focus:outline-none focus:ring-2 focus:ring-neonBlue"
-        />
-      </div>
+      {currentApartments && currentApartments.length > 0 && (
+        <div className="flex justify-center">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            placeholder="Sök efter lägenhetsnummer..."
+            className="pl-3 py-2 border border-neonBlue bg-midnight text-white placeholder-gray-400 rounded-lg w-full max-w-md focus:outline-none focus:ring-2 focus:ring-neonBlue"
+          />
+        </div>
+      )}
 
       {/* Lägenhetskort */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 py-10">
@@ -110,7 +112,7 @@ export default function ApartmentsCards() {
           currentApartments.map((apartment: ApartmentResponse) => (
             <div
               key={apartment.apt_id}
-              className="border border-neonBlue bg-softNavy p-4 rounded-lg shadow-md shadow-neonBlue/50 transition-transform transform hover:scale-105"
+              className="border border-neonBlue bg-darkBgLight hover:bg-transparent p-4 rounded-lg shadow-md shadow-neonBlue/50 transition-transform transform hover:scale-105"
             >
               <Link
                 href={`/dashboard/detailedPage/${id}/singleApartment/${apartment.apt_id}`}
@@ -127,7 +129,7 @@ export default function ApartmentsCards() {
           ))
         ) : (
           <div className="col-span-full text-center bg-darkBg text-neonBlue">
-            Inga lägenheter matchar sökningen.
+            Data om lägenhter för detta objekt saknas.
           </div>
         )}
       </div>
@@ -138,7 +140,7 @@ export default function ApartmentsCards() {
           <button
             onClick={handlePrevPage}
             disabled={currentPage === 1}
-            className="px-4 py-2 bg-midnight text-neonBlue border border-neonBlue rounded-lg disabled:opacity-50 hover:bg-softNavy transition"
+            className="px-4 py-2 bg-midnight text-neonBlue border border-neonBlue rounded-lg disabled:opacity-50 hover:bg-darkBgLight transition"
           >
             Föregående
           </button>
@@ -148,7 +150,7 @@ export default function ApartmentsCards() {
           <button
             onClick={handleNextPage}
             disabled={currentPage === totalPages}
-            className="px-4 py-2 bg-midnight text-neonBlue border border-neonBlue rounded-lg disabled:opacity-50 hover:bg-softNavy transition"
+            className="px-4 py-2 bg-midnight text-neonBlue border border-neonBlue rounded-lg disabled:opacity-50 hover:bg-darkBgLight transition"
           >
             Nästa
           </button>

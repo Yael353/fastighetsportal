@@ -10,10 +10,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        neonBlue: "#5ec3ff", // Mjukare neonblå
+        darkBg: "#0A192F",
+        midNightBlue: "#171d43",
+        darkBgLight: "#112240",
+        neonBlue: "#00BFFF",
+        neonBlueLight: "#00FFFF",
         neonGreen: "#52ff99", // Ljusare neon
         neonPurple: "#a482ff", // Mildare neonlila
-        darkBg: "#0b1026", // Djup marinblå bakgrund
         accentBlue: "#3b82f6", // Behaglig blå accent
         deepBlue: "#090926", // Mörkare blå
         softNavy: "#0b0b22", // Mjukare nattblå

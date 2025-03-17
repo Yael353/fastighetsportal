@@ -8,7 +8,7 @@ export default function DashboardLayout({
 }) {
   return (
     <SidebarProvider>
-      <div className="w-full min-h-screen flex bg-gray-900">
+      <div className="w-full min-h-screen flex bg-gradient-to-r from-midNightBlue to-darkBg">
         <AppSidebar />
         <SidebarInset>
           <main className="flex-1 overflow-auto">{children}</main>

@@ -72,7 +72,7 @@ export function LoginForm() {
 
   return (
     <ProtectedRoute>
-      <div className="flex justify-center items-center w-full h-screen bg-darkBg relative">
+      <div className="flex justify-center items-center w-full h-screen relative">
         {/* Bakgrundsbilden */}
         <div
           className="absolute top-0 left-0 w-full opacity-50 h-full bg-cover bg-center z-0"
@@ -81,7 +81,7 @@ export function LoginForm() {
 
         <div className="relative w-[500px] h-auto z-10">
           <Card className="w-full mt-5 rounded-lg bg-darkBg/70 border border-neonBlue shadow-md shadow-neonBlue/30 transition-all">
-            <CardHeader className="h-40 flex flex-col justify-center items-center w-full bg-darkBg/100 text-white rounded-t-lg">
+            <CardHeader className="h-40 flex flex-col justify-center items-center w-full  text-white rounded-t-lg">
               <img
                 src="images/logo.jpg"
                 alt="logo"

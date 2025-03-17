@@ -15,8 +15,6 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-  ChartLegend,
-  ChartLegendContent,
 } from "@/components/ui/chart"; // Importera komponenter från chart.tsx
 
 interface Props {
@@ -49,7 +47,7 @@ export default function ElectricityChart({ batchData }: Props) {
   console.log("Processed Chart Data:", elChartDataWithDifferences);
 
   return (
-    <div className="bg-darkBg shadow-lg rounded-lg p-4 border border-neonBlue">
+    <div className="bg-darkBg shadow-lg rounded-lg p-4 border border-gray-500">
       <ChartContainer
         config={{
           value: {
@@ -63,6 +61,12 @@ export default function ElectricityChart({ batchData }: Props) {
       >
         <ResponsiveContainer width="100%" height={350}>
           <LineChart data={elChartDataWithDifferences}>
+            <defs>
+              <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#00BFFF" stopOpacity={0.8} />
+                <stop offset="100%" stopColor="#00BFFF" stopOpacity={0.2} />
+              </linearGradient>
+            </defs>
             <CartesianGrid
               strokeDasharray="3 3"
               stroke="#00BFFF"
@@ -74,11 +78,10 @@ export default function ElectricityChart({ batchData }: Props) {
               stroke="#00BFFF"
             />
             <YAxis
-              domain={["dataMin - 0.5", "dataMax + 0.5"]}
-              tickFormatter={(value) => value.toFixed(0)}
+              domain={[0, (dataMax: number) => dataMax + 0.5]}
+              tickFormatter={(value) => value.toFixed(2)}
               stroke="#00BFFF"
             />
-            {/* Använd ChartTooltip istället för Tooltip */}
             <ChartTooltip
               content={
                 <ChartTooltipContent
@@ -97,12 +100,10 @@ export default function ElectricityChart({ batchData }: Props) {
                 />
               }
             />
-            {/* Använd ChartLegend istället för Legend */}
-            
             <Line
               type="monotone"
               dataKey="value"
-              stroke="#00BFFF"
+              stroke="url(#colorValue)"
               strokeWidth={3}
               dot={false}
               activeDot={{

@@ -15,9 +15,6 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-  ChartLegend,
-  ChartLegendContent,
-  ChartStyle,
 } from "@/components/ui/chart"; // Importera komponenter från chart.tsx
 
 interface Props {
@@ -26,7 +23,11 @@ interface Props {
 
 export default function HotWaterChart({ batchData }: Props) {
   if (!batchData)
-    return <div>Ingen varmvattenförbrukningsdata tillgänglig</div>;
+    return (
+      <div className="text-white">
+        Ingen varmvattenförbrukningsdata tillgänglig
+      </div>
+    );
 
   // Filtrera ut alla VV-sensorer
   const allSensors = batchData.flatMap((res) => res.sensor_data);
@@ -38,7 +39,7 @@ export default function HotWaterChart({ batchData }: Props) {
       ? formatData(
           vvSensors[0].data.map((entry) => ({
             time_utc: entry.time_utc,
-            value: entry.value / 1000, // Omvandla till m³ istället för liter om så behövs
+            value: entry.value / 1000,
           }))
         )
       : [];
@@ -46,7 +47,7 @@ export default function HotWaterChart({ batchData }: Props) {
   const vvChartDataWithDifferences = calculateDifferences(vvChartData);
 
   return (
-    <div className="bg-darkBg shadow-lg rounded-lg p-4 border border-neonBlue">
+    <div className="bg-gradient-to-br from-[#0A192F] to-[#112240] shadow-lg rounded-lg p-4 border border-blue-500">
       <ChartContainer
         config={{
           value: {
@@ -60,6 +61,12 @@ export default function HotWaterChart({ batchData }: Props) {
       >
         <ResponsiveContainer width="100%" height={350}>
           <LineChart data={vvChartDataWithDifferences}>
+            <defs>
+              <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#00BFFF" stopOpacity={0.8} />
+                <stop offset="100%" stopColor="#00BFFF" stopOpacity={0.2} />
+              </linearGradient>
+            </defs>
             <CartesianGrid
               strokeDasharray="3 3"
               stroke="#00BFFF"
@@ -74,7 +81,6 @@ export default function HotWaterChart({ batchData }: Props) {
               tickFormatter={(value) => value.toFixed(2)}
               stroke="#00BFFF"
             />
-            {/* Använd ChartTooltip istället för Tooltip */}
             <ChartTooltip
               content={
                 <ChartTooltipContent
@@ -93,12 +99,10 @@ export default function HotWaterChart({ batchData }: Props) {
                 />
               }
             />
-            {/* Använd ChartLegend istället för Legend */}
-           
             <Line
               type="monotone"
               dataKey="value"
-              stroke="#00BFFF"
+              stroke="url(#colorValue)"
               strokeWidth={3}
               dot={false}
               activeDot={{

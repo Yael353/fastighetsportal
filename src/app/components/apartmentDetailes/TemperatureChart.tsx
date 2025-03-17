@@ -8,6 +8,9 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  defs,
+  linearGradient,
+  stop,
 } from "recharts";
 import { BatchSensorDataResponse } from "@/features/models/sensor-data";
 import moment from "moment"; // Importera moment.js för att formatera X-axeln och Tooltip
@@ -41,11 +44,11 @@ export default function TemperatureChart({ batchData }: Props) {
 
   // Beräkna min- och maxvärden för Y-axeln
   const values = gtGmChartData.map((d) => d.value);
-  const minValue = Math.floor(Math.min(...values)) - 0.5;
-  const maxValue = Math.ceil(Math.max(...values)) + 0.5;
+  const minValue = Math.floor(Math.min(...values)) - 0.05;
+  const maxValue = Math.ceil(Math.max(...values)) + 0.05;
 
   return (
-    <div className="bg-darkBg shadow-lg rounded-lg p-4 border border-neonBlue">
+    <div className="bg-gradient-to-br from-[#0A192F] to-[#112240] shadow-lg rounded-lg p-4 border border-blue-500">
       <ChartContainer
         config={{
           value: {
@@ -59,10 +62,16 @@ export default function TemperatureChart({ batchData }: Props) {
       >
         <ResponsiveContainer width="100%" height={350}>
           <LineChart data={gtGmChartData}>
+            <defs>
+              <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#00BFFF" stopOpacity={0.8} />
+                <stop offset="100%" stopColor="#00BFFF" stopOpacity={0.2} />
+              </linearGradient>
+            </defs>
             <CartesianGrid
               strokeDasharray="3 3"
               stroke="#00BFFF"
-              opacity={0.3}
+              opacity={0.2}
             />
             <XAxis
               dataKey="time"
@@ -85,7 +94,7 @@ export default function TemperatureChart({ batchData }: Props) {
             <Line
               type="monotone"
               dataKey="value"
-              stroke="#00BFFF"
+              stroke="url(#colorValue)"
               strokeWidth={3}
               dot={false}
               activeDot={{
