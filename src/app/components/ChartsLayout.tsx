@@ -142,7 +142,7 @@ const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={mergedChartDataOAT_IAT}>
+          <LineChart data={mergedChartDataOAT_IAT} width="100%" height="100%">
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="time" />
               <YAxis yAxisId="left" stroke={sensorColors.OAT} />
