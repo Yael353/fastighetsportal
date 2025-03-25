@@ -1,107 +1,95 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { Card, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, YAxis, Tooltip } from "recharts";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+import { ChartContainer } from "@/components/ui/chart";
 import { AppDispatch, RootState } from "@/features/store/store";
 import { fetchSensorDomain } from "@/features/thunks/fetchSensors";
 import { FaHome } from "react-icons/fa";
 import { useSensorData } from "@/hooks/useSensorData";
-import { Loader2 } from "lucide-react"; 
-import moment from "moment";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Loader2 } from "lucide-react";
 
 export default function DetailedPageHeader() {
-  const { id } = useParams(); // Hämta ID från URL
+  const { id } = useParams();
   const dispatch = useDispatch<AppDispatch>();
+
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   if (typeof id !== "string") {
     return <p>Ogiltigt ID: {JSON.stringify(id)}</p>;
   }
 
-  const { sensorList } = useSensorData(id); // 🆕 En lista med alla sensorer och deras data
+  // 🆕 Hämta sensordata och undercentraler
+  const { sensorList, controllers, selectedControllerId, setSelectedControllerId, propertyName } = useSensorData(id);
 
-  // Hämta sensordomain-data från Redux-storen
-  const { data, loading, error } = useSelector(
-    (state: RootState) => state.property
-  );
+  // 🆕 Hämta vald controller från URL:en (om den finns)
+  const controllerFromUrl = searchParams.get("controller");
 
-  // Hämta sensordomain-data när komponenten mountar
+  // 🆕 Effekt för att sätta rätt controller vid sidladdning
+  useEffect(() => {
+    if (controllerFromUrl && controllers.includes(controllerFromUrl)) {
+      setSelectedControllerId(controllerFromUrl);
+    }
+  }, [controllerFromUrl, controllers]);
+
+  // 🆕 Uppdatera URL:en när en ny tab väljs
+  const handleTabChange = (newController: string) => {
+    setSelectedControllerId(newController);
+    router.push(`?controller=${newController}`, { scroll: false });
+  };
+
+  // ✅ Hämta sensordomain-data när komponenten mountar
   useEffect(() => {
     if (typeof id === "string") {
       dispatch(fetchSensorDomain({ id }));
     }
   }, [id, dispatch]);
 
-  // Hantering av olika tillstånd
-  if (loading) return <p>Loading property data...</p>;
-  if (error) return <p>Error: {error}</p>;
-  if (!data) return <p>No property data found for ID: {id}</p>;
-
-  const { name } = data;
-
   return (
     <div className="bg-darkBg px-4 w-full">
-      {/* Property Information */}
       <Card className="bg-darkBg border-none p-4">
         <div className="flex items-center justify-center mt-4 gap-5">
           <CardTitle className="text-5xl bg-darkBg font-bold text-white tracking-wide first-letter:uppercase">
-            {name.charAt(0).toUpperCase() + name.slice(1)}
+            {propertyName}
           </CardTitle>
           <FaHome size={48} />
         </div>
       </Card>
 
-      {/* 🔹 FLEX med WRAP för att hantera flera kort dynamiskt */}
-      <div className="flex flex-wrap gap-4 py-4 pb-10 justify-center [&>*]:w-[calc(25%-1rem)]">
+      {/* 🆕 Tabs för undercentraler */}
+      {controllers.length > 1 && (
+        <div className="container flex justify-center py-2">
+          <Tabs value={selectedControllerId} onValueChange={handleTabChange}>
+            <TabsList className="flex w-full bg-gray-800 justify-start gap-2 p-1 rounded-lg">
+              {controllers.map((controller, index) => (
+                <TabsTrigger key={controller} value={controller} className="tab-style">
+                  {`Undercentral ${index + 1}`}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
+      )}
+
+      {/* 🆕 Dynamiskt genererade kort */}
+      <div className="flex flex-wrap gap-4 py-4 pb-10 justify-start [&>*]:w-[calc(25%-1rem)]">
         {sensorList.map(({ title, value, data }, index) => (
-          <Card
-            key={index}
-            className="flex flex-row bg-darkBg items-center justify-between px-4 w-full max-w-xl h-24 rounded-lg shadow-md border border-neonBlue"
-          >
+          <Card key={index} className="flex flex-row bg-darkBg items-center justify-between px-4 w-full max-w-xl h-24 rounded-lg shadow-md border border-neonBlue">
             <div className="flex flex-col justify-center">
-              <CardTitle className="text-xs font-medium text-gray-400">
-                {title}
-              </CardTitle>
-              <div className="text-4xl font-bold text-gray-200">
-                {value !== null ? (
-                  value.toFixed(1) + "°C"
-                ) : (
-                  <Loader2 className="h-10 w-10 text-gray-200 animate-spin" />
-                )}
-              </div>
+              <CardTitle className="text-xs font-medium text-gray-400">{title}</CardTitle>
+              <div className="text-4xl font-bold text-gray-200">{value !== null ? value.toFixed(1) + "°C" : <Loader2 className="animate-spin w-6 h-6" />}</div>
             </div>
             <div className="">
               <ChartContainer className="h-16 w-[130px] 2xl:w-[300px]">
                 <LineChart data={data}>
-                  <Line
-                    type="monotone"
-                    dataKey="value"
-                    stroke="#00699f"
-                    strokeWidth={3}
-                    dot={false}
-                  />
+                  <Line type="monotone" dataKey="value" stroke="#00699f" strokeWidth={3} dot={false} />
                   <YAxis hide />
-                  <Tooltip
-                  labelFormatter={(label) => moment(label).format("YY-MM-DD HH:mm")}
-                  position={{ y: 60 }}
-                    formatter={(value: number) => `${value.toFixed(2)}°C`}
-                    contentStyle={{
-                      backgroundColor: "#001220", // Bakgrundsfärg
-                      borderColor: "#00BFFF", // Ramfärg
-                      color: "#fff", // Textfärg
-                      borderRadius: "8px", // Rundade kanter
-                      padding: "10px", // Padding för bättre spacing
-                      fontSize: "14px", // Justera textstorlek
-                      fontWeight: "bold", // Fetstilt text
-                    }}                  
-                  />
+                  <Tooltip formatter={(value: number) => `${value.toFixed(2)}°C`} />
                 </LineChart>
               </ChartContainer>
             </div>
