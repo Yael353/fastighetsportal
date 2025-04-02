@@ -84,8 +84,8 @@ export default function DetailedPageHeader() {
               <CardTitle className="text-xs font-medium text-gray-400">{title}</CardTitle>
               <div className="text-4xl font-bold text-gray-200">{value !== null ? value.toFixed(1) + "°C" : <Loader2 className="animate-spin w-6 h-6" />}</div>
             </div>
-            <div className="">
-              <ChartContainer className="h-16 w-[130px] 2xl:w-[300px]">
+            <div className="w-[130px] 2xl:w-[300px]">
+              <ChartContainer className="h-16 w-full">
                 <LineChart data={data}>
                   <Line type="monotone" dataKey="value" stroke="#00699f" strokeWidth={3} dot={false} />
                   <YAxis hide />
