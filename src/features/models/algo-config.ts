@@ -5,4 +5,5 @@ export type AlgoConfigResponse = {
   comfort_constant: number;
   sun_constant: number;
   iat_sp: number;
+  [key: string]: any;
 };

@@ -44,8 +44,6 @@ export default function ElectricityChart({ batchData }: Props) {
 
   const elChartDataWithDifferences = calculateDifferences(elChartDataArray);
 
-  console.log("Processed Chart Data:", elChartDataWithDifferences);
-
   return (
     <div className="bg-darkBg shadow-lg rounded-lg p-4 border border-gray-500">
       <ChartContainer
@@ -86,7 +84,6 @@ export default function ElectricityChart({ batchData }: Props) {
               content={
                 <ChartTooltipContent
                   labelFormatter={(label, payload) => {
-                    console.log("Tooltip label:", label, "Payload:", payload);
                     return moment(payload?.[0]?.payload?.time ?? label).format(
                       "YY-MM-DD HH:mm"
                     );

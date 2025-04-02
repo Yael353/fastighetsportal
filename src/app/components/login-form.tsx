@@ -83,7 +83,7 @@ export function LoginForm() {
           <Card className="w-full mt-5 rounded-lg bg-darkBg/70 border border-neonBlue shadow-md shadow-neonBlue/30 transition-all">
             <CardHeader className="h-40 flex flex-col justify-center items-center w-full  text-white rounded-t-lg">
               <img
-                src="images/logo.jpg"
+                src="/images/logo.jpg"
                 alt="logo"
                 className="w-24 h-24 rounded-full border-2 border-neonBlue mb-2"
               />

@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/features/store/store";
-import { getAuthToken } from "@/utils/auth";
-import { fetchAlgoConfig } from "@/features/thunks/algoConfig";
 import { fetchSummaryApartmentStatistics } from "@/features/thunks/fetchSensors";
 import { useParams } from "next/navigation";
 import {
@@ -16,23 +14,11 @@ import {
 
 export default function ApartmentComp() {
   const dispatch = useDispatch<AppDispatch>();
-  const authToken = getAuthToken();
+
   const { id } = useParams();
   const sensorDomainId = Array.isArray(id) ? id[0] : id;
 
-  // Hämta controllers från property-store
-  const property = useSelector((state: RootState) => state.property.data);
-  const controllers = property?.controllers || [];
-
-  console.log("cont", controllers);
-
-  // Hämta algoConfig (vi visar bara iat_sp från denna)
-  const algoConfig = useSelector((state: RootState) => state.algoConfig.data);
-  const algoLoading = useSelector(
-    (state: RootState) => state.algoConfig.loading
-  );
-
-  // Hämta lägenhetsstatistik från summaryStatistics
+  // Hämta lägenhetsstatistik från Redux
   const summaryStatistics = useSelector(
     (state: RootState) => state.summaryStatistics.data
   );
@@ -41,42 +27,10 @@ export default function ApartmentComp() {
   );
 
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedControllerId, setSelectedControllerId] = useState<
-    string | null
-  >(null);
-
-  // Hämta AlgoConfig & Lägenhetsstatistik vid komponentens mount
-  useEffect(() => {
-    if (authToken && selectedControllerId) {
-      // Fetch algoConfig only for the selected controller ID
-      if (!algoConfig?.[selectedControllerId]) {
-        const fetchAlgo = async () => {
-          const data = await dispatch(
-            fetchAlgoConfig({ controllerId: selectedControllerId })
-          );
-          if (data) {
-            console.log(`Hämtade algoConfig för ${selectedControllerId}`);
-          } else {
-            console.warn(
-              `Ingen algoConfig hittades för ${selectedControllerId}`
-            );
-          }
-        };
-        fetchAlgo();
-      }
-    }
-  }, [authToken, selectedControllerId, Object.keys(algoConfig || {}).length]);
 
   useEffect(() => {
     if (sensorDomainId) {
       dispatch(fetchSummaryApartmentStatistics({ sensorDomainId }))
-        .then((data) => {
-          if (!data) {
-            console.warn(
-              `Ingen summaryStatistics hittades för ${sensorDomainId}`
-            );
-          }
-        })
         .catch((error) =>
           console.error("Fel vid hämtning av summaryStatistics:", error)
         )
@@ -84,20 +38,17 @@ export default function ApartmentComp() {
     } else {
       setIsLoading(false);
     }
-  }, [sensorDomainId]);
+  }, [sensorDomainId, dispatch]);
 
-  console.log("Summarystat ", summaryStatistics);
+  // console.log("Summarystat ", summaryStatistics);
 
-  if (summaryLoading) {
+  if (summaryLoading || isLoading) {
     return <div>Laddar...</div>;
   }
 
-  if (summaryStatistics == null) {
-    return (
-      <div className="flex justify-center text-lg font-bold bg-darkBg text-neonBlue mb-4">
-        Statestik saknas
-      </div>
-    );
+  // Här renderar vi inget om summaryStatistics är null eller tomt
+  if (!summaryStatistics || Object.keys(summaryStatistics).length === 0) {
+    return null; // Här gör vi bara en kortslutning, inget kommer att renderas
   }
 
   return (
@@ -124,25 +75,24 @@ export default function ApartmentComp() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {summaryStatistics &&
-              Object.entries(summaryStatistics).map(([size, stats]) => (
-                <TableRow
-                  key={size}
-                  className="bg-darkBgLight text-white hover:bg-transparent"
-                >
-                  <TableCell className="text-neonBlue">{size}</TableCell>
-                  {["kWh", "L", "C"].map((unit) => (
-                    <TableCell
-                      key={unit}
-                      className="text-center font-semibold text-gray-300"
-                    >
-                      {stats
-                        .find((stat) => stat.u_name === unit)
-                        ?.avg?.toFixed(1) || "-"}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
+            {Object.entries(summaryStatistics).map(([size, stats]) => (
+              <TableRow
+                key={size}
+                className="bg-darkBgLight text-white hover:bg-transparent"
+              >
+                <TableCell className="text-neonBlue">{size}</TableCell>
+                {["kWh", "L", "C"].map((unit) => (
+                  <TableCell
+                    key={unit}
+                    className="text-center font-semibold text-gray-300"
+                  >
+                    {stats
+                      .find((stat) => stat.u_name === unit)
+                      ?.avg?.toFixed(1) || "-"}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </div>

@@ -1,13 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../slices/authSlice";
 import propertyReducer from "../slices/propertySlice";
-import overviewReducer from "@/features/slices/overviewSlice";
-import sensorDataReducer from "@/features/slices/batchSlice";
+import overviewReducer from "../slices/overviewSlice";
+import sensorDataReducer from "../slices/batchSlice";
 import { buildingsReducer } from "../slices/buildingsSlice";
-import apartmentReducer from "@/features/slices/ApartmentConsumptionSlice";
-import summaryStatisticsReducer from "@/features/slices/summaryStatisticsSlice";
-import algoConfigReducer from "@/features/slices/algoConfigSlice";
-import monthlyStatisticsReducer from "@/features/slices/monthlyStatisticsSlice";
+import apartmentReducer from "../slices/ApartmentConsumptionSlice";
+import summaryStatisticsReducer from "../slices/summaryStatisticsSlice";
+import algoConfigReducer from "../slices/algoConfigSlice";
+import monthlyStatisticsReducer from "../slices/monthlyStatisticsSlice";
+import energyFluxReducer from "../slices/energyFluxSlice";
 
 export const store = configureStore({
   reducer: {
@@ -20,6 +21,7 @@ export const store = configureStore({
     summaryStatistics: summaryStatisticsReducer,
     algoConfig: algoConfigReducer,
     monthlyStatistics: monthlyStatisticsReducer,
+    energyFlux: energyFluxReducer,
   },
 });
 

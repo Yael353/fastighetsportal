@@ -7,36 +7,37 @@ import { authFetch } from "@/utils/fetch";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export const fetchAlgoConfig = createAsyncThunk<
-  AlgoConfigResponse,
+  AlgoConfigResponse | null, // <-- ändrat här
   { controllerId: string },
   { state: RootState; dispatch: AppDispatch; rejectValue: string }
 >(
   "algoConfig/fetch",
   async ({ controllerId }, { dispatch, rejectWithValue }) => {
     try {
-      // Anropa API:et med authFetch
       const response = await authFetch(
         `${apiUrl}/open/v1/algo_config/${controllerId}`,
         { method: "GET" },
         dispatch
       );
 
-      // Kontrollera HTTP-status
+     
       if (response.status === 404) {
-        throw new RESPONSE_404("Fel uppgifter, prova igen");
-      } else if (response.status === 403) {
-        throw new RESPONSE_403("Fel uppgifter, prova igen");
+        return null;
       }
+      // if (!response.ok) {
+      //   // Alla andra fel
+      //   const errorData = await response.json().catch(() => ({}));
+      //   throw new Error(
+      //     errorData.message || `HTTP error! status: ${response.status}`
+      //   );
+      // }
 
-      // Parsar JSON-svaret
       const responseJson = await response.json();
-
       return responseJson as AlgoConfigResponse;
     } catch (error: any) {
-      console.error("Error fetching algo config:", error.message || error);
+      // console.error("Error fetching algo config:", error.message || error);
 
-      // Hantera specifika fel och returnera användarvänliga meddelanden
-      if (error instanceof RESPONSE_404 || error instanceof RESPONSE_403) {
+      if (error instanceof RESPONSE_403) {
         return rejectWithValue(error.message);
       }
 

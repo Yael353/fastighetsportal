@@ -26,9 +26,6 @@ export const fetchSensorDomain = createAsyncThunk<
   { state: RootState; dispatch: AppDispatch; rejectValue: string }
 >("sensorDomain/fetch", async ({ id }, { dispatch, rejectWithValue }) => {
   try {
-    // console.log(`Fetching sensor domain with ID: ${id}`);
-    // console.log(`Request URL: ${apiUrl}/open/v1/sensor_domains/${id}`);
-
     const response = await authFetch(
       `${apiUrl}/open/v1/sensor_domains/${id}`,
       { method: "GET" },
@@ -43,7 +40,6 @@ export const fetchSensorDomain = createAsyncThunk<
 
     const responseJson = await response.json();
 
-    // console.log("Sensordomain från fetchSensors ", responseJson);
     return responseJson as SensorDomain;
   } catch (error: any) {
     console.error("Error fetching sensor domain:", error.message || error);
@@ -103,8 +99,6 @@ export const fetchBatchSensorData = createAsyncThunk<
         // Parsar och lagrar varje batchs svar
         const responseJson = await response.json();
 
-        console.log("BatchResponse: ", responseJson);
-
         allResponses.push(responseJson);
       }
 
@@ -147,8 +141,6 @@ export const fetchBuildings = createAsyncThunk<
 
     const responseJson = await response.json();
 
-    // console.log("Raw API response JSON:", responseJson);
-
     const responseObject = Object.fromEntries(Object.entries(responseJson));
 
     return responseObject as BuildingsResponse;
@@ -189,7 +181,6 @@ export const fetchApartmentConsumptionLastXDays = createAsyncThunk<
 
     try {
       const fetchedURL = `${apiUrl}/open/v1/sensor_domains/${sensorDomainId}/buildings/${buildingId}/apartments/${apartmentId}?${params}`;
-      // console.log("Data som hämtas", fetchedURL);
 
       const response = await authFetch(fetchedURL, { method: "GET" }, dispatch);
 
@@ -200,8 +191,6 @@ export const fetchApartmentConsumptionLastXDays = createAsyncThunk<
       }
 
       const responseJson = await response.json();
-
-      // console.log("JsonRespons", responseJson);
 
       return responseJson as AllApartmentConsumptionResponse;
     } catch (error: any) {
@@ -294,8 +283,6 @@ export const fetchMonthlyApartmentStatistics = createAsyncThunk<
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
     try {
-      console.log("Fetching monthly apartment statistics");
-
       const response = await authFetch(
         `${apiUrl}/open/v1/sensor_domains/${sensorDomainId}/buildings/${buildingId}/apartments/${apartmentId}/consumption/monthly`,
         {},

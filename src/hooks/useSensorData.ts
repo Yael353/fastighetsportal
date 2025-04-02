@@ -59,8 +59,10 @@ export const useSensorData = (id: string) => {
     if (!sensorDomain?.sensors || !selectedControllerId) return [];
 
     return sensorDomain.sensors.filter((sensor) => {
-      const isFromSelectedController = sensor.name.includes(selectedControllerId);
-      const isTemperatureSensor = sensor.vala_description.measurement_type === "temp";
+      const isFromSelectedController =
+        sensor.name.includes(selectedControllerId);
+      const isTemperatureSensor =
+        sensor.vala_description.measurement_type === "temp";
       const isNotSetPoint = !sensor.vala_description.name_long
         ?.toLowerCase()
         .includes("set point");
@@ -69,10 +71,10 @@ export const useSensorData = (id: string) => {
     });
   }, [sensorDomain, selectedControllerId]);
 
-  console.log(
-    `🔍 Filtrerade sensorer för undercentral ${selectedControllerId}:`,
-    filteredSensors
-  );
+  // console.log(
+  //   `🔍 Filtrerade sensorer för undercentral ${selectedControllerId}:`,
+  //   filteredSensors
+  // );
 
   // ✅ Hämta sensorDomain om det saknas
   useEffect(() => {

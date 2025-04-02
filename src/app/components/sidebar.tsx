@@ -33,7 +33,12 @@ export function AppSidebar() {
       className="bg-gradient-to-l from-midNightBlue to-darkBg flex flex-col outline-none border-r border-neonBlue"
     >
       {/* Header */}
-      <SidebarHeader className="flex justify-center items-center border-b border-neonBlue mx-4">
+      <SidebarHeader className="flex justify-center items-center border-b border-neonBlue mx-4 p-4">
+        <img
+          src="/images/logo.jpg"
+          alt="logo"
+          className="w-36 h-32 rounded-full border-2 border-neonBlue"
+        />
         <h2 className="w-full flex justify-center px-4 py-3 text-lg font-semibold tracking-wide text-neonBlue bg-gradient-from-r from-midNightBlue to-darkBg">
           Tornets Portal
         </h2>

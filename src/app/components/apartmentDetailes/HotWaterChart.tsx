@@ -85,7 +85,6 @@ export default function HotWaterChart({ batchData }: Props) {
               content={
                 <ChartTooltipContent
                   labelFormatter={(label, payload) => {
-                    console.log("Tooltip label:", label, "Payload:", payload);
                     return moment(payload?.[0]?.payload?.time ?? label).format(
                       "YY-MM-DD HH:mm"
                     );

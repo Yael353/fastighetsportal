@@ -112,7 +112,7 @@ export default function ApartmentsCards() {
           currentApartments.map((apartment: ApartmentResponse) => (
             <div
               key={apartment.apt_id}
-              className="border border-neonBlue bg-darkBgLight hover:bg-transparent p-4 rounded-lg shadow-md shadow-neonBlue/50 transition-transform transform hover:scale-105"
+              className="border border-neonBlue bg-darkBgLight hover:bg-transparent p-4 rounded-lg shadow-sm shadow-neonBlue/50 transition-transform transform hover:scale-105"
             >
               <Link
                 href={`/dashboard/detailedPage/${id}/singleApartment/${apartment.apt_id}`}

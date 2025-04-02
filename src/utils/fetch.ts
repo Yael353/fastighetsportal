@@ -11,27 +11,18 @@ export const authFetch = async (
   const token = getAuthToken();
 
   if (!token) {
-    console.error("No valid accessToken found. Logging out...");
     dispatch(logout());
     throw new Error("No access token. You have been logged out.");
   }
 
   const expiresAt = Number(localStorage.getItem("expiresAt")) || 0;
   if (expiresAt && expiresAt - Date.now() < 0) {
-    console.warn("Token has expired. Logging out...");
     dispatch(logout());
     throw new Error("Auth token expired.");
   }
 
-  const existingHeaders =
-    init.headers instanceof Headers
-      ? Object.fromEntries(init.headers.entries())
-      : Array.isArray(init.headers)
-      ? Object.fromEntries(init.headers)
-      : init.headers || {};
-
-  const headers: Record<string, string> = {
-    ...existingHeaders,
+  const headers: HeadersInit = {
+    ...(init.headers || {}),
     Authorization: `Bearer ${token}`,
     "Content-Type": "application/json",
   };
@@ -45,16 +36,21 @@ export const authFetch = async (
     const response = await fetch(url, options);
 
     if (!response.ok) {
+      // Specialhantering för auth-relaterade fel
       if (response.status === 401 || response.status === 403) {
-        console.warn("Unauthorized or expired token. Logging out...");
         dispatch(logout());
+        throw new Error(`Auth error: ${response.statusText}`);
       }
-      return response; // Returnera response även vid 404
+      // Returnera response som den är för andra fel (inklusive 404)
+      return response;
     }
 
     return response;
   } catch (error) {
-    console.error("Error in authFetch:", error);
+    // Endast logga oväntade fel
+    if (!(error instanceof RESPONSE_404)) {
+      console.error("Network error in authFetch:", error);
+    }
     throw error;
   }
 };

@@ -83,6 +83,7 @@ export type ApartmentResponse = {
 
 export type BuildingResponse = {
   name: string;
+  api_id: string;
   owner: string;
   building_id: string;
   apartments: ApartmentResponse[];

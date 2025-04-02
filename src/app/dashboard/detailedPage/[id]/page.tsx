@@ -8,7 +8,6 @@ import { AppDispatch, RootState } from "@/features/store/store";
 import { useParams } from "next/navigation";
 import { getAuthToken } from "@/utils/auth";
 import { fetchSensorDomain } from "@/features/thunks/fetchSensors";
-import ApartmentsCards from "@/app/components/detailedPageComp/apartment/ApartmentsCards";
 
 export default function DetailedPage() {
   type UserParams = {
@@ -32,7 +31,6 @@ export default function DetailedPage() {
       </div>
       <div className="bg-gradient-to-r from-midNightBlue to-darkBg">
         <SensorDataComp id={id} />
-        {/* <ApartmentsCards /> */}
       </div>
     </div>
   );

@@ -120,13 +120,17 @@ export default function ApartmentScreen() {
   }, [sensorDomainId, sensorIds, selectedDays, dispatch]);
 
   if (buildingsLoading) {
-    return <div>Laddar byggnader...</div>;
+    return (
+      <div className="flex justify-center text-neonBlueLight">
+        Laddar byggnader...
+      </div>
+    );
   }
   if (buildingsError) {
-    return <div>Fel vid hämtning av byggnader: {buildingsError}</div>;
+    return <div className="flex justify-center text-neonBlueLight">Fel vid hämtning av byggnader: {buildingsError}</div>;
   }
   if (!buildingId) {
-    return <div>Byggnad kunde inte hittas för lägenhet: {apartmentId}</div>;
+    return <div className="flex justify-center text-neonBlueLight">Byggnad kunde inte hittas för lägenhet: {apartmentId}</div>;
   }
 
   const building = Object.values(buildings).find(

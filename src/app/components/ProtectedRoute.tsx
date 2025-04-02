@@ -9,52 +9,71 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   const router = useRouter();
   const [isValidating, setIsValidating] = useState(true);
 
-  // Funktion för att validera token
-  const validateToken = (): boolean => {
-    const token = localStorage.getItem("accessToken");
+  // Förbättrad tokenvalidering med try-catch och fallback
+  const validateToken = (token: string | null): boolean => {
     if (!token) return false;
 
     try {
-      const decodedToken = JSON.parse(atob(token.split(".")[1])); // Decodera JWT-token
-      const expiresAt = decodedToken.exp * 1000;
+      const payload = token.split(".")[1];
+      if (!payload) return false;
 
+      const decoded = JSON.parse(atob(payload));
+      const expiresAt = decoded.exp * 1000;
       return expiresAt > Date.now();
     } catch (error) {
-      console.error("Tokenvalidering misslyckades:", error);
+      console.error("Token validation error:", error);
       return false;
     }
   };
 
-  // Validera token vid första rendering
-  useEffect(() => {
-    const tokenIsValid = validateToken();
+  // Centraliserad navigeringshantering
+  const handleNavigation = (tokenIsValid: boolean) => {
     if (tokenIsValid) {
       router.replace("/dashboard");
     } else {
-      localStorage.setItem("logout", Date.now().toString());
+      localStorage.removeItem("accessToken");
+      localStorage.setItem("logoutEvent", Date.now().toString());
       router.replace("/");
+      router.refresh();
     }
     setIsValidating(false);
-  }, [router]);
+  };
 
+  // Huvudeffekt för initial validering
   useEffect(() => {
-    const handleStorageEvent = (event: StorageEvent) => {
-      if (event.key === "accessToken" && event.newValue) {
-        router.replace("/dashboard");
-      } else if (event.key === "logout") {
-        router.replace("/");
+    const token = localStorage.getItem("accessToken");
+    handleNavigation(validateToken(token));
+  }, []); // Empty dependency array för att köras en gång
+
+  // Hantera storage events och session mellan fliker/fönster
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "accessToken") {
+        handleNavigation(validateToken(e.newValue));
+      } else if (e.key === "logoutEvent") {
+        handleNavigation(false);
       }
     };
 
-    window.addEventListener("storage", handleStorageEvent);
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
-    return () => {
-      window.removeEventListener("storage", handleStorageEvent);
+  // Förhindra cachning av skyddade routes
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (!validateToken(localStorage.getItem("accessToken"))) {
+        localStorage.removeItem("accessToken");
+      }
     };
-  }, [router]);
 
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, []);
+
+  // Visa inget under validering (eller en laddningsindikator)
   if (isValidating) {
-    return <div style={{ backgroundColor: "#111827", height: "100vh" }}></div>;
+    return <div className="bg-darkBg h-screen w-full"></div>;
   }
 
   return <>{children}</>;

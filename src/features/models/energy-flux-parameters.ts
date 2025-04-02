@@ -5,4 +5,5 @@ export type EnergyFluxParametersResponse = {
   window: number;
   wall: number;
   offset: number;
+  [key: string]: any;
 };
