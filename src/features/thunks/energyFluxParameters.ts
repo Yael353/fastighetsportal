@@ -22,6 +22,7 @@ export const fetchEnergyFlux = createAsyncThunk<
         dispatch
       );
       if (response.status === 404) {
+        console.warn("Energy flux not found (404)");
         return null;
       }
       if (response.status === 403) {
@@ -31,14 +32,14 @@ export const fetchEnergyFlux = createAsyncThunk<
       const data = await response.json();
       return data;
     } catch (error) {
-      // // Logga endast oväntade fel
-      // if (!(error instanceof RESPONSE_404)) {
-      //   console.error("Error fetching energy flux:", error);
-      // }
+      // Logga endast oväntade fel
+      if (!(error instanceof RESPONSE_404)) {
+        console.error("Error fetching energy flux:", error);
+      }
 
-      // if (error instanceof RESPONSE_403) {
-      //   return rejectWithValue(error.message);
-      // }
+      if (error instanceof RESPONSE_403) {
+        return rejectWithValue(error.message);
+      }
 
       return rejectWithValue(
         error instanceof Error ? error.message : "Ett oväntat fel inträffade"
