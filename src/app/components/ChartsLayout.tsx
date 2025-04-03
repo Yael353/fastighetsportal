@@ -21,7 +21,8 @@ import {
 } from "@/components/ui/carousel";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/features/store/store";
-import { Sensor } from "@/features/models/sensor-data";
+import { BatchSensorDataFreq, Sensor } from "@/features/models/sensor-data";
+import { fetchBatchSensorData } from "@/features/thunks/fetchSensors";
 
 interface ApartmentCompProps {
   id: string;
@@ -88,6 +89,7 @@ const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
   const sensorsState = useSelector(
     (state: RootState) => state.sensorData.sensors
   );
+  const [selectedDays, setSelectedDays] = useState(1);
 
   const filterSensors = (name: string): Sensor[] => {
     const sensors =
@@ -168,6 +170,38 @@ const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
     );
     return formatChartDataTime(merged);
   }, [chartDataFWT, chartDataRWT]);
+
+  useEffect(() => {
+    if (!sensorDomain) return;
+
+    const allSensors = [
+      ...filteredOAT,
+      ...filteredIAT,
+      ...filteredFWT,
+      ...filteredRWT,
+    ];
+    const sensorIds = allSensors.map((s) => s.id);
+
+    if (sensorIds.length === 0) return;
+
+    dispatch(
+      fetchBatchSensorData({
+        sensorDomainId: sensorDomain.id,
+        sensorIds,
+        startUtc: moment().utc().subtract(selectedDays, "days"),
+        endUtc: moment().utc(),
+        freq: BatchSensorDataFreq.raw,
+      })
+    );
+  }, [
+    dispatch,
+    sensorDomain,
+    filteredOAT,
+    filteredIAT,
+    filteredFWT,
+    filteredRWT,
+    selectedDays,
+  ]);
 
   const DelayedChart = () => {
     const [show, setShow] = useState(false);
@@ -478,6 +512,27 @@ const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
         <CarouselPrevious />
         <CarouselNext />
       </Carousel>
+      <div className="flex justify-center space-x-4 my-6 p-2 flex-col">
+        <h3 className="text-white text-xl font-semibold justify-center items-center flex p-3">
+          Välj tidsintervall
+        </h3>
+        <div className="flex justify-center items-center gap-3">
+          {[1, 7, 14, 30].map((days) => (
+            <button
+              key={days}
+              onClick={() => setSelectedDays(days)}
+              className={`px-6 py-2 font-semibold rounded-md transition-all
+          ${
+            selectedDays === days
+              ? "bg-neonBlue text-white shadow-neonBlue"
+              : "bg-darkBgLight text-neonBlue hover:bg-neonBlue hover:text-white hover:shadow-neonBlue"
+          }`}
+            >
+              {days} dagar
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
