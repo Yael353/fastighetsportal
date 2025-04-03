@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { Card, CardTitle } from "@/components/ui/card";
-import { LineChart, Line, YAxis, Tooltip } from "recharts";
+import { LineChart, Line, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { ChartContainer } from "@/components/ui/chart";
 import { AppDispatch, RootState } from "@/features/store/store";
 import { fetchSensorDomain } from "@/features/thunks/fetchSensors";
@@ -69,14 +69,14 @@ export default function DetailedPageHeader() {
 
       {/* 🆕 Tabs för undercentraler */}
       {controllers.length > 1 && (
-        <div className="container flex justify-center py-2">
-          <Tabs value={selectedControllerId} onValueChange={handleTabChange}>
-            <TabsList className="flex w-full bg-gray-800 justify-start gap-2 p-1 rounded-lg">
+        <div className="flex w-full justify-center py-2">
+          <Tabs className="justify-center" value={selectedControllerId} onValueChange={handleTabChange}>
+            <TabsList className="flex bg-darkBg gap-2 p-1 rounded-lg">
               {controllers.map((controller, index) => (
                 <TabsTrigger
                   key={controller}
                   value={controller}
-                  className="tab-style"
+                  className="tab-style bg-gray-800"
                 >
                   {`Undercentral ${index + 1}`}
                 </TabsTrigger>
@@ -106,7 +106,9 @@ export default function DetailedPageHeader() {
               </div>
             </div>
             <div className="w-[130px] 2xl:w-[300px]">
+            
               <ChartContainer className="h-16 w-full">
+              <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={data}>
                   <Line
                     type="monotone"
@@ -134,7 +136,9 @@ export default function DetailedPageHeader() {
                     }}
                   />
                 </LineChart>
+                </ResponsiveContainer>
               </ChartContainer>
+              
             </div>
           </Card>
         ))}

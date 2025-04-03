@@ -89,9 +89,26 @@ const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
     (state: RootState) => state.sensorData.sensors
   );
 
-  const filterSensors = (name: string): Sensor[] =>
-    sensorDomain?.sensors?.filter((s) => s.vala_description?.name === name) ||
-    [];
+  const filterSensors = (name: string): Sensor[] => {
+    const sensors =
+      sensorDomain?.sensors?.filter((s) => s.vala_description?.name === name) ||
+      [];
+
+    if (name === "IAT") {
+      const summationSensor = sensors.find((s) =>
+        (s.description || "").includes("Summation")
+      );
+      return summationSensor ? [summationSensor] : [];
+    }
+
+    // För FWT och RWT: plocka bara första sensorn
+    if (name === "FWT" || name === "RWT") {
+      return sensors.length > 0 ? [sensors[0]] : [];
+    }
+
+    // För OAT: visa alla (om du vill filtrera även här kan vi göra det)
+    return sensors;
+  };
 
   const filteredOAT = useMemo(() => filterSensors("OAT"), [sensorDomain]);
   const filteredIAT = useMemo(() => filterSensors("IAT"), [sensorDomain]);
@@ -170,7 +187,7 @@ const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
     }
 
     return (
-      <ResponsiveContainer width="100%" height={540}>
+      <ResponsiveContainer width="100%" height="100%">
         <LineChart data={chartData}>
           <defs>
             <linearGradient id="colorOAT1" x1="0" y1="0" x2="0" y2="1">
@@ -220,7 +237,7 @@ const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
             yAxisId="right"
             stroke={sensorColors.IAT}
             orientation="right"
-            domain={[18, 23]}
+            domain={[18, 25]}
             tickFormatter={(value) => value.toFixed(0)}
             allowDecimals={false}
           />
@@ -272,11 +289,11 @@ const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
               }}
             />
           ))}
-          {iatSensors.map((sensor) => (
+          {iatSensors.length > 0 && (
             <Line
-              key={sensor.id}
+              key={iatSensors[0].id}
               type="monotone"
-              dataKey={sensor.id}
+              dataKey={iatSensors[0].id}
               name="Inomhustemperatur"
               stroke="url(#colorIAT1)"
               strokeWidth={3}
@@ -289,7 +306,7 @@ const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
                 fill: "#000",
               }}
             />
-          ))}
+          )}
         </LineChart>
       </ResponsiveContainer>
     );
@@ -299,7 +316,6 @@ const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
     <div className="w-[90%] place-self-center p-6 rounded-lg relative">
       <Carousel className="w-full">
         <CarouselContent>
-          {/* Slide 1 – OAT/IAT */}
           <CarouselItem>
             <div className="bg-gradient-to-br from-[#0A192F] to-[#112240] shadow-lg rounded-lg p-4 border border-blue-500 text-white">
               <ChartContainer
@@ -322,8 +338,6 @@ const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
               </ChartContainer>
             </div>
           </CarouselItem>
-
-          {/* Slide 2 – FWT/RWT */}
           <CarouselItem>
             <div className="bg-gradient-to-br from-[#0A192F] to-[#112240] shadow-lg rounded-lg p-4 border border-blue-500 text-white">
               <ChartContainer
@@ -381,7 +395,7 @@ const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
                       }
                     />
                     <YAxis
-                      domain={[25, 45]}
+                      domain={[20, 45]}
                       stroke="#00BFFF"
                       tickFormatter={(value) => value.toFixed(0)}
                       allowDecimals={false}
@@ -461,8 +475,6 @@ const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
             </div>
           </CarouselItem>
         </CarouselContent>
-
-        {/* Pilar */}
         <CarouselPrevious />
         <CarouselNext />
       </Carousel>

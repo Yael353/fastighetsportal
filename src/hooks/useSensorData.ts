@@ -71,11 +71,6 @@ export const useSensorData = (id: string) => {
     });
   }, [sensorDomain, selectedControllerId]);
 
-  // console.log(
-  //   `🔍 Filtrerade sensorer för undercentral ${selectedControllerId}:`,
-  //   filteredSensors
-  // );
-
   // ✅ Hämta sensorDomain om det saknas
   useEffect(() => {
     if (!sensorDomain) {
