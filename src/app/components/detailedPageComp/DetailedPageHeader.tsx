@@ -25,7 +25,13 @@ export default function DetailedPageHeader() {
   }
 
   // 🆕 Hämta sensordata och undercentraler
-  const { sensorList, controllers, selectedControllerId, setSelectedControllerId, propertyName } = useSensorData(id);
+  const {
+    sensorList,
+    controllers,
+    selectedControllerId,
+    setSelectedControllerId,
+    propertyName,
+  } = useSensorData(id);
 
   // 🆕 Hämta vald controller från URL:en (om den finns)
   const controllerFromUrl = searchParams.get("controller");
@@ -67,7 +73,11 @@ export default function DetailedPageHeader() {
           <Tabs value={selectedControllerId} onValueChange={handleTabChange}>
             <TabsList className="flex w-full bg-gray-800 justify-start gap-2 p-1 rounded-lg">
               {controllers.map((controller, index) => (
-                <TabsTrigger key={controller} value={controller} className="tab-style">
+                <TabsTrigger
+                  key={controller}
+                  value={controller}
+                  className="tab-style"
+                >
                   {`Undercentral ${index + 1}`}
                 </TabsTrigger>
               ))}
@@ -79,17 +89,50 @@ export default function DetailedPageHeader() {
       {/* 🆕 Dynamiskt genererade kort */}
       <div className="flex flex-wrap gap-4 py-4 pb-10 justify-start [&>*]:w-[calc(25%-1rem)]">
         {sensorList.map(({ title, value, data }, index) => (
-          <Card key={index} className="flex flex-row bg-darkBg items-center justify-between px-4 w-full max-w-xl h-24 rounded-lg shadow-md border border-neonBlue">
+          <Card
+            key={index}
+            className="flex flex-row bg-darkBg items-center justify-between px-4 w-full max-w-xl h-24 rounded-lg shadow-md border border-neonBlue"
+          >
             <div className="flex flex-col justify-center">
-              <CardTitle className="text-xs font-medium text-gray-400">{title}</CardTitle>
-              <div className="text-4xl font-bold text-gray-200">{value !== null ? value.toFixed(1) + "°C" : <Loader2 className="animate-spin w-6 h-6" />}</div>
+              <CardTitle className="text-xs font-medium text-gray-400">
+                {title}
+              </CardTitle>
+              <div className="text-4xl font-bold text-gray-200">
+                {value !== null ? (
+                  value.toFixed(1) + "°C"
+                ) : (
+                  <Loader2 className="animate-spin w-6 h-6" />
+                )}
+              </div>
             </div>
             <div className="w-[130px] 2xl:w-[300px]">
               <ChartContainer className="h-16 w-full">
                 <LineChart data={data}>
-                  <Line type="monotone" dataKey="value" stroke="#00699f" strokeWidth={3} dot={false} />
+                  <Line
+                    type="monotone"
+                    dataKey="value"
+                    stroke="#00699f"
+                    strokeWidth={3}
+                    dot={false}
+                  />
                   <YAxis hide />
-                  <Tooltip formatter={(value: number) => `${value.toFixed(2)}°C`} />
+                  <Tooltip
+                    content={({ payload }) => {
+                      if (!payload || payload.length === 0) {
+                        return null;
+                      }
+
+                      const value = payload[0]?.value;
+
+                      return (
+                        <div className="bg-[#0A192F] border border-blue-500 rounded-md p-2 text-white text-sm shadow-lg">
+                          {typeof value === "number"
+                            ? `${value.toFixed(2)} °C`
+                            : value}
+                        </div>
+                      );
+                    }}
+                  />
                 </LineChart>
               </ChartContainer>
             </div>
