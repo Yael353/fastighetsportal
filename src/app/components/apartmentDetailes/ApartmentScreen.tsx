@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { batch, useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "next/navigation";
 import moment from "moment";
 import { AppDispatch, RootState } from "@/features/store/store";
@@ -63,8 +63,10 @@ export default function ApartmentScreen() {
   );
 
   useEffect(() => {
-    if (!buildings || Object.keys(buildings).length === 0) {
-      dispatch(fetchBuildings({ id: sensorDomainId }));
+    if (typeof sensorDomainId === "string" && !Array.isArray(sensorDomainId)) {
+      if (!buildings || Object.keys(buildings).length === 0) {
+        dispatch(fetchBuildings({ id: sensorDomainId }));
+      }
     }
   }, [sensorDomainId, dispatch]);
 
@@ -76,14 +78,19 @@ export default function ApartmentScreen() {
   }, [buildings, apartmentId]);
 
   useEffect(() => {
-    if (sensorDomainId && buildingId && apartmentId) {
+    if (
+      typeof sensorDomainId === "string" &&
+      !Array.isArray(sensorDomainId) &&
+      typeof buildingId === "string" &&
+      typeof apartmentId === "string"
+    ) {
       dispatch(
         fetchMonthlyApartmentStatistics({
           sensorDomainId,
           buildingId,
           apartmentId,
           days_interval: 30,
-        })
+        } as any)
       );
       dispatch(
         fetchApartmentConsumptionLastXDays({
@@ -96,14 +103,13 @@ export default function ApartmentScreen() {
     }
   }, [sensorDomainId, buildingId, apartmentId, dispatch]);
 
-  // === Hämta sensorIds från apartmentConsumption och dispatcha fetchBatchSensorData ===
   const sensorIds = useMemo(
     () => apartmentConsumption?.map((item) => item.id) || [],
     [apartmentConsumption]
   );
 
   useEffect(() => {
-    if (sensorDomainId && sensorIds.length > 0) {
+    if (typeof sensorDomainId === "string" && sensorIds.length > 0) {
       dispatch(
         fetchBatchSensorData({
           sensorDomainId,
@@ -127,10 +133,18 @@ export default function ApartmentScreen() {
     );
   }
   if (buildingsError) {
-    return <div className="flex justify-center text-neonBlueLight">Fel vid hämtning av byggnader: {buildingsError}</div>;
+    return (
+      <div className="flex justify-center text-neonBlueLight">
+        Fel vid hämtning av byggnader: {buildingsError}
+      </div>
+    );
   }
   if (!buildingId) {
-    return <div className="flex justify-center text-neonBlueLight">Byggnad kunde inte hittas för lägenhet: {apartmentId}</div>;
+    return (
+      <div className="flex justify-center text-neonBlueLight">
+        Byggnad kunde inte hittas för lägenhet: {apartmentId}
+      </div>
+    );
   }
 
   const building = Object.values(buildings).find(
@@ -138,7 +152,6 @@ export default function ApartmentScreen() {
   );
   const apartment = building?.apartments.find((a) => a.apt_id === apartmentId);
 
-  // Korten
   const temperatureData = apartmentConsumption?.find(
     (item) => item.vala_description.measurement_type === "temp"
   );
@@ -148,6 +161,14 @@ export default function ApartmentScreen() {
   const hotWaterData = apartmentConsumption?.find(
     (item) => item.vala_description.measurement_type === "volume"
   );
+
+  type View = "temperature" | "electricity" | "hotWater" | "monthlyStatistics";
+  const views: { key: View; label: string }[] = [
+    { key: "temperature", label: "Temperatur" },
+    { key: "electricity", label: "Elförbrukning" },
+    { key: "hotWater", label: "Varmvattenförbrukning" },
+    { key: "monthlyStatistics", label: "Månadsstatistik" },
+  ];
 
   return (
     <div className="">
@@ -203,7 +224,9 @@ export default function ApartmentScreen() {
 
       {/* Visa fel eller laddning om det behövs */}
       {apartmentConsumptionLoading && (
-        <div className="bg-gray-900 text-white">Laddar konsumtionsdata...</div>
+        <div className="flex justify-center text-neonBlue">
+          Laddar konsumtionsdata...
+        </div>
       )}
       {apartmentConsumptionError && (
         <div className="bg-gray-900 text-white">
@@ -214,22 +237,17 @@ export default function ApartmentScreen() {
       {/* Diagram och Statistik */}
       <div className="bg-gradient-to-r from-midNightBlue to-darkBg">
         {/* Knappmeny för att välja visning */}
-        <div className="flex justify-center space-x-4 my-6 text-">
-          {[
-            { key: "temperature", label: "Temperatur" },
-            { key: "electricity", label: "Elförbrukning" },
-            { key: "hotWater", label: "Varmvattenförbrukning" },
-            { key: "monthlyStatistics", label: "Månadsstatistik" },
-          ].map(({ key, label }) => (
+        <div className="flex justify-center space-x-4 my-6">
+          {views.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setActiveView(key)}
               className={`px-6 py-3 font-semibold rounded-md transition-all duration-300 shadow-sm 
-          ${
-            activeView === key
-              ? "bg-neonBlue text-white shadow-neonBlue"
-              : "bg-darkBgLight text-neonBlue hover:bg-neonBlue hover:text-white hover:shadow-neonBlue"
-          }`}
+        ${
+          activeView === key
+            ? "bg-neonBlue text-white shadow-neonBlue"
+            : "bg-darkBgLight text-neonBlue hover:bg-neonBlue hover:text-white hover:shadow-neonBlue"
+        }`}
             >
               {label}
             </button>

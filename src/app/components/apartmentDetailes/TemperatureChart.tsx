@@ -8,9 +8,6 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  defs,
-  linearGradient,
-  stop,
 } from "recharts";
 import { BatchSensorDataResponse } from "@/features/models/sensor-data";
 import moment from "moment"; // Importera moment.js för att formatera X-axeln och Tooltip
@@ -22,8 +19,7 @@ interface Props {
 }
 
 export default function TemperatureChart({ batchData }: Props) {
-  if (!batchData)
-    return <div className="text-white">Ingen temperaturdata tillgänglig</div>;
+  if (!batchData) return <div className="text-white"></div>;
 
   // Filtrera ut alla GT_GM-sensorer
   const allSensors = batchData.flatMap((res) => res.sensor_data);

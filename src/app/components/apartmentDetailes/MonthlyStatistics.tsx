@@ -18,7 +18,7 @@ interface Props {
 interface Entry {
   year: number;
   month: number;
-  v_name: "IEM" | "IIAT" | "IHTWM";
+  v_name: string;
   diff?: number;
   average?: number;
   u_name: string;
@@ -37,6 +37,8 @@ interface TableRowData {
   key: string;
   year: string;
   month: string;
+  yearNumber: number;
+  monthNumber: number;
   iem: string;
   iiat: string;
   ihtwm: string;
@@ -76,6 +78,8 @@ const MonthlyStatistics: React.FC<Props> = ({ data, loading, error }) => {
       month: new Date(entry.year, entry.month - 1).toLocaleString("default", {
         month: "long",
       }),
+      yearNumber: entry.year,
+      monthNumber: entry.month,
       iem: entry.iem
         ? `${parseFloat((entry.iem.diff ?? 0).toFixed(2))} ${entry.iem.u_name}`
         : "N/A",
@@ -90,12 +94,14 @@ const MonthlyStatistics: React.FC<Props> = ({ data, loading, error }) => {
           }`
         : "N/A",
     }))
+
     .reverse()
     .sort(
       (a, b) =>
-        new Date(b.year, b.month, 1).getTime() -
-        new Date(a.year, a.month, 1).getTime()
+        new Date(b.yearNumber, b.monthNumber - 1).getTime() -
+        new Date(a.yearNumber, a.monthNumber - 1).getTime()
     )
+
     .slice(0, 18);
 
   return (
