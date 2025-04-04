@@ -40,15 +40,13 @@ export default function ApartmentComp() {
     }
   }, [sensorDomainId, dispatch]);
 
-  // console.log("Summarystat ", summaryStatistics);
-
   if (summaryLoading || isLoading) {
     return <div>Laddar...</div>;
   }
 
   // Här renderar vi inget om summaryStatistics är null eller tomt
   if (!summaryStatistics || Object.keys(summaryStatistics).length === 0) {
-    return null; // Här gör vi bara en kortslutning, inget kommer att renderas
+    return null; 
   }
 
   return (

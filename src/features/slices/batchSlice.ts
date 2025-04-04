@@ -34,10 +34,16 @@ const sensorDataSlice = createSlice({
       })
 
       .addCase(fetchBatchSensorData.fulfilled, (state, action) => {
-        const { meta, payload } = action;
+        const { payload } = action;
+
+        if (!Array.isArray(payload)) return; // Skyddar mot undefined/null payload
 
         payload.forEach((batch: BatchSensorDataResponse) => {
+          if (!batch.sensor_data || !Array.isArray(batch.sensor_data)) return; // Skyddar mot undefined/null sensor_data
+
           batch.sensor_data.forEach((sensor) => {
+            if (!sensor || !sensor.id || !Array.isArray(sensor.data)) return; // Skyddar mot undefined/null sensor eller sensor.data
+
             if (!state.sensors[sensor.id]) {
               state.sensors[sensor.id] = {
                 sensorData: [],
@@ -52,6 +58,8 @@ const sensorDataSlice = createSlice({
             const mergedData = [...existingData];
 
             newData.forEach((newPoint) => {
+              if (!newPoint || newPoint.time_utc == null) return; // Skyddar mot undefined/null newPoint
+
               const exists = existingData.some(
                 (oldPoint) => oldPoint.time_utc === newPoint.time_utc
               );
@@ -66,7 +74,6 @@ const sensorDataSlice = createSlice({
           });
         });
       })
-
       .addCase(fetchBatchSensorData.rejected, (state, action) => {
         const { meta } = action;
         meta.arg.sensorIds.forEach((sensorId) => {

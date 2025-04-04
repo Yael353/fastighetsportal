@@ -21,9 +21,11 @@ export const fetchEnergyFlux = createAsyncThunk<
         { method: "GET" },
         dispatch
       );
-      if (response.status === 404) {
-        console.warn("Energy flux not found (404)");
-        return null;
+      if (!response.ok) {
+        if (response.status === 404) {
+          console.warn(`404: No data found for this object`);
+          return null;
+        }
       }
       if (response.status === 403) {
         throw new RESPONSE_403("Åtkomst nekad");

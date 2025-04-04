@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "next/navigation";
-import { RootState } from "@/features/store/store";
+import { AppDispatch, RootState } from "@/features/store/store";
 import { fetchBuildings } from "@/features/thunks/fetchSensors";
 import {
   ApartmentResponse,
@@ -14,7 +14,8 @@ import Link from "next/link";
 
 export default function ApartmentsCards() {
   const { id } = useParams();
-  const dispatch = useDispatch();
+  const buildingId = Array.isArray(id) ? id[0] : id ?? "";
+  const dispatch = useDispatch<AppDispatch>();
 
   const {
     data: buildingsData,
@@ -27,7 +28,7 @@ export default function ApartmentsCards() {
   const apartmentsPerPage = 9;
 
   useEffect(() => {
-    dispatch(fetchBuildings({ id }));
+    dispatch(fetchBuildings({ id: buildingId }));
   }, [id, dispatch]);
 
   if (loading) {
