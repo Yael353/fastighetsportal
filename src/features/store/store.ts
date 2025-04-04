@@ -9,6 +9,7 @@ import summaryStatisticsReducer from "../slices/summaryStatisticsSlice";
 import algoConfigReducer from "../slices/algoConfigSlice";
 import monthlyStatisticsReducer from "../slices/monthlyStatisticsSlice";
 import energyFluxReducer from "../slices/energyFluxSlice";
+import chartsSensorReducer from "../slices/chartsSensorSlice";
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
     algoConfig: algoConfigReducer,
     monthlyStatistics: monthlyStatisticsReducer,
     energyFlux: energyFluxReducer,
+    chartsSensorData: chartsSensorReducer,
   },
 });
 
