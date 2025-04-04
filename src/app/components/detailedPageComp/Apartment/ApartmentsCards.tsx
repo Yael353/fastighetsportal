@@ -92,6 +92,10 @@ export default function ApartmentsCards() {
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   };
 
+  if (!apartments || apartments.length === 0) {
+    return null;
+  }
+
   return (
     <div className="space-y-6 py-10 bg-darkBg rounded-lg">
       {/* Sökfält */}
@@ -109,30 +113,24 @@ export default function ApartmentsCards() {
 
       {/* Lägenhetskort */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 py-10">
-        {currentApartments.length > 0 ? (
-          currentApartments.map((apartment: ApartmentResponse) => (
-            <div
-              key={apartment.apt_id}
-              className="border border-neonBlue bg-darkBgLight hover:bg-transparent p-4 rounded-lg shadow-sm shadow-neonBlue/50 transition-transform transform hover:scale-105"
+        {currentApartments.map((apartment: ApartmentResponse) => (
+          <div
+            key={apartment.apt_id}
+            className="border border-neonBlue bg-darkBgLight hover:bg-transparent p-4 rounded-lg shadow-sm shadow-neonBlue/50 transition-transform transform hover:scale-105"
+          >
+            <Link
+              href={`/dashboard/detailedPage/${id}/singleApartment/${apartment.apt_id}`}
+              className="block h-full w-full text-center"
             >
-              <Link
-                href={`/dashboard/detailedPage/${id}/singleApartment/${apartment.apt_id}`}
-                className="block h-full w-full text-center"
-              >
-                <h2 className="text-2xl font-bold mb-2 text-neonBlue">
-                  Lgh: {apartment.apt_id}
-                </h2>
-                <p className="text-gray-300">
-                  {apartment.size_type} - {apartment.size_kvm} kvm
-                </p>
-              </Link>
-            </div>
-          ))
-        ) : (
-          <div className="col-span-full text-center bg-darkBg text-neonBlue">
-            Data om lägenhter för detta objekt saknas.
+              <h2 className="text-2xl font-bold mb-2 text-neonBlue">
+                Lgh: {apartment.apt_id}
+              </h2>
+              <p className="text-gray-300">
+                {apartment.size_type} - {apartment.size_kvm} kvm
+              </p>
+            </Link>
           </div>
-        )}
+        ))}
       </div>
 
       {/* Pagination */}

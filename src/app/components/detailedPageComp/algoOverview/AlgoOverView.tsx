@@ -138,11 +138,7 @@ const AlgoOverView = ({ controllerId }: AlgoOverviewProps) => {
     (!algoConfig && !energyFlux);
 
   if (showNotFound) {
-    return (
-      <div className="flex justify-center text-orange-400">
-        Ingen konfiguration hittades...
-      </div>
-    );
+    return null;
   }
 
   return (
