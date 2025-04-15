@@ -22,7 +22,7 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/features/store/store";
 import { BatchSensorDataFreq, Sensor } from "@/features/models/sensor-data";
-import { fetchBatchSensorData } from "@/features/thunks/fetchSensors";
+import { fetchChartSensorData } from "@/features/thunks/chartFetch";
 
 interface ApartmentCompProps {
   id: string;
@@ -86,9 +86,8 @@ const formatChartDataTime = (data: ChartDataPoint[]): ChartDataPoint[] => {
 const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
   const dispatch = useDispatch<AppDispatch>();
   const sensorDomain = useSelector((state: RootState) => state.property.data);
-  const sensorsState = useSelector(
-    (state: RootState) => state.sensorData.sensors
-  );
+  const sensorsState = useSelector((state: RootState) => state.chartsSensorData.sensors);
+
   const [selectedDays, setSelectedDays] = useState(1);
 
   const filterSensors = (name: string): Sensor[] => {
@@ -185,12 +184,12 @@ const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
     if (sensorIds.length === 0) return;
 
     dispatch(
-      fetchBatchSensorData({
+      fetchChartSensorData({
         sensorDomainId: sensorDomain.id,
         sensorIds,
         startUtc: moment().utc().subtract(selectedDays, "days"),
         endUtc: moment().utc(),
-        freq: BatchSensorDataFreq.raw,
+        freq: selectedDays === 1 ? BatchSensorDataFreq.raw : BatchSensorDataFreq.hour,
       })
     );
   }, [
