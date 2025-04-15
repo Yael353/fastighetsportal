@@ -24,6 +24,8 @@ export default function DetailedPageHeader() {
     return <p>Ogiltigt ID: {JSON.stringify(id)}</p>;
   }
 
+  const loading = useSelector((state: RootState) => state.property.loading);
+
   // 🆕 Hämta sensordata och undercentraler
   const {
     sensorList,
@@ -61,7 +63,11 @@ export default function DetailedPageHeader() {
       <Card className="bg-darkBg border-none p-4">
         <div className="flex items-center justify-center mt-4 gap-5">
           <CardTitle className="text-5xl bg-darkBg font-bold text-white tracking-wide first-letter:uppercase">
-            {propertyName}
+            {loading ? (
+              <Loader2 className="inline h-6 w-6 animate-spin text-blue-500" />
+            ) : (
+              propertyName
+            )}
           </CardTitle>
           <FaHome size={48} />
         </div>
@@ -70,7 +76,11 @@ export default function DetailedPageHeader() {
       {/* 🆕 Tabs för undercentraler */}
       {controllers.length > 1 && (
         <div className="flex w-full justify-center py-2">
-          <Tabs className="justify-center" value={selectedControllerId} onValueChange={handleTabChange}>
+          <Tabs
+            className="justify-center"
+            value={selectedControllerId}
+            onValueChange={handleTabChange}
+          >
             <TabsList className="flex bg-darkBg gap-2 p-1 rounded-lg">
               {controllers.map((controller, index) => (
                 <TabsTrigger
@@ -106,39 +116,37 @@ export default function DetailedPageHeader() {
               </div>
             </div>
             <div className="w-[130px] 2xl:w-[300px]">
-            
               <ChartContainer className="h-16 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={data}>
-                  <Line
-                    type="monotone"
-                    dataKey="value"
-                    stroke="#00699f"
-                    strokeWidth={3}
-                    dot={false}
-                  />
-                  <YAxis hide />
-                  <Tooltip
-                    content={({ payload }) => {
-                      if (!payload || payload.length === 0) {
-                        return null;
-                      }
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={data}>
+                    <Line
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#00699f"
+                      strokeWidth={3}
+                      dot={false}
+                    />
+                    <YAxis hide />
+                    <Tooltip
+                      content={({ payload }) => {
+                        if (!payload || payload.length === 0) {
+                          return null;
+                        }
 
-                      const value = payload[0]?.value;
+                        const value = payload[0]?.value;
 
-                      return (
-                        <div className="bg-[#0A192F] border border-blue-500 rounded-md p-2 text-white text-sm shadow-lg">
-                          {typeof value === "number"
-                            ? `${value.toFixed(2)} °C`
-                            : value}
-                        </div>
-                      );
-                    }}
-                  />
-                </LineChart>
+                        return (
+                          <div className="bg-[#0A192F] border border-blue-500 rounded-md p-2 text-white text-sm shadow-lg">
+                            {typeof value === "number"
+                              ? `${value.toFixed(2)} °C`
+                              : value}
+                          </div>
+                        );
+                      }}
+                    />
+                  </LineChart>
                 </ResponsiveContainer>
               </ChartContainer>
-              
             </div>
           </Card>
         ))}
