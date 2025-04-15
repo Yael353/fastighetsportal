@@ -255,7 +255,7 @@ export default function ApartmentScreen() {
         </div>
 
         {/* Rendera endast den valda vyn */}
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center w-[1400px] mx-auto">
           {activeView === "temperature" && (
             <div className="w-[80%]  p-6 rounded-lg ">
               <h3 className="text-lg flex justify-center font-semibold text-white mb-4">

@@ -142,8 +142,8 @@ const AlgoOverView = ({ controllerId }: AlgoOverviewProps) => {
   }
 
   return (
-    <div className="rounded-lg bg-darkBg border border-neonBlue p-6 w-full flex flex-col">
-      <div className="flex flex-row gap-8">
+    <div className="rounded-lg bg-darkBg border border-neonBlue p-6 w-fit mx-auto flex flex-col">
+      <div className="flex flex-col gap-8 p-10">
         {algoConfig && (
           <Section
             type="algo"
@@ -213,7 +213,7 @@ const Section = React.memo(
       {config === null ? (
         <div className="text-yellow-500 text-center py-4">Data saknas</div>
       ) : hasData ? (
-        <div className="space-y-4">
+        <div className="flex gap-10">
           {editableFields.map((key: string) => (
             <InputField
               key={`${type}-${key}`}
