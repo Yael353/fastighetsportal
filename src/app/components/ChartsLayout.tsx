@@ -1,7 +1,10 @@
+"use client";
+
 import React, { useEffect, useState, useMemo } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";
 import moment from "moment";
+import { Loader2 } from "lucide-react";
 import {
   LineChart,
   Line,
@@ -23,6 +26,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/features/store/store";
 import { BatchSensorDataFreq, Sensor } from "@/features/models/sensor-data";
 import { fetchChartSensorData } from "@/features/thunks/chartFetch";
+import { resetChartsData } from "@/features/slices/chartsSensorSlice";
 
 interface ApartmentCompProps {
   id: string;
@@ -86,7 +90,11 @@ const formatChartDataTime = (data: ChartDataPoint[]): ChartDataPoint[] => {
 const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
   const dispatch = useDispatch<AppDispatch>();
   const sensorDomain = useSelector((state: RootState) => state.property.data);
-  const sensorsState = useSelector((state: RootState) => state.chartsSensorData.sensors);
+  const sensorsState = useSelector(
+    (state: RootState) => state.chartsSensorData.sensors
+  );
+  const isSensorDomainReady = sensorDomain && sensorDomain.sensors?.length > 0;
+
 
   const [selectedDays, setSelectedDays] = useState(1);
 
@@ -170,18 +178,25 @@ const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
     return formatChartDataTime(merged);
   }, [chartDataFWT, chartDataRWT]);
 
+  const sensorIds = useMemo(() => {
+    return [...filteredOAT, ...filteredIAT, ...filteredFWT, ...filteredRWT].map(
+      (s) => s.id
+    );
+  }, [filteredOAT, filteredIAT, filteredFWT, filteredRWT]);
+
+  // 🧹 Rensa graf-datan direkt vid mount, så ingen gammal data visas först
   useEffect(() => {
-    if (!sensorDomain) return;
+    dispatch(resetChartsData());
+  }, [dispatch, id]);
 
-    const allSensors = [
-      ...filteredOAT,
-      ...filteredIAT,
-      ...filteredFWT,
-      ...filteredRWT,
-    ];
-    const sensorIds = allSensors.map((s) => s.id);
+  useEffect(() => {
+    if (!sensorDomain || sensorIds.length === 0) return;
 
-    if (sensorIds.length === 0) return;
+    // console.log("[🧠 FETCH TRIGGER]", {
+    //   selectedDays,
+    //   sensorIds,
+    //   domainId: sensorDomain.id,
+    // });
 
     dispatch(
       fetchChartSensorData({
@@ -189,34 +204,35 @@ const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
         sensorIds,
         startUtc: moment().utc().subtract(selectedDays, "days"),
         endUtc: moment().utc(),
-        freq: selectedDays === 1 ? BatchSensorDataFreq.raw : BatchSensorDataFreq.hour,
+        freq:
+          selectedDays === 1
+            ? BatchSensorDataFreq.raw
+            : BatchSensorDataFreq.hour,
       })
     );
   }, [
     dispatch,
-    sensorDomain,
-    filteredOAT,
-    filteredIAT,
-    filteredFWT,
-    filteredRWT,
+    sensorDomain?.id, // 👈 stabil referens
     selectedDays,
+    sensorIds.join(","), // 👈 detta gör array till stabil sträng
+    isSensorDomainReady
   ]);
 
   const DelayedChart = () => {
-    const [show, setShow] = useState(false);
-    const chartData = useMemo(() => mergedChartDataOAT_IAT, []);
-    const oatSensors = useMemo(() => filteredOAT, []);
-    const iatSensors = useMemo(() => filteredIAT, []);
+    const chartData = mergedChartDataOAT_IAT;
+    const oatSensors = filteredOAT;
+    const iatSensors = filteredIAT;
 
-    useEffect(() => {
-      const timer = setTimeout(() => {
-        setShow(true);
-      }, 300);
-      return () => clearTimeout(timer);
-    }, []);
+    const isLoading = useSelector(
+      (state: RootState) => state.chartsSensorData.loading
+    );
 
-    if (!show) {
-      return <div style={{ width: "100%", height: "350px" }} />;
+    if (isLoading) {
+      return (
+        <div className="w-full h-[350px] flex justify-center items-center">
+          <Loader2 className="w-6 h-6 text-neonBlue animate-spin" />
+        </div>
+      );
     }
 
     return (
@@ -345,8 +361,16 @@ const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
     );
   };
 
+  if (!isSensorDomainReady) {
   return (
-    <div className="w-[90%] place-self-center p-6 rounded-lg relative">
+    <div className="w-full h-[350px] flex justify-center items-center">
+      <Loader2 className="w-6 h-6 text-neonBlue animate-spin" />
+    </div>
+  );
+}
+
+  return (
+    <div className="w-[80%] place-self-center p-6 rounded-lg relative">
       <Carousel className="w-full">
         <CarouselContent>
           <CarouselItem>
@@ -362,12 +386,7 @@ const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
                   },
                 }}
               >
-                {typeof window !== "undefined" &&
-                typeof document !== "undefined" ? (
-                  <DelayedChart />
-                ) : (
-                  <div style={{ width: "100%", height: "350px" }} />
-                )}
+                <DelayedChart />
               </ChartContainer>
             </div>
           </CarouselItem>

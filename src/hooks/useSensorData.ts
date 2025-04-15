@@ -71,6 +71,11 @@ export const useSensorData = (id: string) => {
     });
   }, [sensorDomain, selectedControllerId]);
 
+  const sensorIds = useMemo(() => {
+    return filteredSensors.map((sensor) => sensor.id);
+  }, [filteredSensors]);
+  
+
   // ✅ Hämta sensorDomain om det saknas
   useEffect(() => {
     if (!sensorDomain) {
@@ -79,11 +84,14 @@ export const useSensorData = (id: string) => {
   }, [dispatch, sensorDomain, id]);
 
   useEffect(() => {
-    if (!sensorDomain || !selectedControllerId) return;
-
-    const sensorIds = filteredSensors.map((sensor) => sensor.id);
-    if (sensorIds.length === 0) return;
-
+    if (!sensorDomain || !selectedControllerId || sensorIds.length === 0) return;
+  
+    // console.log("[🧠 SENSOR FETCH TRIGGER]", {
+    //   controller: selectedControllerId,
+    //   sensorIds,
+    //   domainId: sensorDomain.id,
+    // });
+  
     dispatch(
       fetchBatchSensorData({
         sensorDomainId: sensorDomain.id,
@@ -93,7 +101,13 @@ export const useSensorData = (id: string) => {
         freq: BatchSensorDataFreq.raw,
       })
     );
-  }, [dispatch, sensorDomain, filteredSensors, selectedControllerId]);
+  }, [
+    dispatch,
+    sensorDomain?.id,
+    selectedControllerId,
+    sensorIds.join(","), // stabil dependency
+  ]);
+  
 
   // ✅ Funktion för att hämta senaste värdet från en sensor
   const getLatestValue = (sensorId: string) => {
