@@ -58,14 +58,14 @@ export function PropertyList() {
     window.scrollTo(0, 0);
   };
 
-  // Skapa en array med sidnummer
+  
   const getPageNumbers = () => {
     const pages = [];
-    const maxPagesToShow = 5; // Max antal sidnummer som visas samtidigt
+    const maxPagesToShow = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
     let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
 
-    // Justera startPage om vi närmar oss slutet
+  
     if (endPage - startPage + 1 < maxPagesToShow) {
       startPage = Math.max(1, endPage - maxPagesToShow + 1);
     }

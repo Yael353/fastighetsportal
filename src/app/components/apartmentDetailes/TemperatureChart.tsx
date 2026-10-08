@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { BatchSensorDataResponse } from "@/features/models/sensor-data";
-import moment from "moment"; // Importera moment.js för att formatera X-axeln och Tooltip
+import moment from "moment";
 import { formatData } from "@/utils/date";
 import { ChartContainer } from "@/components/ui/chart";
 

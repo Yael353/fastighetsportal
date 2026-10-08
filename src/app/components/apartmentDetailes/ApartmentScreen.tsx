@@ -236,7 +236,6 @@ export default function ApartmentScreen() {
 
       {/* Diagram och Statistik */}
       <div className="bg-gradient-to-r from-midNightBlue to-darkBg">
-        {/* Knappmeny för att välja visning */}
         <div className="flex justify-center space-x-4 my-6">
           {views.map(({ key, label }) => (
             <button

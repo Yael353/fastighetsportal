@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import DetailedPageHeader from "@/app/components/detailedPageComp/DetailedPageHeader";
 import SensorDataComp from "@/app/components/detailedPageComp/SensorDataComp";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/features/store/store";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/features/store/store";
 import { useParams } from "next/navigation";
 import { getAuthToken } from "@/utils/auth";
 import { fetchSensorDomain } from "@/features/thunks/fetchSensors";

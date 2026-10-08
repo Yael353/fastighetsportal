@@ -8,14 +8,14 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { BatchSensorDataResponse } from "@/features/models/sensor-data";
-import moment from "moment"; // Importera moment.js för att formatera tidsaxeln
+import moment from "moment"; 
 import { formatData } from "@/utils/date";
 import { calculateDifferences } from "@/utils/sensors";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"; // Importera komponenter från chart.tsx
+} from "@/components/ui/chart"; 
 
 interface Props {
   batchData: BatchSensorDataResponse[] | null;

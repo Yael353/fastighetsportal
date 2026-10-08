@@ -25,7 +25,6 @@ const initialState: AuthState = {
   hasInitiatedLocalAccount: false,
 };
 
-// AsyncThunk för att hämta autentisering från servern.
 export const authenticateUser = createAsyncThunk<
   AuthResponse,
   AuthCredentials,
@@ -59,7 +58,7 @@ const authSlice = createSlice({
     login: (state, action: PayloadAction<AuthResponse>) => {
       state.isLoggedIn = true;
       state.account = action.payload.account;
-      state.token = { accessToken: action.payload.access_token }; // Konverterar till AccessTokenData
+      state.token = { accessToken: action.payload.access_token }; 
 
       if (typeof window !== "undefined") {
         localStorage.setItem(
@@ -91,7 +90,7 @@ const authSlice = createSlice({
         const account = localStorage.getItem("account");
 
         if (token && account) {
-          state.token = { accessToken: token }; // Konverterar till AccessTokenData
+          state.token = { accessToken: token };
           state.account = JSON.parse(account);
           state.isLoggedIn = true;
         } else {
@@ -112,7 +111,7 @@ const authSlice = createSlice({
           state.loading = false;
           state.isLoggedIn = true;
           state.account = action.payload.account;
-          state.token = { accessToken: action.payload.access_token }; // Konverterar till AccessTokenData
+          state.token = { accessToken: action.payload.access_token };
 
           if (typeof window !== "undefined") {
             localStorage.setItem("accessToken", action.payload.access_token);
@@ -126,6 +125,7 @@ const authSlice = createSlice({
       .addCase(
         authenticateUser.rejected,
         (state, action: PayloadAction<any>) => {
+          console.log("Felmeddelande från rejectWithValue:", action.payload);
           state.loading = false;
           state.error = action.payload;
           state.isLoggedIn = false;

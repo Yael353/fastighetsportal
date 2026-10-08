@@ -1,5 +1,3 @@
-// utils/paginator.ts
-
 /**
  * Delar upp en array i mindre batcher baserat på angiven storlek.
  * @param array Arrayen som ska delas upp

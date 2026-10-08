@@ -97,13 +97,12 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   // När sessionen har löpt ut, visa ett meddelande och omdirigera efter kort stund
   useEffect(() => {
     if (sessionExpired) {
-      // Här kan du visa ett meddelande på sidan istället för en alert
       const timeout = setTimeout(() => {
         localStorage.removeItem("accessToken");
         localStorage.setItem("logoutEvent", Date.now().toString());
         router.replace("/");
         router.refresh();
-      }, 3000); // t.ex. 3 sekunder innan omdirigering
+      }, 3000);
       return () => clearTimeout(timeout);
     }
   }, [sessionExpired, router]);

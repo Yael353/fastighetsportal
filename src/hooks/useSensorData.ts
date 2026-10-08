@@ -10,16 +10,16 @@ import { Loader2 } from "lucide-react";
 export const useSensorData = (id: string) => {
   const dispatch = useDispatch<AppDispatch>();
 
-  // ✅ Hämta sensor-domain från Redux-storen
+  // Hämta sensor-domain från Redux-storen
   const sensorDomain = useSelector((state: RootState) => state.property.data);
   const sensorsState = useSelector(
     (state: RootState) => state.sensorData.sensors
   );
 
-  // 🏠 ✅ Hämta husets namn
+  // Hämta husets namn
   const propertyName = sensorDomain?.name || "Invänta hus";
 
-  // ✅ Hitta alla unika undercentraler (DUCs) med minst 1 relevant sensor
+  // Hitta alla unika undercentraler (DUCs) med minst 1 relevant sensor
   const controllers = useMemo(() => {
     if (!sensorDomain?.sensors) return [];
 
@@ -42,19 +42,19 @@ export const useSensorData = (id: string) => {
     return Array.from(controllersSet);
   }, [sensorDomain]);
 
-  // ✅ State för vald undercentral
+  // State för vald undercentral
   const [selectedControllerId, setSelectedControllerId] = useState<
     string | null
   >(null);
 
-  // ✅ När vi får controllers, välj den första som default
+  // När vi får controllers, välj den första som default
   useEffect(() => {
     if (controllers.length > 0 && !selectedControllerId) {
       setSelectedControllerId(controllers[0]);
     }
   }, [controllers, selectedControllerId]);
 
-  // ✅ Filtrera sensorer för vald undercentral
+  // Filtrera sensorer för vald undercentral
   const filteredSensors = useMemo(() => {
     if (!sensorDomain?.sensors || !selectedControllerId) return [];
 
@@ -76,7 +76,7 @@ export const useSensorData = (id: string) => {
   }, [filteredSensors]);
   
 
-  // ✅ Hämta sensorDomain om det saknas
+  // Hämta sensorDomain om det saknas
   useEffect(() => {
     if (!sensorDomain) {
       dispatch(fetchSensorDomain({ id }));
@@ -85,13 +85,7 @@ export const useSensorData = (id: string) => {
 
   useEffect(() => {
     if (!sensorDomain || !selectedControllerId || sensorIds.length === 0) return;
-  
-    // console.log("[🧠 SENSOR FETCH TRIGGER]", {
-    //   controller: selectedControllerId,
-    //   sensorIds,
-    //   domainId: sensorDomain.id,
-    // });
-  
+
     dispatch(
       fetchBatchSensorData({
         sensorDomainId: sensorDomain.id,
@@ -105,11 +99,11 @@ export const useSensorData = (id: string) => {
     dispatch,
     sensorDomain?.id,
     selectedControllerId,
-    sensorIds.join(","), // stabil dependency
+    sensorIds.join(","), 
   ]);
   
 
-  // ✅ Funktion för att hämta senaste värdet från en sensor
+  // Funktion för att hämta senaste värdet från en sensor
   const getLatestValue = (sensorId: string) => {
     const sensorData = sensorsState[sensorId]?.sensorData || [];
     return sensorData.length > 0
@@ -117,12 +111,12 @@ export const useSensorData = (id: string) => {
       : null;
   };
 
-  // ✅ Funktion för att hämta senaste datan för en sensor
+  // Funktion för att hämta senaste datan för en sensor
   const getChartData = (sensorId: string) => {
     return sensorsState[sensorId]?.sensorData || [];
   };
 
-  // ✅ Skapa en lista med all sensor-information
+  // Skapa en lista med all sensor-information
   const sensorList = filteredSensors.map((sensor) => ({
     title: sensor.vala_description.name_long || sensor.vala_description.name,
     value: getLatestValue(sensor.id),

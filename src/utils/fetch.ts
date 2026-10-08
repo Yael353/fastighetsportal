@@ -12,7 +12,7 @@ export const authFetch = async (
 
   if (!token) {
     dispatch(logout());
-    throw new Error("No access token. You have been logged out.");
+    throw new Error("Du har loggats ut");
   }
 
   const expiresAt = Number(localStorage.getItem("expiresAt")) || 0;

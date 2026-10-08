@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";
 import moment from "moment";
 import { Loader2 } from "lucide-react";
@@ -110,12 +109,12 @@ const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
       return summationSensor ? [summationSensor] : [];
     }
 
-    // För FWT och RWT: plocka bara första sensorn
+    // För FWT och RWT
     if (name === "FWT" || name === "RWT") {
       return sensors.length > 0 ? [sensors[0]] : [];
     }
 
-    // För OAT: visa alla (om du vill filtrera även här kan vi göra det)
+    // För OAT: visa alla
     return sensors;
   };
 
@@ -184,19 +183,13 @@ const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
     );
   }, [filteredOAT, filteredIAT, filteredFWT, filteredRWT]);
 
-  // 🧹 Rensa graf-datan direkt vid mount, så ingen gammal data visas först
+  // Rensa graf-datan direkt vid mount
   useEffect(() => {
     dispatch(resetChartsData());
   }, [dispatch, id]);
 
   useEffect(() => {
     if (!sensorDomain || sensorIds.length === 0) return;
-
-    // console.log("[🧠 FETCH TRIGGER]", {
-    //   selectedDays,
-    //   sensorIds,
-    //   domainId: sensorDomain.id,
-    // });
 
     dispatch(
       fetchChartSensorData({
@@ -212,9 +205,9 @@ const ChartsLayout: React.FC<ApartmentCompProps> = ({ id }) => {
     );
   }, [
     dispatch,
-    sensorDomain?.id, // 👈 stabil referens
+    sensorDomain?.id,
     selectedDays,
-    sensorIds.join(","), // 👈 detta gör array till stabil sträng
+    sensorIds.join(","),
     isSensorDomainReady
   ]);
 
