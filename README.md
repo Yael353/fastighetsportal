@@ -30,8 +30,8 @@ sensorer och energiförbrukning via interaktiva diagram och tabeller.
 
 ### Dashboard med realtidsövervakning
 
-![Dashboard](screenshots/temp.png)
+![Temperature](screenshots/temp.png)
 
 ### Historisk analys
 
-![Historik](screenshots/monthly-statistics.png)
+![Historisk-översyn](screenshots/monthly-statistics.png)
