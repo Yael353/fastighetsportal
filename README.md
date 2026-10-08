@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Webbportal – Fastighetsförvaltning
 
-## Getting Started
+En frontend-portal för fastighetsförvaltning byggd med Next.js, TypeScript
+och Redux. Portalen ger förvaltare en komplett översikt över fastigheter,
+sensorer och energiförbrukning via interaktiva diagram och tabeller.
 
-First, run the development server:
+## ✨ Funktioner
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- JWT-baserad autentisering
+- Paginerad, kortbaserad översikt över alla förvaltade fastigheter
+- Realtidsövervakning av sensorer (inomhus-/utomhustemperatur, radiatorer)
+- Interaktiva Chart.js-diagram med anpassningsbara tidsintervall
+- Detaljerad lägenhetsstatistik uppdelad per storlek
+- Drill-down per lägenhet (el, vatten, temperatur)
+- 18 månaders historisk analys i sorterbara tabeller
+- Helt responsivt gränssnitt med smidiga animationer
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠 Teknikstack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Teknik       | Användning        |
+| ------------ | ----------------- |
+| Next.js      | Ramverk           |
+| TypeScript   | Typsäkerhet       |
+| Redux        | State management  |
+| Tailwind CSS | Styling           |
+| Chart.js     | Datavisualisering |
+| JWT          | Autentisering     |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📸 Skärmdumpar
 
-## Learn More
+### Dashboard med realtidsövervakning
 
-To learn more about Next.js, take a look at the following resources:
+![Dashboard](screenshots/temp.png)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Historisk analys
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+![Historik](screenshots/monthly-statistics.png)
