@@ -26,12 +26,3 @@ sensorer och energiförbrukning via interaktiva diagram och tabeller.
 | Chart.js     | Datavisualisering |
 | JWT          | Autentisering     |
 
-## 📸 Skärmdumpar
-
-### Dashboard med realtidsövervakning
-
-![Temperature](screenshots/temp.png)
-
-### Historisk analys
-
-![Historisk-översyn](screenshots/monthly-statistics.png)
